@@ -1,4 +1,8 @@
-import eye
+try:
+    import eye
+except:
+    import eye_mouse as eye
+
 from talon.voice import Word, Context, Key, Rep, Str, press
 
 ctx = Context("eye_control")
