@@ -52,13 +52,21 @@ def idea_num(cmd, drop=1):
 
 
 def idea_range(cmd, drop=1):
-    print("Registered with {}".format(cmd))
 
     def handler(m):
-        print("In handler, m._words={}".format(m._words))
         start, end = text_to_range(m._words[drop:])
         print(cmd.format(start, end))
         send_idea_command(cmd.format(start, end))
+
+    return handler
+
+
+def idea_words(cmd, join=" "):
+
+    def handler(m):
+        args = [str(w) for w in m.dgndictation[0]._words]
+        print(args)
+        send_idea_command(cmd.format(join.join(args)))
 
     return handler
 
@@ -86,30 +94,53 @@ keymap.update(
         "find declaration": idea("action GotoDeclaration"),
         "find (implementers | implementations)": idea("action GotoImplementation"),
         "find type": idea("action GotoTypeDeclaration"),
+        "(find previous | trail) [<dgndictation>]": idea_words("find prev {}"),
+        "(find next | crew) [<dgndictation>]": idea_words("find next {}"),
+        "find [<dgndictation>]": [idea("action SearchEverywhere"), text],
         "surround this [<dgndictation>]": [idea("action SurroundWith"), text],
         "generate code [<dgndictation>]": [idea("action Generate"), text],
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
+        "(select line | shackle)": [
+            idea("action EditorLineStart"), idea("action EditorLineEndWithSelection")
+        ],
         "select block": [
             idea("action EditorCodeBlockStart"),
             idea("action EditorCodeBlockEndWithSelection"),
+        ],
+        "select this line"
+        + optional_numerals: [
+            idea_num("goto {} 9999", drop=3),
+            idea("action EditorLineStartWithSelection"),
         ],
         "select lines {} until {}".format(
             optional_numerals, optional_numerals
         ): idea_range(
             "range {} {}", drop=2
         ),
+        "select until" + optional_numerals: idea_num("extend {}", drop=2),
+        "select just"
+        + optional_numerals: [
+            idea_num("goto {} 0", drop=2), idea("action EditorLineEndWithSelection")
+        ],
+        "go to end of" + optional_numerals: idea_num("goto {} 9999", drop=4),
+        "(clean | clear) line": [
+            idea("action EditorLineEnd"), idea("action EditorDeleteToLineStart")
+        ],
+        "delete line": idea("action EditorDeleteLine"),
+        "delete to end": idea("action EditorDeleteToLineEnd"),
+        "delete to start": idea("action EditorDeleteToLineStart"),
         "drag up": idea("action MoveLineUp"),
         "drag down": idea("action MoveLineDown"),
         "duplicate": idea("action EditorDuplicate"),
-        "baxly": idea("action Back"),
-        "forthly": idea("action Forward"),
+        "go back": idea("action Back"),
+        "go forward": idea("action Forward"),
         "(synchronizing | synchronize)": idea("action Synchronize"),
         "comment": idea("action CommentByLineComment"),
         "command [<dgndictation>]": [idea("action GotoAction"), text],
         "go to" + optional_numerals: idea_num("goto {} 0", drop=2),
-        # "spring " + optional_numerals: idea_num("goto {} 0"),
+        "clone" + optional_numerals: idea_num("clone {}"),
     }
 )
 
