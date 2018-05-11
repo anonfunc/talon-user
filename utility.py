@@ -3,24 +3,44 @@ import string
 from talon.voice import Str
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
+punctuation = set(".,-!?")
 
 
 def parse_word(word):
-    word = word.lstrip("\\").split("\\", 1)[0]
+    word = str(word).lstrip("\\").split("\\", 1)[0]
     word = mapping.get(word, word)
     return word
 
 
+def parse_words(m):
+    return list(map(parse_word, m.dgndictation[0]._words))
+
+
+def join_words(words, sep=" "):
+    out = ""
+    for i, word in enumerate(words):
+        if i > 0 and word not in punctuation:
+            out += sep
+        out += word
+    return out
+
+
+def insert(s):
+    Str(s)(None)
+
+
 def text(m):
-    tmp = [str(s).lower() for s in m.dgndictation[0]._words]
-    words = [parse_word(word) for word in tmp]
-    Str(" ".join(words))(None)
+    insert(join_words(parse_words(m)).lower())
+
+
+def sentence_text(m):
+    text = join_words(parse_words(m)).lower()
+    insert(text.capitalize())
 
 
 def word(m):
-    tmp = [str(s).lower() for s in m.dgnwords[0]._words]
-    words = [parse_word(word) for word in tmp]
-    Str(" ".join(words))(None)
+    text = join_words(list(map(parse_word, m.dgnwords[0]._words)))
+    insert(text.lower())
 
 
 def surround(by):

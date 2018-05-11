@@ -37,7 +37,12 @@ keymap.update(alpha)
 keymap.update(
     {
         "phrase <dgndictation> [over]": text,
-        # 'word <dgnwords>': word,
+        "word <dgnwords>": word,
+        # Dictation
+        "sentence <dgndictation> [over]": sentence_text,
+        "comma <dgndictation> [over]": [", ", text],
+        "period <dgndictation> [over]": [". ", sentence_text],
+        "more <dgndictation> [over]": [" ", text],
         "question [mark]": "?",
         "tilde": "~",
         "(bang | exclamation point)": "!",
@@ -114,10 +119,10 @@ keymap.update(
         "[op] mod equals": " %= ",
         "(op | is) greater [than]": " > ",
         "(op | is) less [than]": " < ",
-        "(op | is) equal to": " == ",
-        "(op | is) not equal to": " != ",
-        "(op | is) greater or equal to": " >= ",
-        "(op | is) less or equal to": " <= ",
+        "(op | is) equal": " == ",
+        "(op | is) not equal": " != ",
+        "(op | is) greater [than] or equal": " >= ",
+        "(op | is) less [than] or equal": " <= ",
         "(op (power | exponent) | to the power [of])": " ** ",
         "op and": " && ",
         "op or": " || ",

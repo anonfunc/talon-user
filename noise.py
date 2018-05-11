@@ -34,8 +34,9 @@ class NoiseModel:
 
     def on_noise(self, noise):
         now = time.time()
-        if noise.startswith('hiss'):
+        if noise.startswith("hiss"):
             return
+
         if noise == "pop":
             ctrl.mouse_click(button=0, hold=16000)
         elif noise == "hiss_start":
