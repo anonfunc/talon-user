@@ -1,5 +1,6 @@
 try:
     from talon import app, voice
+    from talon.voice import Context, ContextGroup, talon
     from talon.api import lib
 
     def set_enabled(enable):
@@ -17,5 +18,16 @@ try:
 
     app.register("menu", on_menu)
     set_enabled(voice.talon.enabled)
+    #
+    sleep_group = ContextGroup("sleepy")
+    sleepy = Context("sleepy", group=sleep_group)
+
+    sleepy.keymap(
+        {
+            "talon sleep": lambda m: set_enabled(False),
+            "talon wake": lambda m: set_enabled(True),
+        }
+    )
+    sleep_group.load()
 except:
     pass

@@ -8,4 +8,4 @@ def on_status(j):
         engine.mimic("go to sleep")
 
 
-engine.register("status", on_status)
+# engine.register("status", on_status)

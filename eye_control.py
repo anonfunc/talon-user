@@ -14,3 +14,8 @@ ctx.keymap(
         "run calibration": lambda m: eye.on_menu("Eye Tracking >> Calibrate"),
     }
 )
+
+try:
+    eye.on_menu("Eye Tracking >> Control Mouse")
+except:
+    pass

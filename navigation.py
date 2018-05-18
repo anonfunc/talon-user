@@ -1,12 +1,13 @@
+import time
 from talon.voice import Context, Key
+from user.utility import text
 
 ctx = Context("navigation")
 
-
 keymap = {
     # Application navigation
-    "launcher": Key("cmd-space"),
-    "swick": Key("cmd-tab"),
+    # XXX delay is janky, wait until alfred focuses?
+    "launcher [<dgndictation>]": [Key("cmd-space"), lambda _: time.sleep(0.4), text],
     "tab close": Key("cmd-w"),
     "window new": Key("cmd-n"),
     "(window next | gibby)": Key("cmd-`"),
@@ -21,18 +22,19 @@ keymap = {
     "snip left": Key("cmd-shift-left delete"),
     "snip right": Key("cmd-shift-right delete"),
     "slurp": Key("backspace delete"),
-    "trough": Key("alt-backspace"),
+    "delete [last] word": Key("alt-backspace"),
+    "delete next word": Key("alt-delete"),
     # moving
-    "(tab | tarp)": Key("tab"),
-    "tarsh": Key("shift-tab"),
+    "(tab | tarp | indent)": Key("tab"),
+    "(dedent | didn't | tarsh)": Key("shift-tab"),
     "slap": [Key("cmd-right enter")],
     # 'shocker': [Key('cmd-left enter up')],
     # 'wonkrim': Key('alt-ctrl-left'),
     # 'wonkrish': Key('alt-ctrl-right'),
-    "fame": Key("alt-left"),
+    "(leftward | left word)": Key("alt-left"),
     # 'locky soup': [Key('alt-left'),Key('alt-left')],
     # 'locky trace': [Key('alt-left'),Key('alt-left'),Key('alt-left')],
-    "fish": Key("alt-right"),
+    "(rightward | right word)": Key("alt-right"),
     "ricky": Key("cmd-right"),
     "lefty": Key("cmd-left"),
     "(left | crimp)": Key("left"),
@@ -40,9 +42,9 @@ keymap = {
     "jeep": Key("up"),
     "(down | dune | doom)": Key("down"),
     # selecting
-    "snatch": Key("cmd-x"),
-    "stoosh": Key("cmd-c"),
-    "spark": Key("cmd-v"),
+    "(snatch | cut this)": Key("cmd-x"),
+    "(stoosh | copy this)": Key("cmd-c"),
+    "(spark | paste here)": Key("cmd-v"),
     "shreepway": Key("cmd-shift-up"),
     "shroomway": Key("cmd-shift-down"),
     "shreep": Key("shift-up"),

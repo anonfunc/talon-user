@@ -7,7 +7,7 @@ import string
 from user.utility import *
 
 alpha_alt = (
-    "air bat cap die each fail gone harm ice jury crash look "
+    "air bat cap die each fail gone harm sit jury crash look "
     "mad near odd pit quest red sun trap urge vest whale box yes zip"
 ).split()
 alnum = list(zip(alpha_alt, string.ascii_lowercase)) + [
@@ -36,9 +36,10 @@ keymap = {}
 keymap.update(alpha)
 keymap.update(
     {
-        "phrase <dgndictation> [over]": text,
-        "word <dgnwords>": word,
+        "(phrase | oh) <dgndictation> [over]": text,
+        # "word <dgnwords>": word,
         # Dictation
+        #
         "sentence <dgndictation> [over]": sentence_text,
         "comma <dgndictation> [over]": [", ", text],
         "period <dgndictation> [over]": [". ", sentence_text],
@@ -94,11 +95,11 @@ keymap.update(
         # "run jobs": "jobs\n",
         # "const": "const ",
         # "static": "static ",
-        "args": ["()", Key("left")],
+        "(args | arguments)": ["()", Key("left")],
         "index": ["[]", Key("left")],
         "block": [" {}", Key("left enter enter up tab")],
         "empty array": "[]",
-        "empty dict": "{}",
+        "(empty dict | empty dictionary)": "{}",
         "equals": "=",
         "(minus | dash)": "-",
         "plus": "+",
@@ -147,8 +148,8 @@ keymap.update(
         "last tab": Key("ctrl-shift-tab"),
         "next space": Key("cmd-alt-ctrl-right"),
         "last space": Key("cmd-alt-ctrl-left"),
-        "scroll down": [Key("pagedown")],
-        "scroll up": [Key("pageup")],
+        "page down": [Key("pagedown")],
+        "page up": [Key("pageup")],
         "tab": Key("tab"),
         "left": Key("left"),
         "right": Key("right"),

@@ -87,7 +87,7 @@ def text_to_number(words):
     for word in reversed(words):
         print("{} {} {}".format(result, factor, word))
         if word not in numerals:
-            raise Exception("not a number")
+            raise Exception("not a number: {}".format(words))
 
         number = numeral_map[word]
         if number is None:

@@ -4,13 +4,17 @@ from user.utility import surround, parse_word
 
 
 formatters = {
+    # Smashed
+    "tree": (True, lambda i, word, _: word[0:3] if i == 0 else ""),
+    "quad": (True, lambda i, word, _: word[0:4] if i == 0 else ""),
     "dunder": (True, lambda i, word, _: "__%s__" % word if i == 0 else word),
     "camel": (True, lambda i, word, _: word if i == 0 else word.capitalize()),
-    "stud": (True, lambda i, word, _: word.capitalize()),
+    "proper": (True, lambda i, word, _: word.capitalize()),
     "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
     "smash": (True, lambda i, word, _: word),
     "yellsmash": (True, lambda i, word, _: word.upper()),
     "spine": (True, lambda i, word, _: word if i == 0 else "-" + word),
+    # Spaced
     "sentence": (False, lambda i, word, _: word.capitalize() if i == 0 else word),
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),

@@ -1,13 +1,10 @@
-import urllib
-
-from talon import applescript
-from talon.api import ffi
-from talon.voice import Key, press, Str, Context
-from talon.ui import active_app
-
 import requests
-
-from user.utility import text, text_to_number, text_to_range, optional_numerals
+import talon.clip as clip
+from talon import ctrl, tap
+from talon.ui import active_app
+from talon.voice import Context
+from user.utility import optional_numerals, text, text_to_number, text_to_range
+from user.mouse import delayed_click
 
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
@@ -35,6 +32,10 @@ def send_idea_command(cmd):
         response = requests.get("http://localhost:{}/{}".format(port, cmd))
         response.raise_for_status()
         return response.text
+
+
+def get_idea_location():
+    return send_idea_command("location").split()
 
 
 def idea(cmd):
@@ -71,6 +72,23 @@ def idea_words(cmd, join=" "):
     return handler
 
 
+def grab_identifier(m):
+    old_clip = clip.get()
+    times = text_to_number(m._words[1:])  # hardcoded prefix length?
+    if not times:
+        times = 1
+    try:
+        old_line, old_col = get_idea_location()
+        delayed_click(m)
+        for _ in range(times):
+            send_idea_command("action EditorSelectWord")
+        send_idea_command("action EditorCopy")
+        send_idea_command("goto {} {}".format(old_line, old_col))
+        send_idea_command("action EditorPaste")
+    finally:
+        clip.set(old_clip)
+
+
 ctx = Context(
     "jetbrains", func=lambda app, _: any(app.bundle == b for b in port_mapping.keys())
 )
@@ -102,17 +120,18 @@ keymap.update(
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
-        "(select line | shackle)": [
-            idea("action EditorLineStart"), idea("action EditorLineEndWithSelection")
+        "select line"
+        + optional_numerals: [
+            idea_num("goto {} 0", drop=2),
+            idea("action EditorLineStart"),
+            idea("action EditorLineEndWithSelection"),
         ],
         "select block": [
             idea("action EditorCodeBlockStart"),
             idea("action EditorCodeBlockEndWithSelection"),
         ],
-        "select this line"
-        + optional_numerals: [
-            idea_num("goto {} 9999", drop=3),
-            idea("action EditorLineStartWithSelection"),
+        "select this line": [
+            idea("action EditorLineStart"), idea("action EditorLineEndWithSelection")
         ],
         "select lines {} until {}".format(
             optional_numerals, optional_numerals
@@ -122,7 +141,8 @@ keymap.update(
         "select until" + optional_numerals: idea_num("extend {}", drop=2),
         "select just"
         + optional_numerals: [
-            idea_num("goto {} 0", drop=2), idea("action EditorLineEndWithSelection")
+            idea_num("goto {} 9999", drop=2),
+            idea("action EditorLineStartWithSelection"),
         ],
         "go to end of" + optional_numerals: idea_num("goto {} 9999", drop=4),
         "(clean | clear) line": [
@@ -138,9 +158,15 @@ keymap.update(
         "go forward": idea("action Forward"),
         "(synchronizing | synchronize)": idea("action Synchronize"),
         "comment": idea("action CommentByLineComment"),
-        "command [<dgndictation>]": [idea("action GotoAction"), text],
-        "go to" + optional_numerals: idea_num("goto {} 0", drop=2),
+        "action [<dgndictation>]": [idea("action GotoAction"), text],
+        "(go to | jump to)" + optional_numerals: idea_num("goto {} 0", drop=2),
         "clone" + optional_numerals: idea_num("clone {}"),
+        "fix this": idea("action ShowIntentionActions"),
+        "fix next": [idea("action GotoNextError"), idea("action ShowIntentionActions")],
+        "fix previous": [
+            idea("action GotoPreviousError"), idea("action ShowIntentionActions")
+        ],
+        "grab" + optional_numerals: grab_identifier,
     }
 )
 
