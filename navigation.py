@@ -1,13 +1,17 @@
+import subprocess
+
 import time
 from talon.voice import Context, Key
 from user.utility import text
 
 ctx = Context("navigation")
 
+
 keymap = {
     # Application navigation
     # XXX delay is janky, wait until alfred focuses?
     "launcher [<dgndictation>]": [Key("cmd-space"), lambda _: time.sleep(0.4), text],
+    "mission control": Key("ctrl-upc"),
     "tab close": Key("cmd-w"),
     "window new": Key("cmd-n"),
     "(window next | gibby)": Key("cmd-`"),

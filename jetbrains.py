@@ -4,7 +4,9 @@ from talon import ctrl, tap
 from talon.ui import active_app
 from talon.voice import Context
 from user.utility import optional_numerals, text, text_to_number, text_to_range
+
 from user.mouse import delayed_click
+
 
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
@@ -102,21 +104,26 @@ keymap.update(
         "zoom": idea("action HideAllWindows"),
         "find (usage | usages)": idea("action FindUsages"),
         "(refactor | reflector) [<dgndictation>]": [
-            idea("action Refactorings.QuickListPopupAction"), text
+            idea("action Refactorings.QuickListPopupAction"),
+            text,
         ],
-        "fix": idea("action ShowIntentionActions"),
-        "fix next": [idea("action GotoNextError"), idea("action ShowIntentionActions")],
-        "fix previous": [
-            idea("action GotoPreviousError"), idea("action ShowIntentionActions")
+        "fix [this]": idea("action ShowIntentionActions"),
+        "fix next [error]": [
+            idea("action GotoNextError"),
+            idea("action ShowIntentionActions"),
         ],
-        "find declaration": idea("action GotoDeclaration"),
-        "find (implementers | implementations)": idea("action GotoImplementation"),
+        "fix previous [error]": [
+            idea("action GotoPreviousError"),
+            idea("action ShowIntentionActions"),
+        ],
+        "visit declaration": idea("action GotoDeclaration"),
+        "visit (implementers | implementations)": idea("action GotoImplementation"),
         "find type": idea("action GotoTypeDeclaration"),
-        "(find previous | trail) [<dgndictation>]": idea_words("find prev {}"),
-        "(find next | crew) [<dgndictation>]": idea_words("find next {}"),
-        "find [<dgndictation>]": [idea("action SearchEverywhere"), text],
-        "surround this [<dgndictation>]": [idea("action SurroundWith"), text],
-        "generate code [<dgndictation>]": [idea("action Generate"), text],
+        "(select previous | trail) [<dgndictation>]": idea_words("find prev {}"),
+        "(select next | crew) [<dgndictation>]": idea_words("find next {}"),
+        "search [<dgndictation>]": [idea("action SearchEverywhere"), text],
+        "surround [this] [<dgndictation>]": [idea("action SurroundWith"), text],
+        "generate [<dgndictation>]": [idea("action Generate"), text],
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
@@ -131,13 +138,12 @@ keymap.update(
             idea("action EditorCodeBlockEndWithSelection"),
         ],
         "select this line": [
-            idea("action EditorLineStart"), idea("action EditorLineEndWithSelection")
+            idea("action EditorLineStart"),
+            idea("action EditorLineEndWithSelection"),
         ],
         "select lines {} until {}".format(
             optional_numerals, optional_numerals
-        ): idea_range(
-            "range {} {}", drop=2
-        ),
+        ): idea_range("range {} {}", drop=2),
         "select until" + optional_numerals: idea_num("extend {}", drop=2),
         "select just"
         + optional_numerals: [
@@ -146,9 +152,10 @@ keymap.update(
         ],
         "go to end of" + optional_numerals: idea_num("goto {} 9999", drop=4),
         "(clean | clear) line": [
-            idea("action EditorLineEnd"), idea("action EditorDeleteToLineStart")
+            idea("action EditorLineEnd"),
+            idea("action EditorDeleteToLineStart"),
         ],
-        "delete line": idea("action EditorDeleteLine"),
+        "delete line": idea("action EditorDeleteLine"),  # xxx optional line number
         "delete to end": idea("action EditorDeleteToLineEnd"),
         "delete to start": idea("action EditorDeleteToLineStart"),
         "drag up": idea("action MoveLineUp"),
@@ -160,11 +167,12 @@ keymap.update(
         "comment": idea("action CommentByLineComment"),
         "action [<dgndictation>]": [idea("action GotoAction"), text],
         "(go to | jump to)" + optional_numerals: idea_num("goto {} 0", drop=2),
-        "clone" + optional_numerals: idea_num("clone {}"),
+        "clone line" + optional_numerals: idea_num("clone {}", drop=2),
         "fix this": idea("action ShowIntentionActions"),
         "fix next": [idea("action GotoNextError"), idea("action ShowIntentionActions")],
         "fix previous": [
-            idea("action GotoPreviousError"), idea("action ShowIntentionActions")
+            idea("action GotoPreviousError"),
+            idea("action ShowIntentionActions"),
         ],
         "grab" + optional_numerals: grab_identifier,
     }

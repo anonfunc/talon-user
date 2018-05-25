@@ -13,7 +13,10 @@ def parse_word(word):
 
 
 def parse_words(m):
-    return list(map(parse_word, m.dgndictation[0]._words))
+    try:
+        return list(map(parse_word, m.dgndictation[0]._words))
+    except AttributeError:
+        return []
 
 
 def join_words(words, sep=" "):
@@ -39,8 +42,11 @@ def sentence_text(m):
 
 
 def word(m):
-    text = join_words(list(map(parse_word, m.dgnwords[0]._words)))
-    insert(text.lower())
+    try:
+        text = join_words(list(map(parse_word, m.dgnwords[0]._words)))
+        insert(text.lower())
+    except AttributeError:
+        pass
 
 
 def surround(by):
@@ -106,5 +112,5 @@ def text_to_range(words, delimiter="until"):
     tmp = [str(s).lower() for s in words]
     split = tmp.index(delimiter)
     start = text_to_number(words[:split])
-    end = text_to_number(words[split + 1:])
+    end = text_to_number(words[split + 1 :])
     return start, end

@@ -36,8 +36,8 @@ keymap = {}
 keymap.update(alpha)
 keymap.update(
     {
-        "(phrase | oh) <dgndictation> [over]": text,
-        # "word <dgnwords>": word,
+        "phrase <dgndictation> [over]": text,
+        "word <dgnwords>": word,
         # Dictation
         #
         "sentence <dgndictation> [over]": sentence_text,
@@ -71,7 +71,8 @@ keymap.update(
         "triple quote": "'''",
         "(dot | period)": ".",
         "comma": ",",
-        "space": " ",
+        "swipe": ", ",
+        "(space | skoosh)": " ",
         "[forward] slash": "/",
         "backslash": "\\",
         "(dot dot | dotdot)": "..",
