@@ -1,6 +1,6 @@
 import string
 
-from talon.voice import Str
+from talon.voice import Str, Key
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
