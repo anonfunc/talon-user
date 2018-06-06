@@ -10,8 +10,14 @@ import subprocess
 import time
 
 from talon import applescript
+import talon.clip as clip
 from talon.api import ffi
 from talon.voice import Key, press, Str, Context
+
+from user.utility import text
+
+from user.mouse import delayed_click
+
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 
@@ -69,9 +75,7 @@ def current_dir():
     end tell
     """
         )
-    ).decode(
-        "utf-8"
-    )
+    ).decode("utf-8")
 
 
 def parent(_):
@@ -84,23 +88,38 @@ def home(_):
     update_ctx(newdir=os.path.expanduser("~"))
 
 
-def text(m):
+def grab_change_directory(m):
+    old_clip = clip.get()
+    new_dir = None
+    cwd = current_dir()
     try:
-        tmp = [str(s).lower() for s in m.dgndictation[0]._words]
-        words = [parse_word(word) for word in tmp]
-        Str(" ".join(words))(None)
-    except AttributeError:
-        return
+        delayed_click(m, button=0, times=2)
+        new_dir = clip.get()
+    finally:
+        clip.set(old_clip)
+
+    if new_dir.startswith("/"):
+        new_path = new_dir.strip("'")
+    else:
+        new_path = os.path.join(cwd, new_dir.strip("'"))
+
+    if os.path.isdir(new_path):
+        Str("cd {}; ls\n".format(new_dir))(None)
+        update_ctx(newdir=new_dir)
+    else:
+        print("{} not in {}".format(new_dir, subdirs))
+
+
+def grab_thing(m):
+    old_clip = clip.get()
+    try:
+        delayed_click(m, button=0, times=2)
+        delayed_click(m, button=2, times=1)  # Middle click?
+    finally:
+        clip.set(old_clip)
 
 
 mapping = {"semicolon": ";", r"new-line": "\n", r"new-paragraph": "\n\n"}
-
-
-def parse_word(word):
-    word = word.lstrip("\\").split("\\", 1)[0]
-    word = mapping.get(word, word)
-    return word
-
 
 keymap = {}
 keymap.update(
@@ -154,6 +173,8 @@ keymap.update(
         "gradle deploy": "./gradlew deploy",
         "gradle build": "./gradlew deploy",
         "activate": "act",
+        "grab": grab_thing,
+        "follow": grab_change_directory,
         "jump [<dgndictation>]": ["zz ", text, "\n"],
     }
 )

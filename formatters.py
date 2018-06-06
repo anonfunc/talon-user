@@ -17,7 +17,7 @@ formatters = {
     # Spaced
     "sentence": (False, lambda i, word, _: word.capitalize() if i == 0 else word),
     "title": (False, lambda i, word, _: word.capitalize()),
-    "allcaps": (False, lambda i, word, _: word.upper()),
+    "yeller": (False, lambda i, word, _: word.upper()),
     "string": (False, surround("'")),
     "quoted": (False, surround('"')),
     "padded": (False, surround(" ")),

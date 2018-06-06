@@ -81,7 +81,7 @@ def grab_identifier(m):
         times = 1
     try:
         old_line, old_col = get_idea_location()
-        delayed_click(m)
+        delayed_click(m, button=0, times=2)
         for _ in range(times):
             send_idea_command("action EditorSelectWord")
         send_idea_command("action EditorCopy")
