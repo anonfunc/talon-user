@@ -30,6 +30,32 @@ alpha.update({"command control %s" % k: Key("ctrl-ctrl-%s" % v) for k, v in alnu
 alpha.update({"command alt %s" % k: Key("ctrl-alt-%s" % v) for k, v in alnum})
 alpha.update({"alt %s" % k: Key("alt-%s" % v) for k, v in alnum})
 
+numerals = {
+    'ten': '10',
+    'eleven': '11',
+    'twelve': '12',
+    'thirteen': '13',
+    'fourteen': '14',
+    'fifteen': '15',
+    'sixteen': '16',
+    'seventeen': '17',
+    'eighteen': '18',
+    'nineteen': '19',
+    'twenty': '20',
+    'thirty': '30',
+    'forty': '40',
+    'fifty': '50',
+    'sixty': '60',
+    'seventy': '70',
+    'eighty': '80',
+    'ninety': '90',
+    'hundred': '00',
+    'thousand': '000',
+    'million': '000000',
+}
+
+alpha.update(numerals)
+
 ctx = Context("input")
 
 keymap = {}
