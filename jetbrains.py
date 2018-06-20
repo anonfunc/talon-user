@@ -31,7 +31,7 @@ def send_idea_command(cmd):
     bundle = active_app().bundle
     port = port_mapping.get(bundle, None)
     if port:
-        response = requests.get("http://localhost:{}/{}".format(port, cmd))
+        response = requests.get("http://localhost:{}/{}".format(port, cmd), timeout=(0.05, 3.05))
         response.raise_for_status()
         return response.text
 
@@ -49,6 +49,10 @@ def idea_num(cmd, drop=1):
     def handler(m):
         line = text_to_number(m._words[drop:])
         print(cmd.format(line))
+        if int(line) == 0:
+            print("Not sending, arg was 0")
+            return
+        
         send_idea_command(cmd.format(line))
 
     return handler
@@ -90,10 +94,43 @@ def grab_identifier(m):
     finally:
         clip.set(old_clip)
 
+def _window_title():
+    return ffi.string(
+        applescript.run(
+            'tell application "System Events" to get title of first window of (first application process whose frontmost is true)'
+        )
+    ).decode("utf-8")
 
-ctx = Context(
-    "jetbrains", func=lambda app, _: any(app.bundle == b for b in port_mapping.keys())
-)
+def _window_role():
+    return ffi.string(
+        applescript.run(
+            'tell application "System Events" to get subrole of first window of (first application process whose frontmost is true)'
+        )
+    ).decode("utf-8")   
+
+def is_real_jetbrains_editor(app, _):
+    if not any(app.bundle == b for b in port_mapping.keys()):
+        return False
+    # XXX Expose "does editor have focus" as plugin endpoint.
+
+    # We only want to use IntelliJ package if we're looking at the editor window
+    # Dialogs should use basic handling.
+    # Most dialogs have no title, but some do.
+    windowTitle = _window_title()
+    windowRole = _window_role()
+    # However, the main editor windows always have a title like: 
+    #   name [path] - file/path
+    # Using the square bracket as a heuristic should do for now.
+
+    if windowRole != "AXStandardWindow":
+        # Can't differentiate between command pallet and completion dialogues
+        # Still should prevent sending editor commands.
+        return False
+    # False for modal dialogs.
+    return windowTitle and '[' in windowTitle
+
+
+ctx = Context("jetbrains", func=is_real_jetbrains_editor)
 
 keymap = {}
 keymap.update(
@@ -118,10 +155,14 @@ keymap.update(
         ],
         "visit declaration": idea("action GotoDeclaration"),
         "visit (implementers | implementations)": idea("action GotoImplementation"),
-        "find type": idea("action GotoTypeDeclaration"),
+        "visit type": idea("action GotoTypeDeclaration"),
         "(select previous | trail) [<dgndictation>]": idea_words("find prev {}"),
         "(select next | crew) [<dgndictation>]": idea_words("find next {}"),
-        "search [<dgndictation>]": [idea("action SearchEverywhere"), text],
+        "search everywhere [for] [<dgndictation>]": [idea("action SearchEverywhere"), text],
+        "find [<dgndictation>]": [idea("action Find"), text],
+        "find this": idea("action FindWordAtCaret"),
+        "next": idea("action FindNext"),
+        "last": idea("action FindPrevious"),
         "surround [this] [<dgndictation>]": [idea("action SurroundWith"), text],
         "generate [<dgndictation>]": [idea("action Generate"), text],
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],

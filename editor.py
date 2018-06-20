@@ -72,7 +72,7 @@ keymap.update(
         "(select previous | trail) [<dgndictation>]": select_text_to_left_of_cursor,
         "(select next | crew) [<dgndictation>]": select_text_to_right_of_cursor,
         "search [<dgndictation>]": [Key("cmd-f"), text],
-        "select this line": [Key("cmd-left"), Key("shift-end")],
+        "select [this] line": [Key("cmd-left"), Key("shift-end")],
         "(clean | clear) line": [Key("cmd-left"), Key("shift-end"), Key("delete")],
         "delete line": [
             Key("cmd-left"),
