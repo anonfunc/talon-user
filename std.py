@@ -185,6 +185,7 @@ keymap.update(
         "delete": Key("backspace"),
         "enter": Key("enter"),
         "escape": Key("esc"),
+        "menu [<dgndictation>] [over]": [Key("ctrl-f2"), text],
     }
 )
 ctx.keymap(keymap)
