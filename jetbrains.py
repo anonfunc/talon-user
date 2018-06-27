@@ -31,7 +31,9 @@ def send_idea_command(cmd):
     bundle = active_app().bundle
     port = port_mapping.get(bundle, None)
     if port:
-        response = requests.get("http://localhost:{}/{}".format(port, cmd), timeout=(0.05, 3.05))
+        response = requests.get(
+            "http://localhost:{}/{}".format(port, cmd), timeout=(0.05, 3.05)
+        )
         response.raise_for_status()
         return response.text
 
@@ -52,7 +54,7 @@ def idea_num(cmd, drop=1):
         if int(line) == 0:
             print("Not sending, arg was 0")
             return
-        
+
         send_idea_command(cmd.format(line))
 
     return handler
@@ -94,6 +96,7 @@ def grab_identifier(m):
     finally:
         clip.set(old_clip)
 
+
 def _window_title():
     return ffi.string(
         applescript.run(
@@ -101,12 +104,14 @@ def _window_title():
         )
     ).decode("utf-8")
 
+
 def _window_role():
     return ffi.string(
         applescript.run(
             'tell application "System Events" to get subrole of first window of (first application process whose frontmost is true)'
         )
-    ).decode("utf-8")   
+    ).decode("utf-8")
+
 
 def is_real_jetbrains_editor(app, _):
     if not any(app.bundle == b for b in port_mapping.keys()):
@@ -118,7 +123,7 @@ def is_real_jetbrains_editor(app, _):
     # Most dialogs have no title, but some do.
     windowTitle = _window_title()
     windowRole = _window_role()
-    # However, the main editor windows always have a title like: 
+    # However, the main editor windows always have a title like:
     #   name [path] - file/path
     # Using the square bracket as a heuristic should do for now.
 
@@ -127,7 +132,7 @@ def is_real_jetbrains_editor(app, _):
         # Still should prevent sending editor commands.
         return False
     # False for modal dialogs.
-    return windowTitle and '[' in windowTitle
+    return windowTitle and "[" in windowTitle
 
 
 ctx = Context("jetbrains", func=is_real_jetbrains_editor)
@@ -158,7 +163,10 @@ keymap.update(
         "visit type": idea("action GotoTypeDeclaration"),
         "(select previous | trail) [<dgndictation>]": idea_words("find prev {}"),
         "(select next | crew) [<dgndictation>]": idea_words("find next {}"),
-        "search everywhere [for] [<dgndictation>]": [idea("action SearchEverywhere"), text],
+        "search everywhere [for] [<dgndictation>]": [
+            idea("action SearchEverywhere"),
+            text,
+        ],
         "find [<dgndictation>]": [idea("action Find"), text],
         "find this": idea("action FindWordAtCaret"),
         "next": idea("action FindNext"),

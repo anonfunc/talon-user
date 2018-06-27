@@ -22,7 +22,6 @@ class NoiseModel:
     def on_move(self, typ, e):
         if typ != tap.MMOVE:
             return
-
         self.mouse_last = pos = Point2d(e.x, e.y)
         if self.hiss_start and not self.dragging:
             if (pos - self.mouse_origin).len() > 10:
@@ -34,9 +33,6 @@ class NoiseModel:
 
     def on_noise(self, noise):
         now = time.time()
-        # if noise.startswith("hiss"):
-        #     return
-
         if noise == "pop":
             ctrl.mouse_click(button=0, hold=16000)
         elif noise == "hiss_start":

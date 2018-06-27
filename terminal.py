@@ -163,7 +163,10 @@ keymap.update(
         "jet history": "git hist\n",
         "jet merge [<dgndictation>]": ["git merge ", text],
         "jet pull [<dgndictation>]": ["git pull ", text],
-        "jet pull (base | rebase | read [base]) [<dgndictation>]": ["git pull --rebase ", text],
+        "jet pull (base | rebase | read [base]) [<dgndictation>]": [
+            "git pull --rebase ",
+            text,
+        ],
         "jet push [<dgndictation>]": ["git push ", text],
         "jet rebase": "git rebase -i HEAD~",
         "jet stash": "git stash\n",

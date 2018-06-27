@@ -9,7 +9,6 @@ def switch_app(m):
     full = apps.get(name)
     if not full:
         return
-
     for app in ui.apps():
         if app.name == full:
             app.focus()
@@ -27,7 +26,6 @@ def update_lists():
     for app in ui.apps():
         if not app.windows():
             continue
-
         words = app.name.split(" ")
         for word in words:
             if word and not word in new:
@@ -35,7 +33,6 @@ def update_lists():
         new[app.name] = app.name
     if set(new.keys()) == set(apps.keys()):
         return
-
     ctx.set_list("apps", new.keys())
     apps = new
 

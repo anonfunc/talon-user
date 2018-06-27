@@ -1,15 +1,4 @@
-
-import time
-
-from talon.audio import noise
-from talon.voice import Key
-from talon.track.geom import Point2d
-
-try:
-    import eye
-except:
-    import eye_mouse as eye
-
+import eye_mouse
 import time
 from talon import ctrl, tap
 from talon.voice import Context
@@ -22,20 +11,12 @@ force_move = None
 
 
 def on_move(typ, e):
-    x0, y0 = mouse_history[-1][0:2]
-    x, y = e.x, e.y
-    if abs(x - x0) < 5 and abs(y - y0) < 5:
-        return
-
-    mouse_history.append((x, y, time.time()))
+    mouse_history.append((e.x, e.y, time.time()))
+    if force_move:
+        e.x, e.y = force_move
+        return True
 
 
-# if force_move:
-#     e.x, e.y = force_move
-#     return True
-
-
-tap.unregister(tap.MMOVE, on_move)
 tap.register(tap.MMOVE, on_move)
 
 
@@ -47,13 +28,13 @@ def click_pos(m):
 
 
 def delayed_click(m, button=0, times=1):
-    old = eye.config.control_mouse
-    eye.config.control_mouse = False
+    old = eye_mouse.config.control_mouse
+    eye_mouse.config.control_mouse = False
     x, y = click_pos(m)
     ctrl.mouse(x, y)
     ctrl.mouse_click(x, y, button=button, times=times, wait=16000)
     time.sleep(0.032)
-    eye.config.control_mouse = old
+    eye_mouse.config.control_mouse = old
 
 
 def delayed_right_click(m):
@@ -105,7 +86,7 @@ def control_mouse(m):
 
 
 keymap = {
-    "clicker": delayed_right_click,
+    "righty": delayed_right_click,
     "click": delayed_click,
     "dubclick": delayed_dubclick,
     "tripclick": delayed_tripclick,
@@ -128,23 +109,3 @@ keymap = {
     "(squid | run) calibration": lambda m: eye.on_menu("Eye Tracking >> Calibrate"),
 }
 ctx.keymap(keymap)
-#
-# keymap = {
-#     "click drag": mouse_drag,
-#     "click release": mouse_release,
-#     "click left": adv_click(0),
-#     "click right": adv_click(1),
-#     "scrodge": mouse_scroll(10),
-#     "scroop": mouse_scroll(-10),
-#     "click control": adv_click(0, "ctrl"),
-#     "chipper": adv_click(0, "ctrl"),
-#     "click command": adv_click(0, "cmd"),
-#     "click option": adv_click(0, "alt"),
-#     "click shift": adv_click(0, "shift"),
-#     "click shift alt": adv_click(0, "alt", "shift"),
-#     "click double": adv_click(0, times=2),
-#     "click triple": adv_click(0, times=3),
-#     "click shift double": adv_click(0, "shift", times=2),
-# }
-#
-# ctx.keymap(keymap)

@@ -22,7 +22,7 @@ class AudioTimeline:
         with self.lock:
             self.tmp += [samples[i] for i in range(count)]
             while len(self.tmp) > self.chunk:
-                chunk, self.tmp = max(self.tmp[:self.chunk]), self.tmp[self.chunk:]
+                chunk, self.tmp = max(self.tmp[: self.chunk]), self.tmp[self.chunk :]
                 chunk = (max(0, chunk) * 2) ** 0.5
                 if self.odd:
                     chunk = -chunk
@@ -33,7 +33,7 @@ class AudioTimeline:
                 for event in self.events:
                     event[0] -= offset
             self.events = [event for event in self.events if event[0] > -self.width]
-            self.history = self.history[-self.width:]
+            self.history = self.history[-self.width :]
 
     def draw(self, vg, x, y, width, height):
         lib.nvgBeginPath(vg)
