@@ -2,7 +2,7 @@ import requests
 import talon.clip as clip
 from talon import ctrl, tap
 from talon.ui import active_app
-from talon.voice import Context
+from talon.voice import Context, ContextGroup
 from user.utility import optional_numerals, text, text_to_number, text_to_range
 
 from user.mouse import delayed_click
@@ -20,6 +20,7 @@ port_mapping = {
     "com.jetbrains.goland": 8659,
     "com.jetbrains.PhpStorm": 8662,
     "com.jetbrains.pycharm": 8658,
+    "com.jetbrains.rider": 8660,
     "com.jetbrains.rubymine": 8661,
     "com.jetbrains.WebStorm": 8663,
     "com.google.android.studio": 8652,
@@ -47,7 +48,6 @@ def idea(cmd):
 
 
 def idea_num(cmd, drop=1):
-
     def handler(m):
         line = text_to_number(m._words[drop:])
         print(cmd.format(line))
@@ -61,7 +61,6 @@ def idea_num(cmd, drop=1):
 
 
 def idea_range(cmd, drop=1):
-
     def handler(m):
         start, end = text_to_range(m._words[drop:])
         print(cmd.format(start, end))
@@ -71,7 +70,6 @@ def idea_range(cmd, drop=1):
 
 
 def idea_words(cmd, join=" "):
-
     def handler(m):
         args = [str(w) for w in m.dgndictation[0]._words]
         print(args)
@@ -135,7 +133,8 @@ def is_real_jetbrains_editor(app, _):
     return windowTitle and "[" in windowTitle
 
 
-ctx = Context("jetbrains", func=is_real_jetbrains_editor)
+group = ContextGroup("jetbrains")
+ctx = Context("jetbrains", func=is_real_jetbrains_editor, group=group)
 
 keymap = {}
 keymap.update(
@@ -228,3 +227,4 @@ keymap.update(
 )
 
 ctx.keymap(keymap)
+group.load()

@@ -1,7 +1,7 @@
 import eye_mouse
 import time
 from talon import ctrl, tap
-from talon.voice import Context
+from talon.voice import Context, Key
 
 ctx = Context("mouse")
 
@@ -82,7 +82,7 @@ def adv_click(button, *mods, **kwargs):
 
 def control_mouse(m):
     ctrl.mouse(0, 0)
-    eye.on_menu("Eye Tracking >> Control Mouse")
+    eye_mouse.on_menu("Eye Tracking >> Control Mouse"),
 
 
 keymap = {
@@ -106,6 +106,5 @@ keymap = {
     # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
     "(squid | control mouse)": control_mouse,
     # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
-    "(squid | run) calibration": lambda m: eye.on_menu("Eye Tracking >> Calibrate"),
 }
 ctx.keymap(keymap)

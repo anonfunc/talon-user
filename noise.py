@@ -1,5 +1,6 @@
 import time
 
+import eye_zoom_mouse
 from talon import ctrl
 from talon import tap
 from talon.audio import noise
@@ -32,6 +33,8 @@ class NoiseModel:
                 ctrl.mouse_click(x, y, button=0, down=True)
 
     def on_noise(self, noise):
+        if eye_zoom_mouse.zoom_mouse.enabled:
+            return
         now = time.time()
         if noise == "pop":
             ctrl.mouse_click(button=0, hold=16000)

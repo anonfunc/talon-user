@@ -1,11 +1,21 @@
 from talon.voice import Word, Context, Key, Rep, RepPhrase, Str, press
 from talon import ctrl, clip
-from talon_init import TALON_HOME, TALON_PLUGINS, TALON_USER
 import string
 
-alpha_alt = (
-    "air bat cap die each fail gone harm sit jury crash look mad near odd pit quest red sun trap urge vest whale box yes zip".split()
+from user.utility import (
+    parse_word,
+    parse_words,
+    rot13,
+    sentence_text,
+    surround,
+    text,
+    word,
 )
+
+alpha_alt = (
+    "air bat cap die each fail gone harm sit jury crash look mad "
+    "near odd pit quest red sun trap urge vest whale box yes zip"
+).split()
 alnum = list(zip(alpha_alt, string.ascii_lowercase)) + [
     (str(i), str(i)) for i in range(0, 10)
 ]
@@ -28,71 +38,18 @@ mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
 
 
-def parse_word(word):
-    word = str(word).lstrip("\\").split("\\", 1)[0]
-    word = mapping.get(word, word)
-    return word
-
-
-def join_words(words, sep=" "):
-    out = ""
-    for i, word in enumerate(words):
-        if i > 0 and word not in punctuation:
-            out += sep
-        out += word
-    return out
-
-
-def parse_words(m):
-    return list(map(parse_word, m.dgndictation[0]._words))
-
-
-def insert(s):
-    Str(s)(None)
-
-
-def text(m):
-    insert(join_words(parse_words(m)).lower())
-
-
-def sentence_text(m):
-    text = join_words(parse_words(m)).lower()
-    insert(text.capitalize())
-
-
-def word(m):
-    text = join_words(list(map(parse_word, m.dgnwords[0]._words)))
-    insert(text.lower())
-
-
-def surround(by):
-
-    def func(i, word, last):
-        if i == 0:
-            word = by + word
-        if last:
-            word += by
-        return word
-
-    return func
-
-
-def rot13(i, word, _):
-    out = ""
-    for c in word.lower():
-        if c in string.ascii_lowercase:
-            c = chr((((ord(c) - ord("a")) + 13) % 26) + ord("a"))
-        out += c
-    return out
-
-
 formatters = {
-    "dunder": (True, lambda i, word, _: "__%s__" % word if i == 0 else word),
+    "dunder": (
+        True,
+        lambda i, word, last: ("__%s" % word if i == 0 else word)
+        + ("__" if last else ""),
+    ),
     "camel": (True, lambda i, word, _: word if i == 0 else word.capitalize()),
     "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
     "smash": (True, lambda i, word, _: word),
     # spinal or kebab?
     "kebab": (True, lambda i, word, _: word if i == 0 else "-" + word),
+    "spinal": (True, lambda i, word, _: word if i == 0 else "-" + word),
     # 'sentence':  (False, lambda i, word, _: word.capitalize() if i == 0 else word),
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),
@@ -101,7 +58,6 @@ formatters = {
     "padded": (False, surround(" ")),
     "rot-thirteen": (False, rot13),
 }
-
 
 def FormatText(m):
     fmt = []
@@ -263,14 +219,6 @@ keymap.update(
         "last space": Key("cmd-alt-ctrl-left"),
         "page down": [Key("pagedown")],
         "page up": [Key("pageup")],
-        "tab": Key("tab"),
-        "left": Key("left"),
-        "right": Key("right"),
-        "up": Key("up"),
-        "down": Key("down"),
-        "delete": Key("backspace"),
-        "enter": Key("enter"),
-        "escape": Key("esc"),
         "menu [<dgndictation>] [over]": [Key("ctrl-f2"), text],
     }
 )
