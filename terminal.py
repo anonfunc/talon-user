@@ -65,17 +65,15 @@ def list_dir(_):
 
 
 def current_dir():
-    return ffi.string(
-        applescript.run(
-            """
-    tell application "iTerm"
-        tell current session of current window
-            variable named "session.path"
+    return applescript.run(
+        """
+        tell application "iTerm"
+            tell current session of current window
+                variable named "session.path"
+            end tell
         end tell
-    end tell
-    """
-        )
-    ).decode("utf-8")
+        """
+    )
 
 
 def parent(_):
