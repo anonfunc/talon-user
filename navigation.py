@@ -39,7 +39,7 @@ keymap = {
     # 'locky soup': [Key('alt-left'),Key('alt-left')],
     # 'locky trace': [Key('alt-left'),Key('alt-left'),Key('alt-left')],
     "(rightward | right word)": Key("alt-right"),
-    "ricky": Key("cmd-right"),
+    "righty": Key("cmd-right"),
     "lefty": Key("cmd-left"),
     "(left | crimp)": Key("left"),
     "(right | chris)": Key("right"),

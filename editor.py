@@ -11,6 +11,7 @@ supported_apps = {
     "com.jetbrains.goland",
     "com.jetbrains.PhpStorm",
     "com.jetbrains.pycharm",
+    "com.jetbrains.rider",
     "com.jetbrains.rubymine",
     "com.jetbrains.WebStorm",
     "com.google.android.studio",
@@ -27,12 +28,13 @@ def select_text_to_left_of_cursor(m):
     words = parse_words(m)
     if not words:
         return
+    old = clip.get()
     key = join_words(words).lower()
-    with clip.capture(timeout=5) as clipboardText:
-        press("shift-home", wait=2000)
-        press("cmd-c", wait=2000)
-        press("right", wait=2000)
-    text_left = clipboardText.get()
+    press("shift-home", wait=2000)
+    press("cmd-c", wait=2000)
+    press("right", wait=2000)
+    text_left = clip.get()
+    clip.set(old)
     result = text_left.find(key)
     if result == -1:
         return
@@ -50,11 +52,12 @@ def select_text_to_right_of_cursor(m):
     if not words:
         return
     key = join_words(words).lower()
-    with clip.capture(timeout=5) as clipboardText:
-        press("shift-end", wait=2000)
-        press("cmd-c", wait=2000)
-        press("left", wait=2000)
-    text_right = clipboardText.get()
+    old = clip.get()
+    press("shift-end", wait=2000)
+    press("cmd-c", wait=2000)
+    press("left", wait=2000)
+    text_right = clip.get()
+    clip.set(old)
     result = text_right.find(key)
     if result == -1:
         return

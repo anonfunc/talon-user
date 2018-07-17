@@ -60,16 +60,14 @@ def mouse_release(m):
 
 
 def mouse_scroll(amount):
-
     def scroll(m):
         print("amount is", amount)
-        ctrl.mouse_scroll(x=amount)
+        ctrl.mouse_scroll(y=amount)
 
     return scroll
 
 
 def adv_click(button, *mods, **kwargs):
-
     def click(e):
         for key in mods:
             ctrl.key_press(key, down=True)
@@ -86,7 +84,7 @@ def control_mouse(m):
 
 
 keymap = {
-    "righty": delayed_right_click,
+    "clicker": delayed_right_click,
     "click": delayed_click,
     "dubclick": delayed_dubclick,
     "tripclick": delayed_tripclick,
