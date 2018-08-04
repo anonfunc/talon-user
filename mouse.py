@@ -1,4 +1,5 @@
 import eye_mouse
+import eye_zoom_mouse
 import time
 from talon import ctrl, tap
 from talon.voice import Context, Key
@@ -82,6 +83,9 @@ def control_mouse(m):
     ctrl.mouse(0, 0)
     eye_mouse.on_menu("Eye Tracking >> Control Mouse"),
 
+def control_zoom_mouse(m):
+    ctrl.mouse(0, 0)
+    eye_mouse.on_menu("Eye Tracking >> Control Mouse (Zoom)"),
 
 keymap = {
     "clicker": delayed_right_click,
@@ -103,6 +107,7 @@ keymap = {
     "toggle cursor": Key("ctrl-alt-k"),
     # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
     "(squid | control mouse)": control_mouse,
+    "zoom mouse": control_zoom_mouse,
     # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
 }
 ctx.keymap(keymap)

@@ -1,8 +1,10 @@
+import os
+
 import requests
 import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
-from talon.voice import Context, ContextGroup
+from talon.voice import Context, ContextGroup, Key
 from user.std import text, parse_word
 
 try:
@@ -80,13 +82,22 @@ port_mapping = {
 }
 
 
+def _get_nonce(port):
+    try:
+        with open(os.path.join("/tmp", "vcidea_" + port), "r") as fh:
+            return fh.read()
+    except IOError:
+        return None
+
+
 def send_idea_command(cmd):
     print("Sending {}".format(cmd))
     bundle = active_app().bundle
     port = port_mapping.get(bundle, None)
-    if port:
+    nonce = _get_nonce(port)
+    if port and nonce:
         response = requests.get(
-            "http://localhost:{}/{}".format(port, cmd), timeout=(0.05, 3.05)
+            "http://localhost:{}/{}/{}".format(port, nonce, cmd), timeout=(0.05, 3.05)
         )
         response.raise_for_status()
         return response.text
@@ -149,14 +160,15 @@ def grab_identifier(m):
 
 
 def is_real_jetbrains_editor(app, window):
-    if not any(app.bundle == b for b in port_mapping.keys()):
+    if app.bundle not in port_mapping:
         return False
     # XXX Expose "does editor have focus" as plugin endpoint.
-    return "[" in window.title
+    # XXX Window title empty in full screen.
+    return "[" in window.title or len(window.title) == 0
 
 
-group = ContextGroup("jetbrains")
-ctx = Context("jetbrains", func=is_real_jetbrains_editor, group=group)
+# group = ContextGroup("jetbrains")
+ctx = Context("jetbrains", func=is_real_jetbrains_editor)  # , group=group)
 
 keymap = {}
 keymap.update(
@@ -215,27 +227,24 @@ keymap.update(
             _optional_numerals, _optional_numerals
         ): idea_range("range {} {}", drop=2),
         "select until" + _optional_numerals: idea_num("extend {}", drop=2),
-        "select just"
-        + _optional_numerals: [
-            idea_num("goto {} 9999", drop=2),
-            idea("action EditorLineStartWithSelection"),
-        ],
-        "go to end of" + _optional_numerals: idea_num("goto {} 9999", drop=4),
+        "(go | jump) to end of" + _optional_numerals: idea_num("goto {} 9999", drop=4),
         "(clean | clear) line": [
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
         ],
-        "delete line": idea("action EditorDeleteLine"),  # xxx optional line number
-        "delete to end": idea("action EditorDeleteToLineEnd"),
-        "delete to start": idea("action EditorDeleteToLineStart"),
+        "(delete | remove) line": idea(
+            "action EditorDeleteLine"
+        ),  # xxx optional line number
+        "(delete | clear) to end": idea("action EditorDeleteToLineEnd"),
+        "(delete | clear) to start": idea("action EditorDeleteToLineStart"),
         "drag up": idea("action MoveLineUp"),
         "drag down": idea("action MoveLineDown"),
         "duplicate": idea("action EditorDuplicate"),
-        "go back": idea("action Back"),
-        "go forward": idea("action Forward"),
+        "(go | jump) back": idea("action Back"),
+        "(go | jump) forward": idea("action Forward"),
         "(synchronizing | synchronize)": idea("action Synchronize"),
         "comment": idea("action CommentByLineComment"),
-        "action [<dgndictation>]": [idea("action GotoAction"), text],
+        "(action | please) [<dgndictation>]": [idea("action GotoAction"), text],
         "(go to | jump to)" + _optional_numerals: idea_num("goto {} 0", drop=2),
         "clone line" + _optional_numerals: idea_num("clone {}", drop=2),
         "fix this": idea("action ShowIntentionActions"),
@@ -245,8 +254,16 @@ keymap.update(
             idea("action ShowIntentionActions"),
         ],
         "grab" + _optional_numerals: grab_identifier,
+        "(start | stop) recording": idea("action StartStopMacroRecording"),
+        "edit (recording | recordings)": idea("action EditMacros"),
+        "play recording": idea("action PlaybackLastMacro"),
+        "play recording <dgndictation>": [
+            idea("action PlaySavedMacrosAction"),
+            text,
+            Key("enter"),
+        ],
     }
 )
 
 ctx.keymap(keymap)
-group.load()
+# group.load()
