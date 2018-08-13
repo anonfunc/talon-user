@@ -84,7 +84,7 @@ port_mapping = {
 
 def _get_nonce(port):
     try:
-        with open(os.path.join("/tmp", "vcidea_" + port), "r") as fh:
+        with open(os.path.join("/tmp", "vcidea_" + str(port)), "r") as fh:
             return fh.read()
     except IOError:
         return None
