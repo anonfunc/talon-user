@@ -1,5 +1,5 @@
-import eye_mouse
-import eye_zoom_mouse
+from talon_plugins import eye_mouse
+from talon_plugins import eye_zoom_mouse
 import time
 from talon import ctrl, tap
 from talon.voice import Context, Key
@@ -81,11 +81,11 @@ def adv_click(button, *mods, **kwargs):
 
 def control_mouse(m):
     ctrl.mouse(0, 0)
-    eye_mouse.on_menu("Eye Tracking >> Control Mouse"),
+    eye_mouse.control_mouse.toggle()
 
 def control_zoom_mouse(m):
     ctrl.mouse(0, 0)
-    eye_mouse.on_menu("Eye Tracking >> Control Mouse (Zoom)"),
+    eye_zoom_mouse.control_mouse.toggle(),
 
 keymap = {
     "clicker": delayed_right_click,

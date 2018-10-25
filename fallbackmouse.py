@@ -71,7 +71,7 @@ def mouse_release(m):
 def mouse_scroll(amount):
 
     def scroll(m):
-        print("amount is", amount)
+        # print("amount is", amount)
         ctrl.mouse_scroll(x=amount)
 
     return scroll

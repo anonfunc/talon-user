@@ -1,5 +1,5 @@
 from talon.voice import Word, Context, Key, Rep, RepPhrase, Str, press
-from talon import ctrl, clip
+from talon import app, ctrl, clip, ui
 import string
 
 from user.utility import (
@@ -11,28 +11,6 @@ from user.utility import (
     text,
     word,
 )
-
-alpha_alt = (
-    "air bat cap die each fail gone harm sit jury crash look mad "
-    "near odd pit quest red sun trap urge vest whale box yes zip"
-).split()
-alnum = list(zip(alpha_alt, string.ascii_lowercase)) + [
-    (str(i), str(i)) for i in range(0, 10)
-]
-
-alpha = {}
-alpha.update(dict(alnum))
-alpha.update(
-    {
-        "ship %s" % word: letter
-        for word, letter in zip(alpha_alt, string.ascii_uppercase)
-    }
-)
-
-alpha.update({"control %s" % k: Key("ctrl-%s" % v) for k, v in alnum})
-alpha.update({"command %s" % k: Key("cmd-%s" % v) for k, v in alnum})
-alpha.update({"command shift %s" % k: Key("ctrl-shift-%s" % v) for k, v in alnum})
-alpha.update({"alt %s" % k: Key("alt-%s" % v) for k, v in alnum})
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
@@ -89,14 +67,16 @@ def FormatText(m):
         sep = ""
     Str(sep.join(words))(None)
 
+def copy_bundle(m):
+    bundle = ui.active_app().bundle
+    clip.set(bundle)
+    app.notify('Copied app bundle', body='{}'.format(bundle))
 
 ctx = Context("input")
 
-keymap = {}
-keymap.update(alpha)
-keymap.update(
+ctx.keymap(
     {
-        "phrase <dgndictation> [over]": text,
+        "say <dgndictation> [over]": text,
         "sentence <dgndictation> [over]": sentence_text,
         "comma <dgndictation> [over]": [", ", text],
         "period <dgndictation> [over]": [". ", sentence_text],
@@ -220,7 +200,6 @@ keymap.update(
         "last space": Key("cmd-alt-ctrl-left"),
         "page down": [Key("pagedown")],
         "page up": [Key("pageup")],
-        "menu [<dgndictation>] [over]": [Key("ctrl-f2"), text],
+        'copy active bundle': copy_bundle,
     }
 )
-ctx.keymap(keymap)
