@@ -148,7 +148,7 @@ keymap.update(
         # "const": "const ",
         # "static": "static ",
         "make [<dgndictation>]": ["make ", text],
-        "make [<dgndictation>]": ["make ", text],
+        "mage [<dgndictation>]": ["mage ", text],
         # git
         "jet [<dgndictation>]": ["git ", text],
         "jet add [<dgndictation>]": ["git add ", text],
@@ -169,6 +169,7 @@ keymap.update(
         "jet rebase": "git rebase -i HEAD~",
         "jet stash": "git stash\n",
         "jet status": "git status\n",
+        "jet stat": "git status --short\n",
         # common
         "gradle": "./gradlew ",
         "gradle deploy": "./gradlew deploy",

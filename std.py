@@ -15,58 +15,6 @@ from user.utility import (
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
 
-
-formatters = {
-    "dunder": (
-        True,
-        lambda i, word, last: ("__%s" % word if i == 0 else word)
-        + ("__" if last else ""),
-    ),
-    "camel": (True, lambda i, word, _: word if i == 0 else word.capitalize()),
-    "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
-    "smash": (True, lambda i, word, _: word),
-    # spinal or kebab?
-    "kebab": (True, lambda i, word, _: word if i == 0 else "-" + word),
-    "spinal": (True, lambda i, word, _: word if i == 0 else "-" + word),
-    # 'sentence':  (False, lambda i, word, _: word.capitalize() if i == 0 else word),
-    "title": (False, lambda i, word, _: word.capitalize()),
-    "allcaps": (False, lambda i, word, _: word.upper()),
-    "dubstring": (False, surround('"')),
-    "string": (False, surround("'")),
-    "padded": (False, surround(" ")),
-    "rot-thirteen": (False, rot13),
-}
-
-def FormatText(m):
-    fmt = []
-    for w in m._words:
-        if isinstance(w, Word):
-            fmt.append(w.word)
-    try:
-        words = parse_words(m)
-    except AttributeError:
-        with clip.capture() as s:
-            press("cmd-c")
-        words = s.get().split(" ")
-        if not words:
-            return
-
-    tmp = []
-    spaces = True
-    for i, word in enumerate(words):
-        word = parse_word(word)
-        for name in reversed(fmt):
-            smash, func = formatters[name]
-            word = func(i, word, i == len(words) - 1)
-            spaces = spaces and not smash
-        tmp.append(word)
-    words = tmp
-
-    sep = " "
-    if not spaces:
-        sep = ""
-    Str(sep.join(words))(None)
-
 def copy_bundle(m):
     bundle = ui.active_app().bundle
     clip.set(bundle)
@@ -82,7 +30,6 @@ ctx.keymap(
         "period <dgndictation> [over]": [". ", sentence_text],
         "more <dgndictation> [over]": [" ", text],
         "word <dgnwords>": word,
-        "(%s)+ [<dgndictation>]" % (" | ".join(formatters)): FormatText,
         "tab": Key("tab"),
         "left": Key("left"),
         "right": Key("right"),

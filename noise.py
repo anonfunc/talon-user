@@ -1,5 +1,5 @@
 import time
-from talon_plugins import eye_zoom_mouse
+from talon_plugins import eye_mouse, eye_zoom_mouse
 from talon import ctrl
 from talon import tap
 from talon.audio import noise
@@ -34,6 +34,8 @@ class NoiseModel:
     def on_noise(self, noise):
         if eye_zoom_mouse.zoom_mouse.enabled:
             return
+        if not eye_mouse.control_mouse.enabled:
+            return 
         now = time.time()
         # print("{} {}".format(noise, now - self.hiss_last))
         
@@ -58,7 +60,7 @@ class NoiseModel:
                 if duration > 0.7:
                     self.button = 2
                     ctrl.mouse_click(button=2)
-                elif duration > 0.1:
+                elif duration > 0.25:
                     self.button = 1
                     ctrl.mouse_click(button=1)
             self.hiss_last = now

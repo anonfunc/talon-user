@@ -2,27 +2,29 @@ from talon.voice import Word, Context, Str
 
 from user.utility import surround, parse_word
 
-
 formatters = {
     # Smashed
+    "acronym": (True, lambda i, word, _: word[0:1].upper()),
     "tree": (True, lambda i, word, _: word[0:3] if i == 0 else ""),
     "quad": (True, lambda i, word, _: word[0:4] if i == 0 else ""),
-    "dunder": (True, lambda i, word, _: "__%s__" % word if i == 0 else word),
+    "dunder": (
+        True,
+        lambda i, word, last: ("__%s" % word if i == 0 else word)
+        + ("__" if last else ""),
+    ),
     "camel": (True, lambda i, word, _: word if i == 0 else word.capitalize()),
-    "proper": (True, lambda i, word, _: word.capitalize()),
     "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
     "smash": (True, lambda i, word, _: word),
-    "yellsmash": (True, lambda i, word, _: word.upper()),
     "spine": (True, lambda i, word, _: word if i == 0 else "-" + word),
+    
     # Spaced
     "sentence": (False, lambda i, word, _: word.capitalize() if i == 0 else word),
     "title": (False, lambda i, word, _: word.capitalize()),
-    "yeller": (False, lambda i, word, _: word.upper()),
+    "allcaps": (False, lambda i, word, _: word.upper()),
     "string": (False, surround("'")),
     "quoted": (False, surround('"')),
     "padded": (False, surround(" ")),
 }
-
 
 def FormatText(m):
     fmt = []

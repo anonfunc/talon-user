@@ -82,10 +82,14 @@ def adv_click(button, *mods, **kwargs):
 def control_mouse(m):
     ctrl.mouse(0, 0)
     eye_mouse.control_mouse.toggle()
+    if eye_zoom_mouse.zoom_mouse.enabled:
+        eye_zoom_mouse.zoom_mouse.toggle(),
 
 def control_zoom_mouse(m):
     ctrl.mouse(0, 0)
-    eye_zoom_mouse.control_mouse.toggle(),
+    eye_zoom_mouse.zoom_mouse.toggle()
+    if eye_mouse.control_mouse.enabled:
+        eye_mouse.control_mouse.toggle() 
 
 keymap = {
     "clicker": delayed_right_click,
@@ -94,8 +98,8 @@ keymap = {
     "tripclick": delayed_tripclick,
     "drag": mouse_drag,
     "release": mouse_release,
-    "wheel down": mouse_scroll(20),
-    "wheel up": mouse_scroll(-20),
+    "wheel down": mouse_scroll(50),
+    "wheel up": mouse_scroll(-50),
     "click command": adv_click(0, "cmd"),
     "click control": adv_click(0, "ctrl"),
     "click option": adv_click(0, "alt"),
