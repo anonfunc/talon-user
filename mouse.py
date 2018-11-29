@@ -83,10 +83,15 @@ def control_mouse(m):
     ctrl.mouse(0, 0)
     eye_mouse.control_mouse.toggle()
     if eye_zoom_mouse.zoom_mouse.enabled:
-        eye_zoom_mouse.zoom_mouse.toggle(),
+        eye_zoom_mouse.zoom_mouse.enable()
 
 def control_zoom_mouse(m):
     ctrl.mouse(0, 0)
+    if eye_zoom_mouse.zoom_mouse.enabled:
+        eye_zoom_mouse.zoom_mouse.disable()
+    else:
+        eye_zoom_mouse.zoom_mouse.enable()
+
     eye_zoom_mouse.zoom_mouse.toggle()
     if eye_mouse.control_mouse.enabled:
         eye_mouse.control_mouse.toggle() 
