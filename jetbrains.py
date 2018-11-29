@@ -25,8 +25,8 @@ for n in range(1000, 10001, 1000):
     _numeral_map[str(n)] = n
 _numeral_map["oh"] = 0  # synonym for zero
 _numeral_map["and"] = None  # drop me
-_numerals = " (" + " | ".join(sorted(_numeral_map.keys())) + ")+"
-_optional_numerals = " (" + " | ".join(sorted(_numeral_map.keys())) + ")*"
+_numerals = "(" + " | ".join(sorted(_numeral_map.keys())) + ")+"
+_optional_numerals = "(" + " | ".join(sorted(_numeral_map.keys())) + ")*"
 
 
 def text_to_number(words):
@@ -37,7 +37,7 @@ def text_to_number(words):
     factor = 1
     for word in reversed(words):
         print("{} {} {}".format(result, factor, word))
-        if word not in _numerals:
+        if word not in _numeral_map:
             raise Exception("not a number: {}".format(words))
 
         number = _numeral_map[word]
@@ -209,8 +209,7 @@ keymap.update(
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
-        "select line"
-        + _optional_numerals: [
+        f"select line {_optional_numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineStart"),
             idea("action EditorLineEndWithSelection"),
@@ -223,11 +222,9 @@ keymap.update(
             idea("action EditorLineStart"),
             idea("action EditorLineEndWithSelection"),
         ],
-        "select lines {} until {}".format(
-            _optional_numerals, _optional_numerals
-        ): idea_range("range {} {}", drop=2),
-        "select until" + _optional_numerals: idea_num("extend {}", drop=2),
-        "(go | jump) to end of" + _optional_numerals: idea_num("goto {} 9999", drop=4),
+        f"select lines {_optional_numerals} until {_optional_numerals}": idea_range("range {} {}", drop=2),
+        f"select until {_optional_numerals}": idea_num("extend {}", drop=2),
+        f"(go | jump) to end of {_optional_numerals}": idea_num("goto {} 9999", drop=4),
         "(clean | clear) line": [
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
@@ -245,15 +242,15 @@ keymap.update(
         "(synchronizing | synchronize)": idea("action Synchronize"),
         "comment": idea("action CommentByLineComment"),
         "(action | please) [<dgndictation>]": [idea("action GotoAction"), text],
-        "(go to | jump to)" + _optional_numerals: idea_num("goto {} 0", drop=2),
-        "clone line" + _optional_numerals: idea_num("clone {}", drop=2),
+        f"(go to | jump to) {_optional_numerals}": idea_num("goto {} 0", drop=2),
+        f"clone line {_optional_numerals}": idea_num("clone {}", drop=2),
         "fix this": idea("action ShowIntentionActions"),
         "fix next": [idea("action GotoNextError"), idea("action ShowIntentionActions")],
         "fix previous": [
             idea("action GotoPreviousError"),
             idea("action ShowIntentionActions"),
         ],
-        "grab" + _optional_numerals: grab_identifier,
+        f"grab {_optional_numerals}": grab_identifier,
         "(start | stop) recording": idea("action StartStopMacroRecording"),
         "edit (recording | recordings)": idea("action EditMacros"),
         "play recording": idea("action PlaybackLastMacro"),
