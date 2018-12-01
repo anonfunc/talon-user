@@ -3,7 +3,7 @@ from talon.voice import Context
 def ExtensionContext(ext):
     def language_match(app, win):
         title = win.title
-        print("Window title:" + title)
+        #print("Window title:" + title)
         if app.bundle == 'com.microsoft.VSCode':
             filename = title.split(' - ', 1)[0]
         elif app.bundle == 'com.apple.Terminal':
