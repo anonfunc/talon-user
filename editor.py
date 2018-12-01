@@ -15,6 +15,7 @@ supported_apps = {
     "com.jetbrains.rubymine",
     "com.jetbrains.WebStorm",
     "com.google.android.studio",
+    "com.microsoft.VSCode",
 }
 
 
