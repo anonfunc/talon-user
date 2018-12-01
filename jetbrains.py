@@ -209,7 +209,7 @@ keymap.update(
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
-        f"select line {_optional_numerals}": [
+        f"select (lines | line) {_optional_numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineStart"),
             idea("action EditorLineEndWithSelection"),
@@ -244,12 +244,6 @@ keymap.update(
         "(action | please) [<dgndictation>]": [idea("action GotoAction"), text],
         f"(go to | jump to) {_optional_numerals}": idea_num("goto {} 0", drop=2),
         f"clone line {_optional_numerals}": idea_num("clone {}", drop=2),
-        "fix this": idea("action ShowIntentionActions"),
-        "fix next": [idea("action GotoNextError"), idea("action ShowIntentionActions")],
-        "fix previous": [
-            idea("action GotoPreviousError"),
-            idea("action ShowIntentionActions"),
-        ],
         f"grab {_optional_numerals}": grab_identifier,
         "(start | stop) recording": idea("action StartStopMacroRecording"),
         "edit (recording | recordings)": idea("action EditMacros"),

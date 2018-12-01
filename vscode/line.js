@@ -8,12 +8,10 @@ exports.GET = function(args) {
         "path": args.path,
     }
     args.statusCode = 200;
-          
 }
 
 exports.POST = async function(args) {
     var vscode = require('vscode');
-            
     // current editor
     const editor = vscode.window.activeTextEditor;
     var body = await args.getJSON();

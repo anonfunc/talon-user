@@ -1,29 +1,3 @@
-# VS CODE VIA HTTP RPC
-# Setup:
-# Install https://marketplace.visualstudio.com/items?itemName=mkloubert.vs-rest-api
-# Copy this file and vscode/ to your ~/.talon/user directory.
-# Configure it in your user settings:
-# "rest.api": {
-#     "autoStart": true,
-#     "openInBrowser": false,
-#     "port": 1781,
-#     "guest": false,
-#     "users": [
-#         {
-#             "name": "talon",
-#             "password": "<BIG RANDOM PASSWORD>",
-#             "canExecute": true
-#         }
-#     ],
-#     "endpoints": {
-#         "talonLine": {
-#             "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/line.js"
-#         }
-#     }
-# }
-# Restart VS Code.
-
-
 import os
 import json
 import time
@@ -121,14 +95,15 @@ def send_api_command(*commands):
     def _send():
         port, username, password = get_rest_api_settings()
         if port:
-            for cmd in commands:
-                print("Sending {}".format(cmd[0]))
-                response = requests.post(
-                    "http://localhost:{}/api/commands/{}".format(port, cmd[0]), 
-                    timeout=(0.05, 3.05),
-                    auth=(username, password)
-                )
-                response.raise_for_status()
+            for cmds in commands:
+                for cmd in cmds:
+                    print("Sending {}".format(cmd))
+                    response = requests.post(
+                        "http://localhost:{}/api/commands/{}".format(port, cmd), 
+                        timeout=(0.05, 3.05),
+                        auth=(username, password)
+                    )
+                    response.raise_for_status()
         else:
             print("Rest API does not have 'port' setting.")
     threading.Thread(target=_send).start()
@@ -164,7 +139,7 @@ def select_lines(drop=1):
             endPos = {"line": end-1, "character": 9999}
             selection = {"start": startPos, "end": endPos}
             response = requests.post(
-                "http://localhost:{}/api/line".format(port), 
+                "http://localhost:{}/api/talonLine".format(port), 
                 timeout=(0.05, 3.05),
                 auth=(username, password),
                 json=selection
@@ -178,6 +153,23 @@ def select_lines(drop=1):
 def vscode_command(*cmds):
     return lambda _: send_api_command(cmds)
 
+def vscode_search(direction, drop=2):
+    def handler(m):
+        pattern = " ".join([str(w) for w in m.dgndictation[0]._words])
+        port, username, password = get_rest_api_settings()
+        if port:
+            response = requests.post(
+                "http://localhost:{}/api/talonSearch".format(port), 
+                timeout=(0.05, 3.05),
+                auth=(username, password),
+                json={"direction": direction, "string": pattern}
+            )
+            response.raise_for_status()
+            return response.text
+        else:
+            print("Rest API does not have 'port' setting.")
+
+    return handler
 
 # group = ContextGroup("vscode")
 ctx = Context("vscode", bundle="com.microsoft.VSCode")  # , group=group)
@@ -198,8 +190,8 @@ keymap.update(
         "visit declaration": vscode_command("editor.action.goToDeclaration"),
         "visit (implementers | implementations)": vscode_command("editor.action.goToImplementation"),
         "visit type": vscode_command("editor.action.goToTypeDefinition"),
-        # "(select previous | trail) [<dgndictation>]": vscode_command("find prev {}"),
-        # "(select next | crew) [<dgndictation>]": vscode_command("find next {}"),
+        "(select previous | trail) [<dgndictation>]": vscode_search("backwards"),
+        "(select next | crew) [<dgndictation>]": vscode_search("forwards"),
         # "search everywhere [for] [<dgndictation>]": [
         #     vscode_command("action"),
         #     text,
@@ -210,10 +202,10 @@ keymap.update(
         "select less": vscode_command("editor.action.smartSelect.shrink"),
         "select more": vscode_command("editor.action.smartSelect.grow"),
         f"select line {_optional_numerals}": [
-            go_to_line(drop=2), vscode_command("cursorStart", "cursorEndSelect")
+            go_to_line(drop=2), vscode_command("cursorHome", "cursorEndSelect")
         ],
-        "select this line": [vscode_command("cursorStart", "cursorEndSelect")],
-        f"select lines {_optional_numerals} until {_optional_numerals}": select_lines(drop=2),
+        "select this line": [vscode_command("cursorHome", "cursorEndSelect")],
+        f"select (lines | line) {_optional_numerals} until {_optional_numerals}": select_lines(drop=2),
         "(clean | clear) line": [
            vscode_command("cursorLineStart", "deleteAllRight")
         ],
@@ -227,8 +219,8 @@ keymap.update(
         "(go | jump) forward": vscode_command("workbench.action.navigateForward"),
         "comment": vscode_command("editor.action.commentLine"),
         "(action | please) [<dgndictation>]": [vscode_command("workbench.action.showCommands"), delay(), text],
-        f"(go to | jump to) {_optional_numerals}": [go_to_line(drop=2), vscode_command("cursorStart")],
-        f"(go | jump) to end of {_optional_numerals}": [go_to_line(drop=4), vscode_command("cursorStart")],
+        f"(go to | jump to) {_optional_numerals}": [go_to_line(drop=2), vscode_command("cursorHome")],
+        f"(go | jump) to end of {_optional_numerals}": [go_to_line(drop=4), vscode_command("cursorHome")],
     }
 )
 

@@ -20,7 +20,10 @@ Note that you *must* replace two bits in the following config:
         "endpoints": {
             "talonLine": {
                 "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/line.js"
-            }
+            },
+            "talonSearch": {
+                "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/search.js"
+            },
         }
     }
 
