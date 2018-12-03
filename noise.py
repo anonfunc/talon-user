@@ -60,7 +60,7 @@ class NoiseModel:
                 if duration > 0.7:
                     self.button = 2
                     ctrl.mouse_click(button=2)
-                elif duration > 0.25:
+                elif duration > 0.3:
                     self.button = 1
                     ctrl.mouse_click(button=1)
             self.hiss_last = now

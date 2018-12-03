@@ -93,7 +93,7 @@ ctx.keymap(
         # "static": "static ",
         "(args | arguments)": ["()", Key("left")],
         "index": ["[]", Key("left")],
-        "block": [" {}", Key("left enter enter up tab")],
+        "block": [" {}", Key("left enter enter up")],
         "empty array": "[]",
         "(empty dict | empty dictionary)": "{}",
         "equals": "=",

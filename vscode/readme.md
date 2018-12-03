@@ -1,7 +1,7 @@
 # VS Code via HTTP Rest API
 ## Install the VS Code plugin and Talon files:
 - Install https://marketplace.visualstudio.com/items?itemName=mkloubert.vs-rest-api
-- Copy [this file](https://github.com/anonfunc/talon-user/tree/master/vscode.py) and this directory to your ~/.talon/user directory.
+- Copy this directory to your ~/.talon/user directory.
 ## Configure the HTTP endpoint in your Code user settings
 Note that you *must* replace two bits in the following config:
 
