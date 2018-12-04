@@ -4,7 +4,7 @@ import requests
 import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
-from talon.voice import Context, ContextGroup, Key
+from talon.voice import Context, ContextGroup, Key, Str
 
 try:
     from user.mouse import delayed_click
@@ -37,7 +37,7 @@ def join_words(words, sep=" "):
             out += sep
         out += word
     return out
-    
+
 def insert(s):
     Str(s)(None)
 
