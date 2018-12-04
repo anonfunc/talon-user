@@ -18,12 +18,22 @@ except ImportError:
 
 
 # region Supporting Code
+mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
+
 def parse_word(word):
     word = str(word).lstrip("\\").split("\\", 1)[0]
     word = mapping.get(word, word)
     return word
 
 
+def join_words(words, sep=" "):
+    out = ""
+    for i, word in enumerate(words):
+        if i > 0 and word not in punctuation:
+            out += sep
+        out += word
+    return out
+    
 def parse_words(m):
     try:
         return list(map(parse_word, m.dgndictation[0]._words))
@@ -31,8 +41,13 @@ def parse_words(m):
         return []
 
 
+def insert(s):
+    Str(s)(None)
+
+
 def text(m):
     insert(join_words(parse_words(m)).lower())
+
 
 
 _numeral_map = dict((str(n), n) for n in range(0, 20))

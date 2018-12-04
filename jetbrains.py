@@ -5,7 +5,6 @@ import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
 from talon.voice import Context, ContextGroup, Key
-from user.std import text, parse_word
 
 try:
     from user.mouse import delayed_click
@@ -16,6 +15,36 @@ except ImportError:
 
 
 # region Supporting Code
+mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
+
+def parse_word(word):
+    word = str(word).lstrip("\\").split("\\", 1)[0]
+    word = mapping.get(word, word)
+    return word
+
+
+def parse_words(m):
+    try:
+        return list(map(parse_word, m.dgndictation[0]._words))
+    except AttributeError:
+        return []
+
+
+def join_words(words, sep=" "):
+    out = ""
+    for i, word in enumerate(words):
+        if i > 0 and word not in punctuation:
+            out += sep
+        out += word
+    return out
+    
+def insert(s):
+    Str(s)(None)
+
+
+def text(m):
+    insert(join_words(parse_words(m)).lower())
+
 _numeral_map = dict((str(n), n) for n in range(0, 20))
 for n in range(20, 101, 10):
     _numeral_map[str(n)] = n
