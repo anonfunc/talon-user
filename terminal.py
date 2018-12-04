@@ -20,6 +20,11 @@ from user.mouse import delayed_click
 
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
+ctx.vocab = [
+    'docker',
+    'talon',
+]
+ctx.vocab_remove = ['doctor', 'Doctor']
 
 subdirs = {}
 

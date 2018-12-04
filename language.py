@@ -1,11 +1,11 @@
-from talon.voice import Context
+from talon.voice import Context, Key
 
 def ExtensionContext(ext):
     def language_match(app, win):
         title = win.title
         #print("Window title:" + title)
         if app.bundle == 'com.microsoft.VSCode':
-            filename = title.split(' - ', 1)[0]
+            filename = title.split(' — ', 1)[0]
         elif app.bundle == 'com.apple.Terminal':
             parts = title.split(' \u2014 ')
             if len(parts) >= 2 and parts[1].startswith(('vi ', 'vim ')):
@@ -19,8 +19,32 @@ def ExtensionContext(ext):
     return language_match
 
 ctx = Context('python', func=ExtensionContext('.py'))
-ctx.keymap({'language test': 'python'})
+# ctx.vocab = [
+#     '',
+#     '',
+# ]
+# ctx.vocab_remove = ['']
+ctx.keymap({
+    'state (def | deaf | deft)': 'def ',
+    'state else if': 'elif ',
+    'state if': 'if ',
+    'state else if': [' else if ()', Key('left')],
+    'state while': ['while ()', Key('left')],
+    'state for': 'for ',
+    'state import': 'import ',
+    'state class': 'class ',
+})
 
 ctx = Context('golang', func=ExtensionContext('.go'))
-ctx.keymap({'language test': 'go'})
+ctx.keymap({
+    'state (funk | func | fun)': 'func ',
+    'state if': 'if ',
+    'state else if': ' else if ',
+    'state while': 'for ',
+    'state for': 'for ',
+    'state switch': 'switch ',
+    'state case': 'case ',
 
+    'state type': 'type ',
+    'state (start | struct | struck)': 'struct ',
+})
