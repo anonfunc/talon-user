@@ -16,6 +16,8 @@ except ImportError:
 
 # region Supporting Code
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
+punctuation = set(".,-!?")
+
 
 def parse_word(word):
     word = str(word).lstrip("\\").split("\\", 1)[0]
