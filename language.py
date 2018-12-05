@@ -5,7 +5,10 @@ def ExtensionContext(ext):
         title = win.title
         #print("Window title:" + title)
         if app.bundle == 'com.microsoft.VSCode':
-            filename = title.split(' — ', 1)[0]
+            if u'\u2014' in title:
+                filename = title.split(u' \u2014 ', 1)[0]  # Unicode em dash!
+            elif '-' in title:
+                filename = title.split(u' - ', 1)[0]
         elif app.bundle == 'com.apple.Terminal':
             parts = title.split(' \u2014 ')
             if len(parts) >= 2 and parts[1].startswith(('vi ', 'vim ')):
@@ -33,6 +36,7 @@ ctx.keymap({
     'state for': 'for ',
     'state import': 'import ',
     'state class': 'class ',
+    'state (past | pass)': 'pass',
 })
 
 ctx = Context('golang', func=ExtensionContext('.go'))
