@@ -21,8 +21,8 @@ def kmaestro(id):
     return _kmaestro
 
 
-keymap = {}
-keymap.update(
+ctx = Context("window")
+ctx.keymap(
     {
         "switcher": kmaestro("Switcher"),
         "window left": kmaestro("Windy Left"),
@@ -30,5 +30,3 @@ keymap.update(
         "window max": kmaestro("Windy Max"),
     }
 )
-ctx = Context("window")
-ctx.keymap(keymap)

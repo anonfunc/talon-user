@@ -201,8 +201,7 @@ def is_real_jetbrains_editor(app, window):
 # group = ContextGroup("jetbrains")
 ctx = Context("jetbrains", func=is_real_jetbrains_editor)  # , group=group)
 
-keymap = {}
-keymap.update(
+ctx.keymap(
     {
         "complete": idea("action CodeCompletion"),
         "smarter": idea("action SmartTypeCompletion"),
@@ -234,7 +233,7 @@ keymap.update(
         "search [for] [<dgndictation>]": [idea("action Find"), text],
         "search [for] this": idea("action FindWordAtCaret"),
         "next result": idea("action FindNext"),
-        "last result": idea("action FindPrevious"),
+        "(last | previous) result": idea("action FindPrevious"),
         "surround [this] [<dgndictation>]": [idea("action SurroundWith"), text],
         "generate [<dgndictation>]": [idea("action Generate"), text],
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
@@ -286,6 +285,4 @@ keymap.update(
         ],
     }
 )
-
-ctx.keymap(keymap)
 # group.load()

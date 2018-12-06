@@ -124,8 +124,7 @@ def grab_thing(m):
 
 mapping = {"semicolon": ";", r"new-line": "\n", r"new-paragraph": "\n\n"}
 
-keymap = {}
-keymap.update(
+ctx.keymap(
     {
         "(cd {terminal.subdirs} | cd)": change_dir,
         "list": list_dir,
@@ -185,6 +184,3 @@ keymap.update(
         "jump [<dgndictation>]": ["zz ", text, "\n"],
     }
 )
-
-
-ctx.keymap(keymap)

@@ -1,7 +1,7 @@
 import talon
 from talon.voice import Word, Context, Str, Rep
 
-from user.utility import surround, text_to_number, optional_numerals
+from user.utility import text_to_number, optional_numerals
 
 
 def repeat(m):
@@ -17,8 +17,5 @@ def repeat(m):
     return repeater(None)
 
 
-keymap = {}
-keymap.update({"repeat" + optional_numerals: repeat})
-
 ctx = Context("repeaters")
-ctx.keymap(keymap)
+ctx.keymap({"repeat" + optional_numerals: repeat})

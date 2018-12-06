@@ -12,8 +12,6 @@ from user.utility import (
     word,
 )
 
-mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
-punctuation = set(".,-!?")
 
 def copy_bundle(m):
     bundle = ui.active_app().bundle
@@ -118,15 +116,15 @@ ctx.keymap(
         "[(op | logical | bitwise)] (right shift | shift right) equals": " >>= ",
         "new window": Key("cmd-n"),
         "next window": Key("cmd-`"),
-        "last window": Key("cmd-shift-`"),
+        "(last | previous) window": Key("cmd-shift-`"),
         "(next app | swick)": Key("cmd-tab"),
-        "last app": Key("cmd-shift-tab"),
+        "(last | previous) app": Key("cmd-shift-tab"),
         "next tab": Key("ctrl-tab"),
         "new tab": Key("cmd-t"),
         "(dizzle | undo)": Key("cmd-z"),
         "last tab": Key("ctrl-shift-tab"),
         "next space": Key("cmd-alt-ctrl-right"),
-        "last space": Key("cmd-alt-ctrl-left"),
+        "(last | previous) space": Key("cmd-alt-ctrl-left"),
         'copy active bundle': copy_bundle,
     }
 )

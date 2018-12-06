@@ -50,14 +50,11 @@ def FormatText(m):
     Str(sep.join(words))(None)
 
 
-keymap = {}
-keymap.update(
+ctx = Context("formatters")
+ctx.keymap(
     {
         # 'word <dgnwords>': word,
         "(%s)+ <dgndictation>"
         % (" | ".join(formatters)): FormatText
     }
 )
-
-ctx = Context("formatters")
-ctx.keymap(keymap)

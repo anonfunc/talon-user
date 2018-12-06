@@ -224,9 +224,7 @@ def vscode_search(direction, drop=2):
 
 # group = ContextGroup("vscode")
 ctx = Context("vscode", bundle="com.microsoft.VSCode")  # , group=group)
-
-keymap = {}
-keymap.update(
+ctx.keymap(
     {
         "complete": vscode_command("editor.action.triggerSuggest"),
         # "smarter": vscode_command("action"),
@@ -293,6 +291,4 @@ keymap.update(
         ],
     }
 )
-
-ctx.keymap(keymap)
 # group.load()

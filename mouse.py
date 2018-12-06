@@ -96,11 +96,11 @@ def control_zoom_mouse(m):
     if eye_mouse.control_mouse.enabled:
         eye_mouse.control_mouse.toggle() 
 
-keymap = {
-    "clicker": delayed_right_click,
+ctx.keymap({
     "click": delayed_click,
-    "dubclick": delayed_dubclick,
-    "tripclick": delayed_tripclick,
+    "click right": delayed_right_click,
+    "click double": delayed_dubclick,
+    "click triple": delayed_tripclick,
     "click drag": mouse_drag,
     "click release": mouse_release,
     "wheel down": mouse_scroll(50),
@@ -118,5 +118,4 @@ keymap = {
     "(squid | control mouse)": control_mouse,
     "zoom mouse": control_zoom_mouse,
     # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
-}
-ctx.keymap(keymap)
+})

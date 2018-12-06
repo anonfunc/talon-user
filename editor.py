@@ -18,7 +18,6 @@ supported_apps = {
     "com.microsoft.VSCode",
 }
 
-
 ctx = Context(
     "notsupported", func=lambda app, _: not any(app.bundle == b for b in supported_apps)
 )
@@ -70,16 +69,16 @@ def select_text_to_right_of_cursor(m):
         press("shift-right")
 
 
-keymap = {}
-keymap.update(
+ctx.keymap(
     {
-        "(select previous | trail) [<dgndictation>]": select_text_to_left_of_cursor,
-        "(select next | crew) [<dgndictation>]": select_text_to_right_of_cursor,
+        "(select previous) [<dgndictation>]": select_text_to_left_of_cursor,
+        "(select next) [<dgndictation>]": select_text_to_right_of_cursor,
         "search [<dgndictation>]": [Key("cmd-f"), text],
-        "select [this] line": [Key("cmd-left"), Key("shift-end")],
-        "(clean | clear) line": [Key("cmd-left"), Key("shift-end"), Key("delete")],
+        "select all": [Key("cmd-a")],
+        "select [this] line": [Key("home"), Key("shift-end")],
+        "(clean | clear) line": [Key("home"), Key("shift-end"), Key("delete")],
         "delete line": [
-            Key("cmd-left"),
+            Key("home"),
             Key("shift-end"),
             Key("delete"),
             Key("delete"),
@@ -88,5 +87,3 @@ keymap.update(
         "delete to start": [Key("shift-home"), Key("delete")],
     }
 )
-
-ctx.keymap(keymap)

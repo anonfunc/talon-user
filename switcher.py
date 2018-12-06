@@ -16,8 +16,7 @@ def switch_app(m):
 
 
 ctx = Context("switcher")
-keymap = {"focus {switcher.apps}": switch_app}
-ctx.keymap(keymap)
+ctx.keymap({"focus {switcher.apps}": switch_app})
 
 
 def update_lists():
