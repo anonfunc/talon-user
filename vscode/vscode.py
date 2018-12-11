@@ -243,8 +243,8 @@ ctx.keymap(
             "editor.action.goToImplementation"
         ),
         "visit type": vscode_command("editor.action.goToTypeDefinition"),
-        "(select previous | trail) [<dgndictation>]": vscode_search("backwards"),
-        "(select next | crew) [<dgndictation>]": vscode_search("forwards"),
+        "(select previous | trail) <dgndictation>": vscode_search("backwards"),
+        "(select next | crew) <dgndictation>": vscode_search("forwards"),
         # "search everywhere [for] [<dgndictation>]": [
         #     vscode_command("action"),
         #     text,

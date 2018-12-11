@@ -10,7 +10,6 @@ ctx.keymap({
     # Application navigation
     # XXX delay is janky, wait until alfred focuses?
     "launcher [<dgndictation>]": [Key("cmd-space"), lambda _: time.sleep(0.4), text],
-    "mission control": Key("ctrl-up"),
     # Following commands should be application specific
     # "freshly": Key("cmd-r"),
     # "baxley": Key("cmd-left"),

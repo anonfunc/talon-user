@@ -4,7 +4,9 @@ from talon.voice import Str, Key
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
-
+vocab = [
+    'nonce'
+]
 
 def parse_word(word):
     word = str(word).lstrip("\\").split("\\", 1)[0]

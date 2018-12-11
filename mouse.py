@@ -1,6 +1,7 @@
 from talon_plugins import eye_mouse
 from talon_plugins import eye_zoom_mouse
 import time
+import threading
 from talon import ctrl, tap
 from talon.voice import Context, Key
 
@@ -62,7 +63,9 @@ def mouse_release(m):
 
 def mouse_scroll(amount):
     def scroll(m):
+        global scrollThread
         print("amount is", amount)
+        scrollThread.amount = amount
         ctrl.mouse_scroll(y=amount)
 
     return scroll
@@ -96,6 +99,28 @@ def control_zoom_mouse(m):
     if eye_mouse.control_mouse.enabled:
         eye_mouse.control_mouse.toggle() 
 
+class ScrollThread (threading.Thread):
+    def __init__(self, amount, delay):
+        super(ScrollThread, self).__init__()
+        self.stop_event = threading.Event()
+        self.amount = amount
+        self.delay = delay
+
+    def run(self):
+        while not self.stop_event.is_set():
+            ctrl.mouse_scroll(y=self.amount)
+            time.sleep(self.delay)
+    
+    def stop(self):
+        self.stop_event.set()
+
+scrollThread = ScrollThread(50, 0.5)
+
+def stopScrolling(m):
+    global scrollThread
+    scrollThread.stop()
+    scrollThread = ScrollThread(50, 0.5)
+
 ctx.keymap({
     "click": delayed_click,
     "click right": delayed_right_click,
@@ -103,8 +128,10 @@ ctx.keymap({
     "click triple": delayed_tripclick,
     "click drag": mouse_drag,
     "click release": mouse_release,
-    "wheel down": mouse_scroll(50),
-    "wheel up": mouse_scroll(-50),
+    "wheel down": mouse_scroll(30),
+    "wheel up": mouse_scroll(-30),
+    "continuous": lambda m: scrollThread.start(),
+    "wheel stop": stopScrolling,
     "click command": adv_click(0, "cmd"),
     "click control": adv_click(0, "ctrl"),
     "click (option | opt)": adv_click(0, "alt"),

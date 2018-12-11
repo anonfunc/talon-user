@@ -3,6 +3,7 @@ from talon.voice import Context, Key
 def ExtensionContext(ext):
     def language_match(app, win):
         title = win.title
+        filename = ""
         #print("Window title:" + title)
         if app.bundle == 'com.microsoft.VSCode':
             if u'\u2014' in title:
@@ -51,4 +52,17 @@ ctx.keymap({
 
     'state type': 'type ',
     'state (start | struct | struck)': 'struct ',
+    'state interface': 'interface ',
+
+    'go dot': Key("cmd-right ."),
+})
+
+ctx = Context('jargon')
+ctx.keymap({
+    'state jason': 'json',
+    'state (oct a | okta | octa)': 'okta',
+    'state (a w s | aws)': 'aws',
+    'state bite': 'byte',
+    'state bites': 'bytes',
+    'state state': 'state',
 })

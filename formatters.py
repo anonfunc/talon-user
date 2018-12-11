@@ -1,6 +1,6 @@
 from talon.voice import Word, Context, Str
 
-from user.utility import surround, parse_word
+from user.utility import surround, parse_word, vocab
 
 formatters = {
     # Smashed
@@ -51,6 +51,7 @@ def FormatText(m):
 
 
 ctx = Context("formatters")
+ctx.vocab = vocab
 ctx.keymap(
     {
         # 'word <dgnwords>': word,

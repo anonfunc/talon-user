@@ -10,6 +10,7 @@ from user.utility import (
     surround,
     text,
     word,
+    vocab,
 )
 
 
@@ -19,7 +20,7 @@ def copy_bundle(m):
     app.notify('Copied app bundle', body='{}'.format(bundle))
 
 ctx = Context("input")
-
+ctx.vocab = vocab
 ctx.keymap(
     {
         "say <dgndictation> [over]": text,

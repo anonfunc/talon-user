@@ -1,5 +1,4 @@
-import talon
-from talon.voice import Word, Context, Str, Rep
+from talon.voice import Word, Context, Str, Rep, talon
 
 from user.utility import text_to_number, optional_numerals
 
@@ -13,8 +12,10 @@ def repeat(m):
     if not repeat_count:
         repeat_count = 1
     repeater = Rep(repeat_count)
-    repeater.ctx = m.ctx
-    return repeater(None)
+    repeater.ctx = talon
+    result = repeater(None)
+    print(f"Result: {result}")
+    return result
 
 
 ctx = Context("repeaters")

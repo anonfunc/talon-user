@@ -224,8 +224,8 @@ ctx.keymap(
         "visit declaration": idea("action GotoDeclaration"),
         "visit (implementers | implementations)": idea("action GotoImplementation"),
         "visit type": idea("action GotoTypeDeclaration"),
-        "(select previous | trail) [<dgndictation>]": idea_words("find prev {}"),
-        "(select next | crew) [<dgndictation>]": idea_words("find next {}"),
+        "(select previous | trail) <dgndictation>": idea_words("find prev {}"),
+        "(select next | crew) <dgndictation>": idea_words("find next {}"),
         "search everywhere [for] [<dgndictation>]": [
             idea("action SearchEverywhere"),
             text,
