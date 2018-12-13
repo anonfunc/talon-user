@@ -142,11 +142,11 @@ def idea(cmd):
     return lambda _: send_idea_command(cmd)
 
 
-def idea_num(cmd, drop=1):
+def idea_num(cmd, drop=1, zero_okay=False):
     def handler(m):
         line = text_to_number(m._words[drop:])
         print(cmd.format(line))
-        if int(line) == 0:
+        if int(line) == 0 and not zero_okay:
             print("Not sending, arg was 0")
             return
 
@@ -181,7 +181,7 @@ def grab_identifier(m):
     try:
         old_line, old_col = get_idea_location()
         delayed_click(m, button=0, times=2)
-        for _ in range(times):
+        for _ in range(times-1):
             send_idea_command("action EditorSelectWord")
         send_idea_command("action EditorCopy")
         send_idea_command("goto {} {}".format(old_line, old_col))
@@ -283,6 +283,13 @@ ctx.keymap(
             text,
             Key("enter"),
         ],
+        "show (mark | marks | bookmark | bookmarks)": idea("action ShowBookmarks"),
+        "[toggle] (mark | bookmark)": idea("action ToggleBookmark"),
+        "next (mark | bookmark)": idea("action GotoNextBookmark"),
+        "(last | previous) (mark | bookmark)": idea("action GotoPreviousBookmark"),
+        f"(mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num("action ToggleBookmark{}", drop=1, zero_okay=True),
+        f"(jump | go) (mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num("action GotoBookmark{}", drop=2, zero_okay=True),
+        
     }
 )
 # group.load()
