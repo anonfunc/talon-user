@@ -104,12 +104,12 @@ def control_zoom_mouse(m):
 def scrollMe():
     global scrollAmount
     if scrollAmount:
-        ctrl.mouse_scroll(y=scrollAmount)
+        ctrl.mouse_scroll(by_lines=False, y=scrollAmount/10)
 
 
 def startScrolling(m):
     global scrollJob
-    scrollJob = cron.interval('500ms', scrollMe)
+    scrollJob = cron.interval('60ms', scrollMe)
 
 
 def stopScrolling(m):
@@ -118,7 +118,12 @@ def stopScrolling(m):
     cron.cancel(scrollJob)
 
 scrollAmount = 0
-scrollJob = cron.interval('500ms', scrollMe)
+scrollJob = None
+
+def toggle_cursor(show):
+    def _toggle(m):
+        ctrl.cursor_visible(show)
+    return _toggle
 
 ctx.keymap({
     "click": delayed_click,
@@ -139,7 +144,8 @@ ctx.keymap({
     "click double": adv_click(0, times=2),
     "click triple": adv_click(0, times=3),
     "click (shift double | double shift)": adv_click(0, "shift", times=2),
-    "toggle cursor": Key("ctrl-alt-k"),
+    "hide cursor": toggle_cursor(False),
+    "show cursor": toggle_cursor(True),
     # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
     "(squid | control mouse)": control_mouse,
     "zoom mouse": control_zoom_mouse,

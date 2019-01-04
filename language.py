@@ -53,6 +53,13 @@ ctx.keymap({
     'state type': 'type ',
     'state (start | struct | struck)': 'struct ',
     'state interface': 'interface ',
+    
+    'state string': 'string ',
+    'state (int | integer | ant)': 'int ',
+    'state (int | integer | ant) 64': 'int64 ',
+    'state slice': '[]',
+    'state tag': ['``', Key("left")],
+    'map of string to string': 'map[string]string',
 
     'go dot': Key("cmd-right ."),
 })

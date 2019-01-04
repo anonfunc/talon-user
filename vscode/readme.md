@@ -24,6 +24,9 @@ Note that you *must* replace two bits in the following config:
             "talonSearch": {
                 "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/search.js"
             },
+            "talonTerminal": {
+                "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/terminal.js"
+            }
         }
     }
 

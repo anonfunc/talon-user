@@ -8,3 +8,9 @@ ctx = Context("misc")
 
 ctx.keymap({
 })
+
+ctx = Context("shortcat")
+
+ctx.keymap({
+    "(shortcat | short cap | shortcut) [<dgndictation>]": [Key("cmd+shift+ctrl+f14"), text],
+})
