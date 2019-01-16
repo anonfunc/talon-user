@@ -1,7 +1,7 @@
 import talon.clip as clip
 from talon.voice import Context, Key, press
 from user.utility import text, parse_words, join_words
-from user.ext.homophones import backwards
+from user.ext.homophones import homophone_lookup
 
 supported_apps = {
     "com.jetbrains.intellij",
@@ -30,7 +30,7 @@ def select_text_to_left_of_cursor(m):
     if not words:
         return
     key = join_words(words).lower()
-    keys = backwards.get(key, [key])
+    keys = homophone_lookup.get(key, [key])
     press("left", wait=2000)
     press("right", wait=2000)
     press("shift-home", wait=2000)
@@ -58,7 +58,7 @@ def select_text_to_right_of_cursor(m):
     if not words:
         return
     key = join_words(words).lower()
-    keys = backwards.get(key, [key])
+    keys = homophone_lookup.get(key, [key])
     press("right", wait=2000)
     press("left", wait=2000)
     press("shift-end", wait=2000)

@@ -49,7 +49,9 @@ with open(homophones_file, "r") as f:
                 phones[w] = others
 
 all_homophones = phones
-backwards = {item.lower(): words for canon,words in phones.items() for item in words}
+
+# Map from every homophone back to the row it was in.
+homophone_lookup = {item.lower(): words for canon,words in phones.items() for item in words}
 
 active_word_list = None
 is_selection = False

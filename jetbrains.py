@@ -5,6 +5,15 @@ import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
 from talon.voice import Context, ContextGroup, Key, Str
+try:
+    from user.ext.homophones import all_homophones
+    # Map from every homophone back to the row it was in.
+    homophone_lookup = {item.lower(): words for canon,words in all_homophones.items() for item in words}
+except ImportError:
+    homophone_lookup = {
+        "right": ["right", "write"],
+        "write": ["right", "write"]
+    }
 
 try:
     from user.mouse import delayed_click
@@ -173,6 +182,22 @@ def idea_words(cmd, join=" "):
     return handler
 
 
+def idea_find(direction):
+    def handler(m):
+        args = [str(w) for w in m.dgndictation[0]._words]
+        cmd = "find {} {}"
+        if len(args) == 1:
+            word = args[0]
+            if word in homophone_lookup:
+                search_string = "({})".format("|".join(homophone_lookup[word]))
+        else:
+            search_string = " ".join(args)
+        print(args)
+        send_idea_command(cmd.format(direction, search_string))
+
+    return handler
+
+
 def grab_identifier(m):
     old_clip = clip.get()
     times = text_to_number(m._words[1:])  # hardcoded prefix length?
@@ -224,8 +249,8 @@ ctx.keymap(
         "visit declaration": idea("action GotoDeclaration"),
         "visit (implementers | implementations)": idea("action GotoImplementation"),
         "visit type": idea("action GotoTypeDeclaration"),
-        "(select previous | trail) <dgndictation>": idea_words("find prev {}"),
-        "(select next | crew) <dgndictation>": idea_words("find next {}"),
+        "(select previous | trail) <dgndictation>": idea_find("prev"),
+        "(select next | crew) <dgndictation>": idea_find("next"),
         "search everywhere [for] [<dgndictation>]": [
             idea("action SearchEverywhere"),
             text,
