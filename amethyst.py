@@ -66,4 +66,3 @@ ctx.keymap({
     f"focus [to] next space": Key("ctrl-right"),
     f"focus [to] (previous | last) space": Key("ctrl-left"),
 })
-

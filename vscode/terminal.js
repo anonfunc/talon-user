@@ -4,7 +4,9 @@ exports.GET = function(args) {
     this._terminalPid
     // current editor
     const editor = vscode.window.activeTextEditor;
-    vscode.window.activeTerminal.processId.then((number) => this._terminalPid = number);
+    if (vscode.window.activeTerminal !== undefined) {
+        vscode.window.activeTerminal.processId.then((number) => this._terminalPid = number);
+    }
     args.response.data = {
         "activeTerminal": vscode.window.activeTerminal,
         "activeTerminalPid": this._terminalPid,

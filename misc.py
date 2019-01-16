@@ -7,6 +7,7 @@ from user.utility import text
 ctx = Context("misc")
 
 ctx.keymap({
+    "go dark": lambda _: subprocess.check_call(["open", "/System/Library/CoreServices/ScreenSaverEngine.app"])
 })
 
 ctx = Context("shortcat")

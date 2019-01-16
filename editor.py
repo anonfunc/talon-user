@@ -1,6 +1,7 @@
 import talon.clip as clip
 from talon.voice import Context, Key, press
 from user.utility import text, parse_words, join_words
+from user.ext.homophones import backwards
 
 supported_apps = {
     "com.jetbrains.intellij",
@@ -28,14 +29,19 @@ def select_text_to_left_of_cursor(m):
     words = parse_words(m)
     if not words:
         return
-    old = clip.get()
     key = join_words(words).lower()
-    press("shift-home", wait=2000)
-    press("cmd-c", wait=2000)
+    keys = backwards.get(key, [key])
+    press("left", wait=2000)
     press("right", wait=2000)
-    text_left = clip.get()
-    clip.set(old)
-    result = text_left.find(key)
+    press("shift-home", wait=2000)
+    with clip.capture() as s:
+        press("cmd-c", wait=2000)
+    press("right", wait=2000)
+    text_left = s.get()
+    result = -1
+    for needle in keys:
+        result = max(text_left.find(needle), result)
+    print(text_left, keys, result)
     if result == -1:
         return
     # cursor over to the found key text
@@ -52,14 +58,22 @@ def select_text_to_right_of_cursor(m):
     if not words:
         return
     key = join_words(words).lower()
-    old = clip.get()
-    press("shift-end", wait=2000)
-    press("cmd-c", wait=2000)
+    keys = backwards.get(key, [key])
+    press("right", wait=2000)
     press("left", wait=2000)
-    text_right = clip.get()
-    clip.set(old)
-    result = text_right.find(key)
-    if result == -1:
+    press("shift-end", wait=2000)
+    with clip.capture() as s:
+        press("cmd-c", wait=2000)
+    text_right = s.get()
+    press("left", wait=2000)
+    result = len(text_right) + 1
+    for needle in keys:
+        index = text_right.find(needle)
+        if index == -1:
+            continue
+        result = min(index, result)
+    print(text_right, keys, result, len(text_right) + 1)
+    if result == len(text_right) + 1:
         return
     # cursor over to the found key text
     for i in range(0, result):

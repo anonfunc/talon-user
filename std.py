@@ -27,7 +27,7 @@ ctx.keymap(
         "sentence <dgndictation> [over]": sentence_text,
         "comma <dgndictation> [over]": [", ", text],
         "period <dgndictation> [over]": [". ", sentence_text],
-        "more <dgndictation> [over]": [" ", text],
+        # "more <dgndictation> [over]": [" ", text],
         "word <dgnwords>": word,
         "slap": [Key("cmd-right enter")],
         "question [mark]": "?",

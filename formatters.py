@@ -21,6 +21,7 @@ formatters = {
     "sentence": (False, lambda i, word, _: word.capitalize() if i == 0 else word),
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),
+    "lowcaps": (False, lambda i, word, _: word.lower()),
     "string": (False, surround("'")),
     "quoted": (False, surround('"')),
     "padded": (False, surround(" ")),
