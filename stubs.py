@@ -1,41 +1,114 @@
 import os
 import sys
-import types
 
 from inspect import signature
+from textwrap import dedent
 
-talon_modules = [m for m in sys.modules.keys() if m.startswith("talon.")]
+INCLUDED_PRIVATE_MEMBERS = ["__init__", "__call__", "_words"]
+
+talon_modules = [
+    m
+    for m in sys.modules.keys()
+    if m.startswith("talon.") or m.startswith("talon_plugins.")
+]
 # talon_modules = ["talon.clip"]
-talon_plugin_modules = [m for m in sys.modules.keys() if m.startswith("talon_plugins.")]
+# talon_plugin_modules = [m for m in sys.modules.keys() if m.startswith("talon_plugins.")]
+# print(talon_plugin_modules)
 
 
-def dump_stubs(mod_name, mod):
-    output = ["from types import *", f"import {mod_name}"]
+def dump_stubs(mod, indent=""):
+    output = []
     for id in dir(mod):
         # print(mod, id)
-        thing = getattr(mod, id)
+        if id.startswith("_") and id not in INCLUDED_PRIVATE_MEMBERS:
+            continue
+        try:
+            thing = getattr(mod, id)
+        except:
+            continue
         if callable(thing):
+            output.append(stub_callable(id, thing, indent))
+        else:
+            type_name = type(thing).__name__
+            if type_name == "module" or id.startswith("_"):
+                continue
             try:
-                output.append(f"def {id}{str(signature(thing))}: ...")
+                output.append(f"{id}: {type_name} = ...")
             except Exception as e:
-                print(e)
-                output.append(f"def {id}(*args, **kwargs) -> Any: ...")
-        # elif isinstance(thing, object):
-        #     output.append(f"class {thing.__name__}{str(signature(thing))}:")
+                # print(e)
+                output.append(f"{id} = ...")
+    if len(output) == 0:
+        return "..."
+    return f"\n{indent}" + f"\n{indent}".join(
+        [
+            o.replace("<no value>", '"unknown value"')
+            .replace("NoneType", "Any")
+            .replace("<class ", "")
+            .replace("'>", "'")
+            for o in output
+        ]
+    )
 
-    return "\n".join(output)
+
+def stub_callable(id, thing, indent):
+    if callable(thing):
+        if not isinstance(thing, type):
+            try:
+                return f"def {id}{str(signature(thing))}: ..."
+            except Exception as e:
+                return f"def {id}(*args, **kwargs) -> Any: ..."
+        else:
+            return f"class {id}: " + dump_stubs(thing, indent=indent + "   ")
 
 
 STUBS_DIR = os.path.expanduser("~/.talon/stubs")
-try:
-    os.mkdirs(STUBS_DIR)
-except:
-    pass
 
-for m in talon_modules:
-    # print(m)
-    name = m.split(".")[-1] + ".pyi"
-    with open(os.path.join(STUBS_DIR, "talon", name), "w") as fh:
-        stubs = dump_stubs(m, sys.modules[m])
-        # print(stubs)
-        fh.write(stubs)
+
+def dump_all_stubs():
+    os.makedirs(STUBS_DIR, exist_ok=True)
+    super_import = (
+        "\n".join(
+            [
+                f"from {t} import *"
+                for t in talon_modules + ["talon.stubbed"]
+                if t != "talon.voice"
+            ]
+        )
+        + "\n"
+    )
+    for m in talon_modules:
+        name = ".".join(m.split("."))
+        if "." in name:
+            path_join = os.path.join(STUBS_DIR, "/".join(name.split(".")[:-1]))
+            os.makedirs(path_join, exist_ok=True)
+        output_path = os.path.join(STUBS_DIR, name.replace(".", "/"))
+        with open(output_path + ".pyi", "w") as fh:
+            stubs = dump_stubs(sys.modules[m])
+            fh.write("from typing import *\n")
+            fh.write(super_import)
+            fh.write(stubs)
+    with open(os.path.join(STUBS_DIR, "talon", "stubbed.pyi"), "w") as fh:
+        fh.write(
+            dedent(
+                """\
+        from typing import *
+        CompiledLib: Any = ...
+        CompiledFFI: Any = ...
+        class _cffi_backend:
+            CData: Any = ...
+        getset_descriptor: Any = ...
+        """
+            )
+        )
+    with open(os.path.join(STUBS_DIR, "talon", "__init__.pyi"), "w") as fh:
+        fh.write(
+            dedent(
+                """\
+        from typing import *
+        """
+            )
+        )
+    print("Done stubbing.")
+
+
+dump_all_stubs()

@@ -88,6 +88,7 @@ def control_mouse(m):
     if eye_zoom_mouse.zoom_mouse.enabled:
         eye_zoom_mouse.zoom_mouse.enable()
 
+
 def control_zoom_mouse(m):
     ctrl.mouse(0, 0)
     if eye_zoom_mouse.zoom_mouse.enabled:
@@ -97,19 +98,18 @@ def control_zoom_mouse(m):
 
     eye_zoom_mouse.zoom_mouse.toggle()
     if eye_mouse.control_mouse.enabled:
-        eye_mouse.control_mouse.toggle() 
-
+        eye_mouse.control_mouse.toggle()
 
 
 def scrollMe():
     global scrollAmount
     if scrollAmount:
-        ctrl.mouse_scroll(by_lines=False, y=scrollAmount/10)
+        ctrl.mouse_scroll(by_lines=False, y=scrollAmount / 10)
 
 
 def startScrolling(m):
     global scrollJob
-    scrollJob = cron.interval('60ms', scrollMe)
+    scrollJob = cron.interval("60ms", scrollMe)
 
 
 def stopScrolling(m):
@@ -117,37 +117,41 @@ def stopScrolling(m):
     scrollAmount = 0
     cron.cancel(scrollJob)
 
+
 scrollAmount = 0
 scrollJob = None
+
 
 def toggle_cursor(show):
     def _toggle(m):
         ctrl.cursor_visible(show)
+
     return _toggle
 
-ctx.keymap({
-    "click": delayed_click,
-    "click right": delayed_right_click,
-    "click double": delayed_dubclick,
-    "click triple": delayed_tripclick,
-    "click drag": mouse_drag,
-    "click release": mouse_release,
-    "wheel down": mouse_scroll(30),
-    "wheel up": mouse_scroll(-30),
-    "continuous": startScrolling,
-    "wheel stop": stopScrolling,
-    "click command": adv_click(0, "cmd"),
-    "click control": adv_click(0, "ctrl"),
-    "click (option | opt)": adv_click(0, "alt"),
-    "click shift": adv_click(0, "shift"),
-    "click (shift alt | alt shift)": adv_click(0, "alt", "shift"),
-    "click double": adv_click(0, times=2),
-    "click triple": adv_click(0, times=3),
-    "click (shift double | double shift)": adv_click(0, "shift", times=2),
-    "hide cursor": toggle_cursor(False),
-    "show cursor": toggle_cursor(True),
-    # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
-    "(squid | control mouse)": control_mouse,
-    "zoom mouse": control_zoom_mouse,
-    # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
-})
+
+ctx.keymap(
+    {
+        "click": delayed_click,
+        "click right": delayed_right_click,
+        "click double": delayed_dubclick,
+        "click triple": delayed_tripclick,
+        "click drag": mouse_drag,
+        "click release": mouse_release,
+        "wheel down": mouse_scroll(30),
+        "wheel up": mouse_scroll(-30),
+        "continuous": startScrolling,
+        "wheel stop": stopScrolling,
+        "click command": adv_click(0, "cmd"),
+        "click control": adv_click(0, "ctrl"),
+        "click (option | opt)": adv_click(0, "alt"),
+        "click shift": adv_click(0, "shift"),
+        "click (shift alt | alt shift)": adv_click(0, "alt", "shift"),
+        "click (shift double | double shift)": adv_click(0, "shift", times=2),
+        "hide cursor": toggle_cursor(False),
+        "show cursor": toggle_cursor(True),
+        # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
+        "(squid | control mouse)": control_mouse,
+        "zoom mouse": control_zoom_mouse,
+        # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
+    }
+)
