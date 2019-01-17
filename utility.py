@@ -1,22 +1,22 @@
 import string
 
-from talon.voice import Str, Key
+from talon.voice import Str
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
-vocab = [
-    'nonce'
-]
+vocab = ["nonce"]
 
-def parse_word(word):
-    word = str(word).lstrip("\\").split("\\", 1)[0]
-    word = mapping.get(word, word)
-    word = word.replace("-", " ") # hate dragon hyphenation.
-    return word
+
+def parse_word(w):
+    w = str(w).lstrip("\\").split("\\", 1)[0]
+    w = mapping.get(w, w)
+    w = w.replace("-", " ")  # hate dragon hyphenation.
+    return w
 
 
 def parse_words(m):
     try:
+        # noinspection PyProtectedMember
         return list(map(parse_word, m.dgndictation[0]._words))
     except AttributeError:
         return []
@@ -24,10 +24,10 @@ def parse_words(m):
 
 def join_words(words, sep=" "):
     out = ""
-    for i, word in enumerate(words):
-        if i > 0 and word not in punctuation:
+    for i, w in enumerate(words):
+        if i > 0 and w not in punctuation:
             out += sep
-        out += word
+        out += w
     return out
 
 
@@ -40,33 +40,31 @@ def text(m):
 
 
 def sentence_text(m):
-    text = join_words(parse_words(m)).lower()
-    insert(text.capitalize())
+    insert(join_words(parse_words(m)).lower().capitalize())
 
 
 def word(m):
     try:
-        text = join_words(list(map(parse_word, m.dgnwords[0]._words)))
-        insert(text.lower())
+        # noinspection PyProtectedMember
+        insert(join_words(list(map(parse_word, m.dgnwords[0]._words))).lower())
     except AttributeError:
         pass
 
 
 def surround(by):
-
-    def func(i, word, last):
+    def func(i, w, last):
         if i == 0:
-            word = by + word
+            w = by + w
         if last:
-            word += by
-        return word
+            w += by
+        return w
 
     return func
 
 
-def rot13(i, word, _):
+def rot13(_, w, __):
     out = ""
-    for c in word.lower():
+    for c in w.lower():
         if c in string.ascii_lowercase:
             c = chr((((ord(c) - ord("a")) + 13) % 26) + ord("a"))
         out += c
@@ -89,16 +87,16 @@ optional_numerals = " (" + " | ".join(sorted(numeral_map.keys())) + ")*"
 
 def text_to_number(words):
     tmp = [str(s).lower() for s in words]
-    words = [parse_word(word) for word in tmp]
+    words = [parse_word(w) for w in tmp]
 
     result = 0
     factor = 1
-    for word in reversed(words):
-        print("{} {} {}".format(result, factor, word))
-        if word not in numerals:
+    for w in reversed(words):
+        print("{} {} {}".format(result, factor, w))
+        if w not in numerals:
             raise Exception("not a number: {}".format(words))
 
-        number = numeral_map[word]
+        number = numeral_map[w]
         if number is None:
             continue
 

@@ -1,12 +1,13 @@
 # https://raw.githubusercontent.com/dwiel/talon_community/master/text/homophones.py
 
+import os
+
 from talon import app, clip, cron
 from talon.engine import engine
-from talon.voice import Word, Key, Context, Str, press
+from talon.voice import Context, Key, Str, Word, press
 from talon.webview import Webview
 
-from user.utility import parse_words, parse_word
-import os
+from .. import utility
 
 ########################################################################
 # global settings
@@ -51,7 +52,9 @@ with open(homophones_file, "r") as f:
 all_homophones = phones
 
 # Map from every homophone back to the row it was in.
-homophone_lookup = {item.lower(): words for canon,words in phones.items() for item in words}
+homophone_lookup = {
+    item.lower(): words for canon, words in phones.items() for item in words
+}
 
 active_word_list = None
 is_selection = False
@@ -102,7 +105,9 @@ table .count {
 </style>
 """
 
-phones_template = css_template + """
+phones_template = (
+    css_template
+    + """
 <div class="contents">
 <h3>homophones</h3>
 <table>
@@ -113,6 +118,7 @@ phones_template = css_template + """
 </table>
 </div>
 """
+)
 
 
 def close_homophones():
@@ -125,9 +131,9 @@ def make_selection(m, is_selection, transform=lambda x: x):
     words = m._words
     d = None
     if len(words) == 1:
-        d = int(parse_word(words[0]))
+        d = int(utility.parse_word(words[0]))
     else:
-        d = int(parse_word(words[1]))
+        d = int(utility.parse_word(words[1]))
     w = active_word_list[d - 1]
     if len(words) > 1:
         w = transform(w)
@@ -159,7 +165,7 @@ def raise_homophones(m, force_raise=False, is_selection=False):
     #     word = parse_word(word)
     elif len(m._words) >= 2:
         word = str(m._words[len(m._words) - 1])
-        word = parse_word(word)
+        word = utility.parse_word(word)
 
     word = word.lower()
 
@@ -187,9 +193,7 @@ def raise_homophones(m, force_raise=False, is_selection=False):
     webview.render(phones_template, homophones=active_word_list)
     webview.show()
 
-    keymap = {
-        "(cancel | 0)": lambda x: close_homophones(),
-    }
+    keymap = {"(cancel | 0)": lambda x: close_homophones()}
 
     def capitalize(x):
         return x[0].upper() + x[1:]
@@ -208,26 +212,32 @@ def raise_homophones(m, force_raise=False, is_selection=False):
     )
     keymap.update(
         {
-            "(ship | title) %s" % (i + 1): lambda m: make_selection(m, is_selection, capitalize)
+            "(ship | title) %s"
+            % (i + 1): lambda m: make_selection(m, is_selection, capitalize)
             for i in valid_indices
         }
     )
     keymap.update(
         {
-            "(yeller | upper | uppercase) %s" % (i + 1): lambda m: make_selection(m, is_selection, uppercase)
+            "(yeller | upper | uppercase) %s"
+            % (i + 1): lambda m: make_selection(m, is_selection, uppercase)
             for i in valid_indices
         }
     )
     keymap.update(
         {
-            "(lower | lowercase) %s" % (i + 1): lambda m: make_selection(m, is_selection, lowercase)
+            "(lower | lowercase) %s"
+            % (i + 1): lambda m: make_selection(m, is_selection, lowercase)
             for i in valid_indices
         }
     )
     pick_context.keymap(keymap)
     pick_context.load()
 
-help_template = css_template + """
+
+help_template = (
+    css_template
+    + """
 <div class="contents">
 <h3>homophones help</h3>
 <table>
@@ -241,22 +251,29 @@ help_template = css_template + """
 </table>
 </div>
 """
+)
+
 
 def homophones_help(m):
     webview.render(help_template)
     webview.show()
 
-    keymap = {
-        "(cancel | exit)": lambda x: close_homophones(),
-    }
+    keymap = {"(cancel | exit)": lambda x: close_homophones()}
     pick_context.keymap(keymap)
     pick_context.load()
 
-context.keymap({
-    '(phones | homophones) help': homophones_help,
-    'phones {homophones.canonical}': raise_homophones,
-    'phones': lambda m: raise_homophones(m, is_selection=True),
-    'force phones {homophones.canonical}': lambda m: raise_homophones(m, force_raise=True),
-    'force phones': lambda m: raise_homophones(m, force_raise=True, is_selection=True),
-})
-context.set_list('canonical', canonical)
+
+context.keymap(
+    {
+        "(phones | homophones) help": homophones_help,
+        "phones {homophones.canonical}": raise_homophones,
+        "phones": lambda m: raise_homophones(m, is_selection=True),
+        "force phones {homophones.canonical}": lambda m: raise_homophones(
+            m, force_raise=True
+        ),
+        "force phones": lambda m: raise_homophones(
+            m, force_raise=True, is_selection=True
+        ),
+    }
+)
+context.set_list("canonical", canonical)

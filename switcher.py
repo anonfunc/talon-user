@@ -1,10 +1,11 @@
-from talon.voice import Word, Context, Key, Rep, Str, press
 from talon import ui
+from talon.voice import Context, Key, Rep, Str, Word, press
 
 apps = {}
 
 
 def switch_app(m):
+    # noinspection PyProtectedMember
     name = str(m._words[1])
     full = apps.get(name)
     if not full:
@@ -27,7 +28,7 @@ def update_lists():
             continue
         words = app.name.split(" ")
         for word in words:
-            if word and not word in new:
+            if word and word not in new:
                 new[word] = app.name
         new[app.name] = app.name
     if set(new.keys()) == set(apps.keys()):

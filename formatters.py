@@ -1,6 +1,6 @@
-from talon.voice import Word, Context, Str
+from talon.voice import Context, Str, Word
 
-from user.utility import surround, parse_word, vocab
+from .utility import parse_word, surround, vocab
 
 formatters = {
     # Smashed
@@ -16,7 +16,6 @@ formatters = {
     "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
     "smash": (True, lambda i, word, _: word),
     "spine": (True, lambda i, word, _: word if i == 0 else "-" + word),
-    
     # Spaced
     "sentence": (False, lambda i, word, _: word.capitalize() if i == 0 else word),
     "title": (False, lambda i, word, _: word.capitalize()),
@@ -27,11 +26,15 @@ formatters = {
     "padded": (False, surround(" ")),
 }
 
-def FormatText(m):
+
+def format_text(m):
     fmt = []
+    # noinspection PyProtectedMember
     for w in m._words:
         if isinstance(w, Word):
+            # noinspection PyUnresolvedReferences
             fmt.append(w.word)
+    # noinspection PyProtectedMember
     words = [str(s).lower() for s in m.dgndictation[0]._words]
 
     tmp = []
@@ -57,6 +60,6 @@ ctx.keymap(
     {
         # 'word <dgnwords>': word,
         "(%s)+ <dgndictation>"
-        % (" | ".join(formatters)): FormatText
+        % (" | ".join(formatters)): format_text
     }
 )

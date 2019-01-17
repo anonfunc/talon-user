@@ -1,7 +1,8 @@
 import talon.clip as clip
 from talon.voice import Context, Key, press
-from user.utility import text, parse_words, join_words
-from user.ext.homophones import homophone_lookup
+
+from .ext.homophones import homophone_lookup
+from .utility import join_words, parse_words, text
 
 supported_apps = {
     "com.jetbrains.intellij",
@@ -91,12 +92,7 @@ ctx.keymap(
         "select all": [Key("cmd-a")],
         "select [this] line": [Key("home"), Key("shift-end")],
         "(clean | clear) line": [Key("home"), Key("shift-end"), Key("delete")],
-        "delete line": [
-            Key("home"),
-            Key("shift-end"),
-            Key("delete"),
-            Key("delete"),
-        ],
+        "delete line": [Key("home"), Key("shift-end"), Key("delete"), Key("delete")],
         "delete to end": [Key("shift-end"), Key("delete")],
         "delete to start": [Key("shift-home"), Key("delete")],
     }

@@ -1,9 +1,9 @@
-from talon_plugins import eye_mouse
-from talon_plugins import eye_zoom_mouse
-import time
 import threading
-from talon import ctrl, tap, cron
+import time
+
+from talon import cron, ctrl, tap
 from talon.voice import Context, Key
+from talon_plugins import eye_mouse, eye_zoom_mouse
 
 ctx = Context("mouse")
 

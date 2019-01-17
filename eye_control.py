@@ -1,10 +1,10 @@
+from talon.voice import Context
 from talon_plugins import eye_mouse
-from talon.voice import Word, Context, Key, Rep, Str, press
 
 ctx = Context("eye_control")
 
 
-def calib_start():
+def _start_calibration():
     return lambda m: eye_mouse.calib_start()
 
 
@@ -18,6 +18,6 @@ ctx.keymap(
         #     "Eye Tracking >> Show Camera Overlay"
         # ),
         # "run calibration": lambda m: eye_mouse.on_menu("Eye Tracking >> Calibrate")
-        "run calibration": calib_start()
+        "run calibration": _start_calibration()
     }
 )

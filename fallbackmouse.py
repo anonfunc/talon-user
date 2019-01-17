@@ -1,11 +1,9 @@
 import time
 
-from talon.audio import noise
-from talon.voice import Key
-from talon.track.geom import Point2d
-
 from talon import ctrl, tap
-from talon.voice import Context
+from talon.audio import noise
+from talon.track.geom import Point2d
+from talon.voice import Context, Key
 
 ctx = Context("mouse")
 
@@ -16,6 +14,7 @@ force_move = None
 
 def on_move(typ, e):
     x0, y0 = mouse_history[-1][0:2]
+    # noinspection PyShadowingNames
     x, y = e.x, e.y
     if abs(x - x0) < 5 and abs(y - y0) < 5:
         return
@@ -33,6 +32,7 @@ tap.register(tap.MMOVE, on_move)
 
 
 def click_pos(m):
+    # noinspection PyProtectedMember
     word = m._words[0]
     start = (word.start + min((word.end - word.start) / 2, 0.100)) / 1000.0
     diff, pos = min([(abs(start - pos[2]), pos) for pos in mouse_history])
@@ -40,6 +40,7 @@ def click_pos(m):
 
 
 def delayed_click(m, button=0, times=1):
+    # noinspection PyShadowingNames
     x, y = click_pos(m)
     ctrl.mouse(x, y)
     ctrl.mouse_click(x, y, button=button, times=times, wait=16000)
@@ -69,7 +70,6 @@ def mouse_release(m):
 
 
 def mouse_scroll(amount):
-
     def scroll(m):
         # print("amount is", amount)
         ctrl.mouse_scroll(x=amount)
@@ -78,7 +78,6 @@ def mouse_scroll(amount):
 
 
 def adv_click(button, *mods, **kwargs):
-
     def click(e):
         for key in mods:
             ctrl.key_press(key, down=True)

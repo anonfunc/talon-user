@@ -1,16 +1,14 @@
-import os
 import json
-import time
+import os
 import threading
+import time
 
 import requests
-import talon.clip as clip
 from talon import ctrl
-from talon.ui import active_app
-from talon.voice import Context, ContextGroup, Key, Str
+from talon.voice import Context, Str
 
 try:
-    from user.mouse import delayed_click
+    from .mouse import delayed_click
 except ImportError:
 
     def delayed_click():
@@ -36,8 +34,10 @@ def join_words(words, sep=" "):
         out += word
     return out
 
+
 def parse_words(m):
     try:
+        # noinspection PyProtectedMember
         return list(map(parse_word, m.dgndictation[0]._words))
     except AttributeError:
         return []
@@ -49,7 +49,6 @@ def insert(s):
 
 def text(m):
     insert(join_words(parse_words(m)).lower())
-
 
 
 _numeral_map = dict((str(n), n) for n in range(0, 20))
@@ -99,7 +98,7 @@ def delay(amount=0.1):
     return lambda _: time.sleep(amount)
 
 
-def grab_identifier(m):
+def grab_identifier(_):
     pass
 
 
@@ -112,7 +111,10 @@ def get_rest_api_settings():
         os.path.expanduser("~/Library/Application Support/Code/User/settings.json")
     ) as fh:
         contents = fh.read()
-        vs_code_settings = json.loads(contents)
+        try:
+            vs_code_settings = json.loads(contents)
+        except json.JSONDecodeError:
+            pass
     if vs_code_settings is None:
         print("Could not load VS Code Settings")
         return None, None, None
@@ -155,6 +157,7 @@ def send_api_command(*commands):
 
 def go_to_line(drop=1):
     def handler(m):
+        # noinspection PyProtectedMember
         line = text_to_number(m._words[drop:])
         if int(line) == 0:
             print("Not sending, arg was 0")
@@ -179,12 +182,13 @@ def go_to_line(drop=1):
 
 def select_lines(drop=1):
     def handler(m):
+        # noinspection PyProtectedMember
         start, end = text_to_range(m._words[drop:])
         port, username, password = get_rest_api_settings()
         if port:
-            startPos = {"line": start - 1, "character": 0}
-            endPos = {"line": end - 1, "character": 9999}
-            selection = {"start": startPos, "end": endPos}
+            start_pos = {"line": start - 1, "character": 0}
+            end_pos = {"line": end - 1, "character": 9999}
+            selection = {"start": start_pos, "end": end_pos}
             response = requests.post(
                 "http://localhost:{}/api/talonLine".format(port),
                 timeout=(0.05, 3.05),
@@ -203,8 +207,9 @@ def vscode_command(*cmds):
     return lambda _: send_api_command(cmds)
 
 
-def vscode_search(direction, drop=2):
+def vscode_search(direction):
     def handler(m):
+        # noinspection PyProtectedMember
         pattern = " ".join([str(w) for w in m.dgndictation[0]._words])
         port, username, password = get_rest_api_settings()
         if port:

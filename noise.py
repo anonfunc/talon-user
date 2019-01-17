@@ -1,13 +1,12 @@
 import time
-from talon_plugins import eye_mouse, eye_zoom_mouse
-from talon import ctrl
-from talon import tap
+
+from talon import ctrl, tap
 from talon.audio import noise
 from talon.track.geom import Point2d
+from talon_plugins import eye_mouse, eye_zoom_mouse
 
 
 class NoiseModel:
-
     def __init__(self):
         self.hiss_start = 0
         self.hiss_last = 0
@@ -35,10 +34,10 @@ class NoiseModel:
         if eye_zoom_mouse.zoom_mouse.enabled:
             return
         if not eye_mouse.control_mouse.enabled:
-            return 
+            return
         now = time.time()
         # print("{} {}".format(noise, now - self.hiss_last))
-        
+
         if noise == "pop":
             ctrl.mouse_click(button=0, hold=16000)
         elif noise == "hiss_start":

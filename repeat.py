@@ -1,10 +1,11 @@
-from talon.voice import Word, Context, Str, Rep, talon
+from talon.voice import Context, Rep, talon
 
-from user.utility import text_to_number, optional_numerals
+from .utility import optional_numerals, text_to_number
 
 
 def repeat(m):
 
+    # noinspection PyProtectedMember
     words = m._words
 
     repeat_count = text_to_number(words[1:])

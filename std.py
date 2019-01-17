@@ -1,23 +1,14 @@
-from talon.voice import Word, Context, Key, Rep, RepPhrase, Str, press
-from talon import app, ctrl, clip, ui
-import string
+from talon import app, clip, ui
+from talon.voice import Context, Key
 
-from user.utility import (
-    parse_word,
-    parse_words,
-    rot13,
-    sentence_text,
-    surround,
-    text,
-    word,
-    vocab,
-)
+from .utility import sentence_text, text, vocab, word
 
 
-def copy_bundle(m):
+def copy_bundle(_):
     bundle = ui.active_app().bundle
     clip.set(bundle)
-    app.notify('Copied app bundle', body='{}'.format(bundle))
+    app.notify("Copied app bundle", body="{}".format(bundle))
+
 
 ctx = Context("input")
 ctx.vocab = vocab
@@ -53,27 +44,6 @@ ctx.keymap(
         "triple quote": "'''",
         "swipe": ", ",
         "(space | skoosh)": " ",
-        # "(dot dot | dotdot)": "..",
-        # "cd": "cd ",
-        # "cd talon home": "cd {}".format(TALON_HOME),
-        # "cd talon user": "cd {}".format(TALON_USER),
-        # "cd talon plugins": "cd {}".format(TALON_PLUGINS),
-        # "run make (durr | dear)": "mkdir ",
-        # "run git": "git ",
-        # "run git clone": "git clone ",
-        # "run git diff": "git diff ",
-        # "run git commit": "git commit ",
-        # "run git push": "git push ",
-        # "run git pull": "git pull ",
-        # "run git status": "git status ",
-        # "run git add": "git add ",
-        # "run (them | vim)": "vim ",
-        # "run ellis": "ls\n",
-        # "dot pie": ".py",
-        # "run make": "make\n",
-        # "run jobs": "jobs\n",
-        # "const": "const ",
-        # "static": "static ",
         "(args | arguments)": ["()", Key("left")],
         "index": ["[]", Key("left")],
         "block": [" {}", Key("left enter enter up")],
@@ -126,6 +96,6 @@ ctx.keymap(
         "last tab": Key("ctrl-shift-tab"),
         "next space": Key("cmd-alt-ctrl-right"),
         "(last | previous) space": Key("cmd-alt-ctrl-left"),
-        'copy active bundle': copy_bundle,
+        "copy active bundle": copy_bundle,
     }
 )

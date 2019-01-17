@@ -1,12 +1,10 @@
+from talon import applescript
 from talon.voice import Context
 
-from talon import applescript
 
-
-def kmaestro(id):
-
+def kmaestro(script_id):
     def _kmaestro(*_):
-        print("Kmaestro {}".format(id))
+        print("Kmaestro {}".format(script_id))
 
         applescript.run(
             """
@@ -14,7 +12,7 @@ def kmaestro(id):
             do script "{id}"
         end tell
         """.format(
-                id=id
+                id=script_id
             )
         )
 

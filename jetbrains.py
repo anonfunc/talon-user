@@ -4,10 +4,10 @@ import requests
 import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
-from talon.voice import Context, ContextGroup, Key, Str
+from talon.voice import Context, Key, Str
 
 try:
-    from user.ext.homophones import all_homophones
+    from .ext.homophones import all_homophones
 
     # Map from every homophone back to the row it was in.
     homophone_lookup = {
@@ -15,9 +15,10 @@ try:
     }
 except ImportError:
     homophone_lookup = {"right": ["right", "write"], "write": ["right", "write"]}
+    all_homophones = homophone_lookup.keys()
 
 try:
-    from user.mouse import delayed_click
+    from .mouse import delayed_click
 except ImportError:
 
     def delayed_click():
@@ -37,6 +38,7 @@ def parse_word(word):
 
 def parse_words(m):
     try:
+        # noinspection PyProtectedMember
         return list(map(parse_word, m.dgndictation[0]._words))
     except AttributeError:
         return []
@@ -156,6 +158,7 @@ def idea(cmd):
 
 def idea_num(cmd, drop=1, zero_okay=False):
     def handler(m):
+        # noinspection PyProtectedMember
         line = text_to_number(m._words[drop:])
         print(cmd.format(line))
         if int(line) == 0 and not zero_okay:
@@ -169,6 +172,7 @@ def idea_num(cmd, drop=1, zero_okay=False):
 
 def idea_range(cmd, drop=1):
     def handler(m):
+        # noinspection PyProtectedMember
         start, end = text_to_range(m._words[drop:])
         print(cmd.format(start, end))
         send_idea_command(cmd.format(start, end))
@@ -178,6 +182,7 @@ def idea_range(cmd, drop=1):
 
 def idea_words(cmd, join=" "):
     def handler(m):
+        # noinspection PyProtectedMember
         args = [str(w) for w in m.dgndictation[0]._words]
         print(args)
         send_idea_command(cmd.format(join.join(args)))
@@ -187,6 +192,7 @@ def idea_words(cmd, join=" "):
 
 def idea_find(direction):
     def handler(m):
+        # noinspection PyProtectedMember
         args = [str(w) for w in m.dgndictation[0]._words]
         search_string = " ".join(args)
         cmd = "find {} {}"
@@ -202,6 +208,7 @@ def idea_find(direction):
 
 def grab_identifier(m):
     old_clip = clip.get()
+    # noinspection PyProtectedMember
     times = text_to_number(m._words[1:])  # hardcoded prefix length?
     if not times:
         times = 1

@@ -1,17 +1,6 @@
-import os
-import re
-import subprocess
-import time
+from talon.voice import Context, Key
 
-from talon import applescript
-import talon.clip as clip
-from talon.api import ffi
-from talon.voice import Key, press, Str, Context
-
-from user.utility import text
-
-from user.mouse import delayed_click
-
+from .utility import text
 
 ctx = Context("slack", bundle="com.tinyspeck.slackmacgap")
 ctx.keymap(

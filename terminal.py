@@ -9,21 +9,16 @@ import re
 import subprocess
 import time
 
-from talon import applescript
 import talon.clip as clip
-from talon.voice import Key, press, Str, Context
+from talon import applescript
+from talon.voice import Context, Key, Str, press
 
-from user.utility import text
-
-from user.mouse import delayed_click
-
+from .mouse import delayed_click
+from .utility import text
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
-ctx.vocab = [
-    'docker',
-    'talon',
-]
-ctx.vocab_remove = ['doctor', 'Doctor']
+ctx.vocab = ["docker", "talon"]
+ctx.vocab_remove = ["doctor", "Doctor"]
 
 subdirs = {}
 
@@ -134,22 +129,6 @@ ctx.keymap(
         "remove directory": "rm -rf ",
         "scroll down": [Key("shift-pagedown")],
         "scroll up": [Key("shift-pageup")],
-        # "run make (durr | dear)": "mkdir ",
-        # "run git": "git ",
-        # "run git clone": "git clone ",
-        # "run git diff": "git diff ",
-        # "run git commit": "git commit ",
-        # "run git push": "git push ",
-        # "run git pull": "git pull ",
-        # "run git status": "git status ",
-        # "run git add": "git add ",
-        # "run (them | vim)": "vim ",
-        # "run ellis": "ls\n",
-        # "dot pie": ".py",
-        # "run make": "make\n",
-        # "run jobs": "jobs\n",
-        # "const": "const ",
-        # "static": "static ",
         "make [<dgndictation>]": ["make ", text],
         "mage [<dgndictation>]": ["mage ", text],
         # git

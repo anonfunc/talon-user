@@ -18,25 +18,27 @@ talon_modules = [
 
 def dump_stubs(mod, indent=""):
     output = []
-    for id in dir(mod):
+    for identifier in dir(mod):
         # print(mod, id)
-        if id.startswith("_") and id not in INCLUDED_PRIVATE_MEMBERS:
+        if identifier.startswith("_") and identifier not in INCLUDED_PRIVATE_MEMBERS:
             continue
+        # noinspection PyBroadException
         try:
-            thing = getattr(mod, id)
+            thing = getattr(mod, identifier)
         except:
             continue
         if callable(thing):
-            output.append(stub_callable(id, thing, indent))
+            output.append(stub_callable(identifier, thing, indent))
         else:
             type_name = type(thing).__name__
-            if type_name == "module" or id.startswith("_"):
+            if type_name == "module" or identifier.startswith("_"):
                 continue
+            # noinspection PyBroadException
             try:
-                output.append(f"{id}: {type_name} = ...")
-            except Exception as e:
+                output.append(f"{identifier}: {type_name} = ...")
+            except:
                 # print(e)
-                output.append(f"{id} = ...")
+                output.append(f"{identifier} = ...")
     if len(output) == 0:
         return "..."
     return f"\n{indent}" + f"\n{indent}".join(
@@ -50,18 +52,19 @@ def dump_stubs(mod, indent=""):
     )
 
 
-def stub_callable(id, thing, indent):
+def stub_callable(identifier, thing, indent):
     if callable(thing):
         if not isinstance(thing, type):
+            # noinspection PyBroadException
             try:
-                return f"def {id}{str(signature(thing))}: ..."
-            except Exception as e:
-                return f"def {id}(*args, **kwargs) -> Any: ..."
+                return f"def {identifier}{str(signature(thing))}: ..."
+            except:
+                return f"def {identifier}(*args, **kwargs) -> Any: ..."
         else:
-            return f"class {id}: " + dump_stubs(thing, indent=indent + "   ")
+            return f"class {identifier}: " + dump_stubs(thing, indent=indent + "   ")
 
 
-STUBS_DIR = os.path.expanduser("~/.talon/stubs")
+STUBS_DIR = os.path.expanduser("~/.talon/user/stubs")
 
 
 def dump_all_stubs():
