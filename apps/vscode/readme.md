@@ -19,13 +19,13 @@ Note that you *must* replace two bits in the following config:
         ],
         "endpoints": {
             "talonLine": {
-                "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/line.js"
+                "script": "/Users/<YOUR USERNAME>/.talon/user/apps/vscode/line.js"
             },
             "talonSearch": {
-                "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/search.js"
+                "script": "/Users/<YOUR USERNAME>/.talon/user/apps/vscode/search.js"
             },
             "talonTerminal": {
-                "script": "/Users/<YOUR USERNAME>/.talon/user/vscode/terminal.js"
+                "script": "/Users/<YOUR USERNAME>/.talon/user/apps/vscode/terminal.js"
             }
         }
     }

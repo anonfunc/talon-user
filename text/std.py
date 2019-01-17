@@ -1,7 +1,7 @@
 from talon import app, clip, ui
 from talon.voice import Context, Key
 
-from .utility import sentence_text, text, vocab, word
+from ..utils import sentence_text, text, vocab, word
 
 
 def copy_bundle(_):

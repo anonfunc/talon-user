@@ -1,6 +1,6 @@
 from talon.voice import Context, Str, Word
 
-from .utility import parse_word, surround, vocab
+from ..utils import parse_word, surround, vocab
 
 formatters = {
     # Smashed

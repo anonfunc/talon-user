@@ -2,7 +2,7 @@ import time
 
 from talon.voice import Context, ContextGroup, Key
 
-from .std import text
+from ..utils import text
 
 
 def delay(amount):

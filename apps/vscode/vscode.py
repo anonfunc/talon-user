@@ -5,104 +5,21 @@ import time
 
 import requests
 from talon import ctrl
-from talon.voice import Context, Str
+from talon.voice import Context
+
+from ...utils import optional_numerals, text, text_to_number, text_to_range
 
 try:
-    from .mouse import delayed_click
+    from ...misc.mouse import delayed_click
 except ImportError:
+    print("Fallback mouse click logic")
 
     def delayed_click():
         ctrl.mouse_click(button=0)
 
 
-# region Supporting Code
-mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
-punctuation = set(".,-!?")
-
-
-def parse_word(word):
-    word = str(word).lstrip("\\").split("\\", 1)[0]
-    word = mapping.get(word, word)
-    return word
-
-
-def join_words(words, sep=" "):
-    out = ""
-    for i, word in enumerate(words):
-        if i > 0 and word not in punctuation:
-            out += sep
-        out += word
-    return out
-
-
-def parse_words(m):
-    try:
-        # noinspection PyProtectedMember
-        return list(map(parse_word, m.dgndictation[0]._words))
-    except AttributeError:
-        return []
-
-
-def insert(s):
-    Str(s)(None)
-
-
-def text(m):
-    insert(join_words(parse_words(m)).lower())
-
-
-_numeral_map = dict((str(n), n) for n in range(0, 20))
-for n in range(20, 101, 10):
-    _numeral_map[str(n)] = n
-for n in range(100, 1001, 100):
-    _numeral_map[str(n)] = n
-for n in range(1000, 10001, 1000):
-    _numeral_map[str(n)] = n
-_numeral_map["oh"] = 0  # synonym for zero
-_numeral_map["and"] = None  # drop me
-_numerals = "(" + " | ".join(sorted(_numeral_map.keys())) + ")+"
-_optional_numerals = "(" + " | ".join(sorted(_numeral_map.keys())) + ")*"
-
-
-def text_to_number(words):
-    tmp = [str(s).lower() for s in words]
-    words = [parse_word(word) for word in tmp]
-
-    result = 0
-    factor = 1
-    for word in reversed(words):
-        print("{} {} {}".format(result, factor, word))
-        if word not in _numeral_map:
-            raise Exception("not a number: {}".format(words))
-        number = _numeral_map[word]
-        if number is None:
-            continue
-        number = int(number)
-        if number > 10:
-            result = result + number
-        else:
-            result = result + factor * number
-        factor = (10 ** len(str(number))) * factor
-    return result
-
-
-def text_to_range(words, delimiter="until"):
-    tmp = [str(s).lower() for s in words]
-    split = tmp.index(delimiter)
-    start = text_to_number(words[:split])
-    end = text_to_number(words[split + 1 :])
-    return start, end
-
-
 def delay(amount=0.1):
     return lambda _: time.sleep(amount)
-
-
-def grab_identifier(_):
-    pass
-
-
-# endregion
 
 
 def get_rest_api_settings():
@@ -263,12 +180,12 @@ ctx.keymap(
         ],
         "select less": vscode_command("editor.action.smartSelect.shrink"),
         "select more": vscode_command("editor.action.smartSelect.grow"),
-        f"select line {_optional_numerals}": [
+        f"select line {optional_numerals}": [
             go_to_line(drop=2),
             vscode_command("cursorHome", "cursorEndSelect"),
         ],
         "select this line": [vscode_command("cursorHome", "cursorEndSelect")],
-        f"select (lines | line) {_optional_numerals} until {_optional_numerals}": select_lines(
+        f"select (lines | line) {optional_numerals} until {optional_numerals}": select_lines(
             drop=2
         ),
         "(clean | clear) line": [vscode_command("cursorLineStart", "deleteAllRight")],
@@ -286,11 +203,11 @@ ctx.keymap(
             delay(),
             text,
         ],
-        f"(go to | jump to) {_optional_numerals}": [
+        f"(go to | jump to) {optional_numerals}": [
             go_to_line(drop=2),
             vscode_command("cursorHome"),
         ],
-        f"(go | jump) to end of {_optional_numerals}": [
+        f"(go | jump) to end of {optional_numerals}": [
             go_to_line(drop=4),
             vscode_command("cursorHome"),
         ],

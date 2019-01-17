@@ -4,10 +4,12 @@ import requests
 import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
-from talon.voice import Context, Key, Str
+from talon.voice import Context, Key
+
+from ..utils import optional_numerals, text, text_to_number, text_to_range
 
 try:
-    from .ext.homophones import all_homophones
+    from ..text.homophones import all_homophones
 
     # Map from every homophone back to the row it was in.
     homophone_lookup = {
@@ -18,95 +20,13 @@ except ImportError:
     all_homophones = homophone_lookup.keys()
 
 try:
-    from .mouse import delayed_click
+    from ..misc.mouse import delayed_click
 except ImportError:
+    print("Fallback mouse click logic")
 
     def delayed_click():
         ctrl.mouse_click(button=0)
 
-
-# region Supporting Code
-mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
-punctuation = set(".,-!?")
-
-
-def parse_word(word):
-    word = str(word).lstrip("\\").split("\\", 1)[0]
-    word = mapping.get(word, word)
-    return word
-
-
-def parse_words(m):
-    try:
-        # noinspection PyProtectedMember
-        return list(map(parse_word, m.dgndictation[0]._words))
-    except AttributeError:
-        return []
-
-
-def join_words(words, sep=" "):
-    out = ""
-    for i, word in enumerate(words):
-        if i > 0 and word not in punctuation:
-            out += sep
-        out += word
-    return out
-
-
-def insert(s):
-    Str(s)(None)
-
-
-def text(m):
-    insert(join_words(parse_words(m)).lower())
-
-
-_numeral_map = dict((str(n), n) for n in range(0, 20))
-for n in range(20, 101, 10):
-    _numeral_map[str(n)] = n
-for n in range(100, 1001, 100):
-    _numeral_map[str(n)] = n
-for n in range(1000, 10001, 1000):
-    _numeral_map[str(n)] = n
-_numeral_map["oh"] = 0  # synonym for zero
-_numeral_map["and"] = None  # drop me
-_numerals = "(" + " | ".join(sorted(_numeral_map.keys())) + ")+"
-_optional_numerals = "(" + " | ".join(sorted(_numeral_map.keys())) + ")*"
-
-
-def text_to_number(words):
-    tmp = [str(s).lower() for s in words]
-    words = [parse_word(word) for word in tmp]
-
-    result = 0
-    factor = 1
-    for word in reversed(words):
-        print("{} {} {}".format(result, factor, word))
-        if word not in _numeral_map:
-            raise Exception("not a number: {}".format(words))
-
-        number = _numeral_map[word]
-        if number is None:
-            continue
-
-        number = int(number)
-        if number > 10:
-            result = result + number
-        else:
-            result = result + factor * number
-        factor = (10 ** len(str(number))) * factor
-    return result
-
-
-def text_to_range(words, delimiter="until"):
-    tmp = [str(s).lower() for s in words]
-    split = tmp.index(delimiter)
-    start = text_to_number(words[:split])
-    end = text_to_number(words[split + 1 :])
-    return start, end
-
-
-# endregion
 
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
@@ -273,7 +193,7 @@ ctx.keymap(
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
-        f"select (lines | line) {_optional_numerals}": [
+        f"select (lines | line) {optional_numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineStart"),
             idea("action EditorLineEndWithSelection"),
@@ -286,11 +206,11 @@ ctx.keymap(
             idea("action EditorLineStart"),
             idea("action EditorLineEndWithSelection"),
         ],
-        f"select lines {_optional_numerals} until {_optional_numerals}": idea_range(
+        f"select lines {optional_numerals} until {optional_numerals}": idea_range(
             "range {} {}", drop=2
         ),
-        f"select until {_optional_numerals}": idea_num("extend {}", drop=2),
-        f"(go | jump) to end of {_optional_numerals}": idea_num("goto {} 9999", drop=4),
+        f"select until {optional_numerals}": idea_num("extend {}", drop=2),
+        f"(go | jump) to end of {optional_numerals}": idea_num("goto {} 9999", drop=4),
         "(clean | clear) line": [
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
@@ -308,9 +228,9 @@ ctx.keymap(
         "(synchronizing | synchronize)": idea("action Synchronize"),
         "comment": idea("action CommentByLineComment"),
         "(action | please) [<dgndictation>]": [idea("action GotoAction"), text],
-        f"(go to | jump to) {_optional_numerals}": idea_num("goto {} 0", drop=2),
-        f"clone line {_optional_numerals}": idea_num("clone {}", drop=2),
-        f"grab {_optional_numerals}": grab_identifier,
+        f"(go to | jump to) {optional_numerals}": idea_num("goto {} 0", drop=2),
+        f"clone line {optional_numerals}": idea_num("clone {}", drop=2),
+        f"grab {optional_numerals}": grab_identifier,
         "(start | stop) recording": idea("action StartStopMacroRecording"),
         "edit (recording | recordings)": idea("action EditMacros"),
         "play recording": idea("action PlaybackLastMacro"),

@@ -1,7 +1,7 @@
 from talon import ctrl
 from talon.voice import Context, Key
 
-from .utility import numerals, text_to_number
+from ..utils import numerals, text_to_number
 
 ctx = Context("amethyst")
 

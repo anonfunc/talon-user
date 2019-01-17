@@ -2,7 +2,7 @@ import subprocess
 
 from talon.voice import Context, Key
 
-from .utility import text
+from ..utils import text
 
 ctx = Context("misc")
 

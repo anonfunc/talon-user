@@ -6,15 +6,13 @@
 
 import os
 import re
-import subprocess
-import time
 
 import talon.clip as clip
 from talon import applescript
 from talon.voice import Context, Key, Str, press
 
-from .mouse import delayed_click
-from .utility import text
+from ..misc.mouse import delayed_click
+from ..utils import text
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]

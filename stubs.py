@@ -1,6 +1,5 @@
 import os
 import sys
-
 from inspect import signature
 from textwrap import dedent
 
@@ -64,7 +63,7 @@ def stub_callable(identifier, thing, indent):
             return f"class {identifier}: " + dump_stubs(thing, indent=indent + "   ")
 
 
-STUBS_DIR = os.path.expanduser("~/.talon/user/stubs")
+STUBS_DIR = os.path.expanduser("~/.talon/user")
 
 
 def dump_all_stubs():

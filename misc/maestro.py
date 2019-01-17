@@ -20,11 +20,4 @@ def kmaestro(script_id):
 
 
 ctx = Context("window")
-ctx.keymap(
-    {
-        "switcher": kmaestro("Switcher"),
-        "window left": kmaestro("Windy Left"),
-        "window right": kmaestro("Windy Right"),
-        "window max": kmaestro("Windy Max"),
-    }
-)
+ctx.keymap({"switcher": kmaestro("Switcher")})

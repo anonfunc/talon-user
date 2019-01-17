@@ -3,11 +3,10 @@
 import os
 
 from talon import app, clip, cron
-from talon.engine import engine
 from talon.voice import Context, Key, Str, Word, press
 from talon.webview import Webview
 
-from .. import utility
+from .. import utils
 
 ########################################################################
 # global settings
@@ -50,12 +49,6 @@ with open(homophones_file, "r") as f:
                 phones[w] = others
 
 all_homophones = phones
-
-# Map from every homophone back to the row it was in.
-homophone_lookup = {
-    item.lower(): words for canon, words in phones.items() for item in words
-}
-
 active_word_list = None
 is_selection = False
 
@@ -131,9 +124,9 @@ def make_selection(m, is_selection, transform=lambda x: x):
     words = m._words
     d = None
     if len(words) == 1:
-        d = int(utility.parse_word(words[0]))
+        d = int(utils.parse_word(words[0]))
     else:
-        d = int(utility.parse_word(words[1]))
+        d = int(utils.parse_word(words[1]))
     w = active_word_list[d - 1]
     if len(words) > 1:
         w = transform(w)
@@ -165,7 +158,7 @@ def raise_homophones(m, force_raise=False, is_selection=False):
     #     word = parse_word(word)
     elif len(m._words) >= 2:
         word = str(m._words[len(m._words) - 1])
-        word = utility.parse_word(word)
+        word = utils.parse_word(word)
 
     word = word.lower()
 

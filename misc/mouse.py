@@ -1,4 +1,3 @@
-import threading
 import time
 
 from talon import cron, ctrl, tap

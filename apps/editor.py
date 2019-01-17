@@ -1,8 +1,19 @@
 import talon.clip as clip
 from talon.voice import Context, Key, press
 
-from .ext.homophones import homophone_lookup
-from .utility import join_words, parse_words, text
+from .. import utils
+
+try:
+    from ..text.homophones import all_homophones
+
+    # Map from every homophone back to the row it was in.
+    homophone_lookup = {
+        item.lower(): words for canon, words in all_homophones.items() for item in words
+    }
+except ImportError:
+    homophone_lookup = {"right": ["right", "write"], "write": ["right", "write"]}
+    all_homophones = homophone_lookup.keys()
+
 
 supported_apps = {
     "com.jetbrains.intellij",
@@ -27,10 +38,10 @@ ctx = Context(
 
 # jcooper-korg from talon slack
 def select_text_to_left_of_cursor(m):
-    words = parse_words(m)
+    words = utils.parse_words(m)
     if not words:
         return
-    key = join_words(words).lower()
+    key = utils.join_words(words).lower()
     keys = homophone_lookup.get(key, [key])
     press("left", wait=2000)
     press("right", wait=2000)
@@ -55,10 +66,10 @@ def select_text_to_left_of_cursor(m):
 
 # jcooper-korg from talon slack
 def select_text_to_right_of_cursor(m):
-    words = parse_words(m)
+    words = utils.parse_words(m)
     if not words:
         return
-    key = join_words(words).lower()
+    key = utils.join_words(words).lower()
     keys = homophone_lookup.get(key, [key])
     press("right", wait=2000)
     press("left", wait=2000)
@@ -88,7 +99,7 @@ ctx.keymap(
     {
         "(select previous) [<dgndictation>]": select_text_to_left_of_cursor,
         "(select next) [<dgndictation>]": select_text_to_right_of_cursor,
-        "search [<dgndictation>]": [Key("cmd-f"), text],
+        "search [<dgndictation>]": [Key("cmd-f"), utils.text],
         "select all": [Key("cmd-a")],
         "select [this] line": [Key("home"), Key("shift-end")],
         "(clean | clear) line": [Key("home"), Key("shift-end"), Key("delete")],

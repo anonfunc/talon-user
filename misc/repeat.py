@@ -1,6 +1,6 @@
 from talon.voice import Context, Rep, talon
 
-from .utility import optional_numerals, text_to_number
+from ..utils import optional_numerals, text_to_number
 
 
 def repeat(m):
