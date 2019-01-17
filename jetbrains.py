@@ -5,15 +5,16 @@ import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
 from talon.voice import Context, ContextGroup, Key, Str
+
 try:
     from user.ext.homophones import all_homophones
+
     # Map from every homophone back to the row it was in.
-    homophone_lookup = {item.lower(): words for canon,words in all_homophones.items() for item in words}
-except ImportError:
     homophone_lookup = {
-        "right": ["right", "write"],
-        "write": ["right", "write"]
+        item.lower(): words for canon, words in all_homophones.items() for item in words
     }
+except ImportError:
+    homophone_lookup = {"right": ["right", "write"], "write": ["right", "write"]}
 
 try:
     from user.mouse import delayed_click
@@ -49,12 +50,14 @@ def join_words(words, sep=" "):
         out += word
     return out
 
+
 def insert(s):
     Str(s)(None)
 
 
 def text(m):
     insert(join_words(parse_words(m)).lower())
+
 
 _numeral_map = dict((str(n), n) for n in range(0, 20))
 for n in range(20, 101, 10):
@@ -185,13 +188,12 @@ def idea_words(cmd, join=" "):
 def idea_find(direction):
     def handler(m):
         args = [str(w) for w in m.dgndictation[0]._words]
+        search_string = " ".join(args)
         cmd = "find {} {}"
         if len(args) == 1:
             word = args[0]
             if word in homophone_lookup:
                 search_string = "({})".format("|".join(homophone_lookup[word]))
-        else:
-            search_string = " ".join(args)
         print(args)
         send_idea_command(cmd.format(direction, search_string))
 
@@ -206,7 +208,7 @@ def grab_identifier(m):
     try:
         old_line, old_col = get_idea_location()
         delayed_click(m, button=0, times=2)
-        for _ in range(times-1):
+        for _ in range(times - 1):
             send_idea_command("action EditorSelectWord")
         send_idea_command("action EditorCopy")
         send_idea_command("goto {} {}".format(old_line, old_col))
@@ -277,7 +279,9 @@ ctx.keymap(
             idea("action EditorLineStart"),
             idea("action EditorLineEndWithSelection"),
         ],
-        f"select lines {_optional_numerals} until {_optional_numerals}": idea_range("range {} {}", drop=2),
+        f"select lines {_optional_numerals} until {_optional_numerals}": idea_range(
+            "range {} {}", drop=2
+        ),
         f"select until {_optional_numerals}": idea_num("extend {}", drop=2),
         f"(go | jump) to end of {_optional_numerals}": idea_num("goto {} 9999", drop=4),
         "(clean | clear) line": [
@@ -312,9 +316,12 @@ ctx.keymap(
         "[toggle] (mark | bookmark)": idea("action ToggleBookmark"),
         "next (mark | bookmark)": idea("action GotoNextBookmark"),
         "(last | previous) (mark | bookmark)": idea("action GotoPreviousBookmark"),
-        f"(mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num("action ToggleBookmark{}", drop=1, zero_okay=True),
-        f"(jump | go) (mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num("action GotoBookmark{}", drop=2, zero_okay=True),
-        
+        f"(mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
+            "action ToggleBookmark{}", drop=1, zero_okay=True
+        ),
+        f"(jump | go) (mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
+            "action GotoBookmark{}", drop=2, zero_okay=True
+        ),
     }
 )
 # group.load()

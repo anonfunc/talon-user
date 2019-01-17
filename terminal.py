@@ -11,7 +11,6 @@ import time
 
 from talon import applescript
 import talon.clip as clip
-from talon.api import ffi
 from talon.voice import Key, press, Str, Context
 
 from user.utility import text
