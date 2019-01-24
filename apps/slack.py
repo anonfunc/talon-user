@@ -11,6 +11,7 @@ ctx.keymap(
         "(threads | all threads)": Key("cmd-shift-t"),
         "react [<dgndictation>]": [Key("cmd-shift-\\"), text],
         "zoom": Key("cmd-."),
+        "(previous | last) unread": Key("alt-shift-up"),
         "next unread": Key("alt-shift-down"),
     }
 )

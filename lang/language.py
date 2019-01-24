@@ -64,6 +64,7 @@ ctx.keymap(
         "state (int | integer | ant) 64": "int64 ",
         "state slice": "[]",
         "state tag": ["``", Key("left")],
+        "state return": "return ",
         "map of string to string": "map[string]string",
         "go dot": Key("cmd-right ."),
     }
