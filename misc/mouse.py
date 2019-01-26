@@ -128,29 +128,35 @@ def toggle_cursor(show):
     return _toggle
 
 
+keymap = {
+    "hide cursor": toggle_cursor(False),
+    "show cursor": toggle_cursor(True),
+    # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
+    "(squid | control mouse)": control_mouse,
+    "zoom mouse": control_zoom_mouse,
+    # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
+}
+
+click_keymap = {
+    "click": delayed_click,
+    "click right": delayed_right_click,
+    "click double": delayed_dubclick,
+    "click triple": delayed_tripclick,
+    "click drag": mouse_drag,
+    "click release": mouse_release,
+    "wheel down": mouse_scroll(30),
+    "wheel up": mouse_scroll(-30),
+    "continuous": startScrolling,
+    "wheel stop": stopScrolling,
+    "click command": adv_click(0, "cmd"),
+    "click control": adv_click(0, "ctrl"),
+    "click (option | opt)": adv_click(0, "alt"),
+    "click shift": adv_click(0, "shift"),
+    "click (shift alt | alt shift)": adv_click(0, "alt", "shift"),
+    "click (shift double | double shift)": adv_click(0, "shift", times=2),
+}
+keymap.update(click_keymap)
+
 ctx.keymap(
-    {
-        "click": delayed_click,
-        "click right": delayed_right_click,
-        "click double": delayed_dubclick,
-        "click triple": delayed_tripclick,
-        "click drag": mouse_drag,
-        "click release": mouse_release,
-        "wheel down": mouse_scroll(30),
-        "wheel up": mouse_scroll(-30),
-        "continuous": startScrolling,
-        "wheel stop": stopScrolling,
-        "click command": adv_click(0, "cmd"),
-        "click control": adv_click(0, "ctrl"),
-        "click (option | opt)": adv_click(0, "alt"),
-        "click shift": adv_click(0, "shift"),
-        "click (shift alt | alt shift)": adv_click(0, "alt", "shift"),
-        "click (shift double | double shift)": adv_click(0, "shift", times=2),
-        "hide cursor": toggle_cursor(False),
-        "show cursor": toggle_cursor(True),
-        # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
-        "(squid | control mouse)": control_mouse,
-        "zoom mouse": control_zoom_mouse,
-        # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
-    }
+    keymap
 )

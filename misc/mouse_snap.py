@@ -60,6 +60,7 @@ class MouseSnap:
         self.save_last()
         self.offset_x = 0
         self.offset_y = 0
+        self.main_screen = ui.main_screen()
         self.width = self.main_screen.width
         self.height = self.main_screen.height
 
@@ -70,22 +71,23 @@ class MouseSnap:
         self.offset_x, self.offset_y, self.width, self.height = self.last_state
 
 
-mg = MouseSnap()
-
-group = ContextGroup("mouseSnap")
-ctx = Context("mouseSnap", group=group)
-ctx.keymap({
-    "north": mg.north,
-    "east": mg.east,
-    "south": mg.south,
-    "west": mg.west,
-    "leap": [lambda _: ctrl.mouse(*mg.pos()), mg.stop, lambda _: group.unload()],
-    "oops": mg.go_back,
-    "done": [mg.stop, lambda _: group.unload()],
-})
-
-startCtx = Context("mouseSnapStarter")
-startCtx.keymap({
-    "mouse snap": [mg.start, lambda _: group.load()],
-    "mouse done": [mg.stop, lambda _: group.unload()],
-})
+# mg = MouseSnap()
+#
+# ctx = Context("mouseSnap")
+# ctx.keymap({
+#     "north": mg.north,
+#     "east": mg.east,
+#     "south": mg.south,
+#     "west": mg.west,
+#     "leap": [lambda _: ctrl.mouse(*mg.pos()), mg.stop, lambda _: ctx.unload()],
+#     "stay": [lambda _: ctrl.mouse(*mg.pos())],
+#     "oops": mg.go_back,
+#     "reset": mg.reset,
+#     "done": [mg.stop, lambda _: ctx.unload()],
+# })
+#
+# startCtx = Context("mouseSnapStarter")
+# startCtx.keymap({
+#     "snap": [mg.reset, mg.start, lambda _: ctx.load()],
+#     # "snap done": [mg.stop, lambda _: ctx.unload()],
+# })

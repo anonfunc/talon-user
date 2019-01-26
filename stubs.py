@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from inspect import signature
 from textwrap import dedent
 
@@ -87,20 +88,19 @@ def dump_all_stubs():
         with open(output_path + ".pyi", "w") as fh:
             stubs = dump_stubs(sys.modules[m])
             fh.write("from typing import *\n")
-            fh.write(super_import)
+            # fh.write(super_import)
             fh.write(stubs)
     with open(os.path.join(STUBS_DIR, "talon", "stubbed.pyi"), "w") as fh:
-        fh.write(
-            dedent(
-                """\
+        stub = dedent("""\
         from typing import *
         CompiledLib: Any = ...
         CompiledFFI: Any = ...
         class _cffi_backend:
             CData: Any = ...
         getset_descriptor: Any = ...
-        """
-            )
+        """)
+        fh.write(
+            stub
         )
     with open(os.path.join(STUBS_DIR, "talon", "__init__.pyi"), "w") as fh:
         fh.write(
@@ -113,4 +113,6 @@ def dump_all_stubs():
     print("Done stubbing.")
 
 
+if time.time() - os.path.getmtime(os.path.join(STUBS_DIR, "talon", "__init__.pyi")) > 3600:
+    dump_all_stubs()
 dump_all_stubs()
