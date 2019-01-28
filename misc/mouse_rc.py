@@ -64,7 +64,7 @@ class MouseRcCar:
             return
         # print("NOIZE", noise)
         if noise == "pop":
-            self.angle -= radians(45)
+            self.angle -= radians(90)
             if self.angle <= 0:
                 self.angle += 2*pi
         elif noise == "hiss_start":
@@ -84,12 +84,12 @@ class MouseRcCar:
         ctrl.cursor_visible(True)
 
 
-mg = MouseRcCar()
-ctx = Context("MouseRcCarStarter")
-ctx.keymap({
-    "start driving": [mg.reset, mg.start],
-    "(done | stop) driving": mg.stop,
-    # "snap done": [mg.stop, lambda _: ctx.unload()],
-})
+# mg = MouseRcCar()
+# ctx = Context("MouseRcCarStarter")
+# ctx.keymap({
+#     "start driving": [mg.reset, mg.start],
+#     "(done | stop) driving": mg.stop,
+#     # "snap done": [mg.stop, lambda _: ctx.unload()],
+# })
 
 #mg.start(None)
