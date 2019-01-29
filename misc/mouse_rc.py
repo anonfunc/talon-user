@@ -111,13 +111,13 @@ class MouseRcCar:
         self.main_screen = ui.main_screen()
         ctrl.cursor_visible(True)
 
-
-mg = MouseRcCar()
-ctx = Context("MouseRcCarStarter")
-ctx.keymap({
-    "start driving": [mg.reset, mg.start],
-    "(done | stop) driving": mg.stop,
-    # "snap done": [mg.stop, lambda _: ctx.unload()],
-})
-
-#mg.start(None)
+#
+# mg = MouseRcCar()
+# ctx = Context("MouseRcCarStarter")
+# ctx.keymap({
+#     "start driving": [mg.reset, mg.start],
+#     "(done | stop) driving": mg.stop,
+#     # "snap done": [mg.stop, lambda _: ctx.unload()],
+# })
+#
+# #mg.start(None)
