@@ -120,10 +120,18 @@ def stopScrolling(m):
 scrollAmount = 0
 scrollJob = None
 
+hideJob = None
+
 
 def toggle_cursor(show):
-    def _toggle(m):
+
+    def _toggle(_):
+        global hideJob
         ctrl.cursor_visible(show)
+        if show:
+            cron.cancel(hideJob)
+        else:
+            hideJob = cron.interval('500ms', lambda: ctrl.cursor_visible(show))
 
     return _toggle
 
@@ -160,3 +168,5 @@ keymap.update(click_keymap)
 ctx.keymap(
     keymap
 )
+
+ctrl.cursor_visible(True)

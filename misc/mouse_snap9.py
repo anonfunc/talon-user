@@ -18,17 +18,17 @@ class MouseSnapNine:
         self.active = False
         self.moving = False
         self.count = 0
-        tap.register(tap.MMOVE, self.on_move)
-
-    def on_move(self, typ, e):
-        if typ != tap.MMOVE or not self.active:
-            return
-        x, y = self.pos()
-        last_pos = self.states[-1]
-        x2, y2 = last_pos[0] + last_pos[2]//2, last_pos[1] + last_pos[3]//2
-        # print("moved ", e, x, y)
-        if (e.x, e.y) != (x, y) and (e.x, e.y) != (x2, y2):
-            self.stop(None)
+    #     tap.register(tap.MMOVE, self.on_move)
+    #
+    # def on_move(self, typ, e):
+    #     if typ != tap.MMOVE or not self.active:
+    #         return
+    #     x, y = self.pos()
+    #     last_pos = self.states[-1]
+    #     x2, y2 = last_pos[0] + last_pos[2]//2, last_pos[1] + last_pos[3]//2
+    #     # print("moved ", e, x, y)
+    #     if (e.x, e.y) != (x, y) and (e.x, e.y) != (x2, y2):
+    #         self.stop(None)
 
     def start(self, *_):
         if self.active:
@@ -121,7 +121,7 @@ ctx.unload()
 
 startCtx = Context("mouseSnapNineStarter")
 startCtx.keymap({
-    "(mouse grid | mousegrid)": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
+    "(grid | mouse grid | mousegrid)": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
     # "snap done": [mg.stop, lambda _: ctx.unload()],
 })
 # mg.start()
