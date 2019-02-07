@@ -53,7 +53,7 @@ def select_text_to_left_of_cursor(m):
     result = -1
     for needle in keys:
         result = max(text_left.find(needle), result)
-    print(text_left, keys, result)
+    # print(text_left, keys, result)
     if result == -1:
         return
     # cursor over to the found key text
@@ -84,7 +84,7 @@ def select_text_to_right_of_cursor(m):
         if index == -1:
             continue
         result = min(index, result)
-    print(text_right, keys, result, len(text_right) + 1)
+    # print(text_right, keys, result, len(text_right) + 1)
     if result == len(text_right) + 1:
         return
     # cursor over to the found key text

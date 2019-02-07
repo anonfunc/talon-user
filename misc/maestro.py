@@ -19,5 +19,5 @@ def kmaestro(script_id):
     return _kmaestro
 
 
-ctx = Context("window")
-ctx.keymap({"switcher": kmaestro("Switcher")})
+ctx = Context("maestro")
+ctx.keymap({"switcher": kmaestro("Switcher"), "window max": kmaestro("Windy Max")})

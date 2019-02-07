@@ -10,7 +10,7 @@ vocab = ["nonce"]
 def parse_word(w):
     w = str(w).lstrip("\\").split("\\", 1)[0]
     w = mapping.get(w, w)
-    w = w.replace("-", " ")  # hate dragon hyphenation.
+    w = w.replace("-", "")  # hate dragon hyphenation.
     return w
 
 
@@ -36,17 +36,13 @@ def insert(s):
 
 
 def text(m):
-    insert(join_words(parse_words(m)).lower())
-
-
-def sentence_text(m):
-    insert(join_words(parse_words(m)).lower().capitalize())
+    insert(join_words(parse_words(m)))
 
 
 def word(m):
     try:
         # noinspection PyProtectedMember
-        insert(join_words(list(map(parse_word, m.dgnwords[0]._words))).lower())
+        insert(join_words(list(map(parse_word, m.dgnwords[0]._words))))
     except AttributeError:
         pass
 
@@ -92,7 +88,7 @@ def text_to_number(words):
     result = 0
     factor = 1
     for w in reversed(words):
-        print("{} {} {}".format(result, factor, w))
+        # print("{} {} {}".format(result, factor, w))
         if w not in numerals:
             raise Exception("not a number: {}".format(words))
 

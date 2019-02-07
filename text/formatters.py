@@ -13,6 +13,9 @@ formatters = {
         + ("__" if last else ""),
     ),
     "camel": (True, lambda i, word, _: word if i == 0 else word.capitalize()),
+    # Golang private/public conventions prefer SendHTML to SendHtml sendHtml
+    "private": (True, lambda i, word, _: word if i == 0 else word if word.upper() == word else word.capitalize()),
+    "public": (True, lambda i, word, _: word if word.upper() == word else word.capitalize()),
     "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
     "smash": (True, lambda i, word, _: word),
     "spine": (True, lambda i, word, _: word if i == 0 else "-" + word),
@@ -21,8 +24,8 @@ formatters = {
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),
     "lowcaps": (False, lambda i, word, _: word.lower()),
-    "string": (False, surround("'")),
-    "quoted": (False, surround('"')),
+    "string": (False, surround('"')),
+    "ticks": (False, surround("'")),
     "padded": (False, surround(" ")),
 }
 
@@ -35,7 +38,7 @@ def format_text(m):
             # noinspection PyUnresolvedReferences
             fmt.append(w.word)
     # noinspection PyProtectedMember
-    words = [str(s).lower() for s in m.dgndictation[0]._words]
+    words = [str(s) for s in m.dgndictation[0]._words]
 
     tmp = []
     spaces = True
@@ -59,7 +62,7 @@ ctx.vocab = vocab
 ctx.keymap(
     {
         # 'word <dgnwords>': word,
-        "(%s)+ <dgndictation>"
+        "(%s)+ <dgndictation> [over]"
         % (" | ".join(formatters)): format_text
     }
 )

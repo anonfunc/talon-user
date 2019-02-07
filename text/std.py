@@ -1,7 +1,7 @@
 from talon import app, clip, ui
 from talon.voice import Context, Key
 
-from ..utils import sentence_text, text, vocab, word
+from ..utils import text, vocab, word
 
 
 def copy_bundle(_):
@@ -15,9 +15,9 @@ ctx.vocab = vocab
 ctx.keymap(
     {
         "say <dgndictation> [over]": text,
-        "sentence <dgndictation> [over]": sentence_text,
+        # "sentence <dgndictation> [over]": sentence_text,  # Formatters.
         "comma <dgndictation> [over]": [", ", text],
-        "period <dgndictation> [over]": [". ", sentence_text],
+        "period <dgndictation> [over]": [". ", text],
         # "more <dgndictation> [over]": [" ", text],
         "word <dgnwords>": word,
         "slap": [Key("cmd-right enter")],
@@ -77,6 +77,7 @@ ctx.keymap(
         "op or": " || ",
         "[op] (logical | bitwise) and": " & ",
         "[op] (logical | bitwise) or": " | ",
+        "op pipe": " | ",
         "(op | logical | bitwise) (ex | exclusive) or": " ^ ",
         "[(op | logical | bitwise)] (left shift | shift left)": " << ",
         "[(op | logical | bitwise)] (right shift | shift right)": " >> ",

@@ -5,7 +5,6 @@ from talon.voice import Context, Key
 from ..utils import text
 
 ctx = Context("navigation")
-
 ctx.keymap(
     {
         # Application navigation

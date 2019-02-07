@@ -82,7 +82,7 @@ ctx.keymap({"testing": "vscode testing"})
 def _update_scope():
     global _terminalContextJob
     if active_app().bundle == "com.microsoft.VSCode":
-        print("In vscode, updating scope...")
+        # print("In vscode, updating scope...")
         talon.update_scope()
     else:
         cron.cancel(_terminalContextJob)

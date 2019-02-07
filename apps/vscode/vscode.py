@@ -173,7 +173,7 @@ ctx.keymap(
         # ],
         "find [<dgndictation>]": [vscode_command("actions.find"), delay(), text],
         "find this": vscode_command("actions.findWithSelection"),
-        "(template | snippet) [<dgndictation>]": [
+        "template [<dgndictation>]": [
             vscode_command("editor.action.insertSnippet"),
             delay(),
             text,

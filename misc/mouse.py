@@ -63,8 +63,11 @@ def mouse_release(m):
 def mouse_scroll(amount):
     def scroll(m):
         global scrollAmount
-        print("amount is", amount)
-        scrollAmount = amount
+        # print("amount is", amount)
+        if (scrollAmount >= 0) == (amount >= 0):
+            scrollAmount += amount
+        else:
+            scrollAmount = amount
         ctrl.mouse_scroll(y=amount)
 
     return scroll
@@ -140,7 +143,7 @@ keymap = {
     "hide cursor": toggle_cursor(False),
     "show cursor": toggle_cursor(True),
     # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
-    "(squid | control mouse)": control_mouse,
+    "(gaze | control mouse)": control_mouse,
     "zoom mouse": control_zoom_mouse,
     # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
 }
@@ -153,8 +156,9 @@ click_keymap = {
     "click drag": mouse_drag,
     "click release": mouse_release,
     "wheel down": mouse_scroll(30),
+    "wheel down continuous": [mouse_scroll(30), startScrolling],
     "wheel up": mouse_scroll(-30),
-    "continuous": startScrolling,
+    "wheel up continuous": [mouse_scroll(-30), startScrolling],
     "wheel stop": stopScrolling,
     "click command": adv_click(0, "cmd"),
     "click control": adv_click(0, "ctrl"),

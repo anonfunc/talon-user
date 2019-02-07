@@ -60,7 +60,7 @@ ctx.keymap(
         f"move [to] next space": mod2("right"),
         f"move [to] (previous | last) space": mod2("left"),
         # Needs space shortcuts
-        f"move [to] space {numerals}": number(mod_one=True, control=True),
+        f"(move | send) [to] space {numerals}": number(mod_one=True, control=True),
         # Not strictly Amethyst
         f"focus space {numerals}": number(control=True),
         "mission control": Key("ctrl-up"),
