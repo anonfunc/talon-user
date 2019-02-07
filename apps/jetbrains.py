@@ -1,4 +1,5 @@
 import os
+import time
 
 import requests
 import talon.clip as clip
@@ -34,11 +35,13 @@ except ImportError:
 # Note that MPS and IntelliJ ultimate will conflict...
 port_mapping = {
     "com.jetbrains.intellij": 8653,
+    "com.jetbrains.intellij-EAP": 8653,
     "com.jetbrains.intellij.ce": 8654,
     "com.jetbrains.AppCode": 8655,
     "com.jetbrains.CLion": 8657,
     "com.jetbrains.datagrip": 8664,
     "com.jetbrains.goland": 8659,
+    "com.jetbrains.goland-EAP": 8659,
     "com.jetbrains.PhpStorm": 8662,
     "com.jetbrains.pycharm": 8658,
     "com.jetbrains.rider": 8660,
@@ -57,7 +60,7 @@ def _get_nonce(port):
 
 
 def send_idea_command(cmd):
-    print("Sending {}".format(cmd))
+    # print("Sending {}".format(cmd))
     bundle = active_app().bundle
     port = port_mapping.get(bundle, None)
     nonce = _get_nonce(port)
@@ -81,7 +84,7 @@ def idea_num(cmd, drop=1, zero_okay=False):
     def handler(m):
         # noinspection PyProtectedMember
         line = text_to_number(m._words[drop:])
-        print(cmd.format(line))
+        # print(cmd.format(line))
         if int(line) == 0 and not zero_okay:
             print("Not sending, arg was 0")
             return
@@ -95,7 +98,7 @@ def idea_range(cmd, drop=1):
     def handler(m):
         # noinspection PyProtectedMember
         start, end = text_to_range(m._words[drop:])
-        print(cmd.format(start, end))
+        # print(cmd.format(start, end))
         send_idea_command(cmd.format(start, end))
 
     return handler
@@ -105,7 +108,7 @@ def idea_words(cmd, join=" "):
     def handler(m):
         # noinspection PyProtectedMember
         args = [str(w) for w in m.dgndictation[0]._words]
-        print(args)
+        # print(args)
         send_idea_command(cmd.format(join.join(args)))
 
     return handler
@@ -121,7 +124,7 @@ def idea_find(direction):
             word = args[0]
             if word in homophone_lookup:
                 search_string = "({})".format("|".join(homophone_lookup[word]))
-        print(args)
+        # print(args)
         send_idea_command(cmd.format(direction, search_string))
 
     return handler
@@ -131,7 +134,7 @@ def idea_bounded(direction):
     def handler(m):
         # noinspection PyProtectedMember
         keys = [alphabet[k] for k in m["jetbrains.alphabet"]]
-        search_string = r'%5B^-_ .%5D*?'.join(keys)  # URL escaped Java regex!
+        search_string = r"%5B^-_ .%5D*?".join(keys)  # URL escaped Java regex!
         cmd = "find {} {}"
         send_idea_command(cmd.format(direction, search_string))
 
@@ -170,8 +173,8 @@ ctx.vocab = ["docker", "GitHub"]
 ctx.vocab_remove = ["doctor", "Doctor"]
 ctx.keymap(
     {
-        "complete": idea("action CodeCompletion"),
-        "smarter": idea("action SmartTypeCompletion"),
+        "complete [<dgndictation>]": [idea("action CodeCompletion"), text],
+        "smarter [<dgndictation>]": [idea("action SmartTypeCompletion"), text],
         "finish": idea("action EditorCompleteStatement"),
         "zoom": idea("action HideAllWindows"),
         "find (usage | usages)": idea("action FindUsages"),
@@ -179,7 +182,7 @@ ctx.keymap(
             idea("action Refactorings.QuickListPopupAction"),
             text,
         ],
-        "fix [this]": idea("action ShowIntentionActions"),
+        "fix this [<dgndictation>]": [idea("action ShowIntentionActions"), text],
         "fix next [error]": [
             idea("action GotoNextError"),
             idea("action ShowIntentionActions"),
@@ -189,31 +192,30 @@ ctx.keymap(
             idea("action ShowIntentionActions"),
         ],
         "(visit declaration | follow)": idea("action GotoDeclaration"),
-        "(visit implementers | visit implementations | implementation | ample)": idea("action GotoImplementation"),
+        "(visit implementers | visit implementations | implementation | ample)": idea(
+            "action GotoImplementation"
+        ),
         "(visit type | type)": idea("action GotoTypeDeclaration"),
         "(select previous) <dgndictation>": idea_find("prev"),
         "(select next) <dgndictation>": idea_find("next"),
         "(previous bounded) {jetbrains.alphabet}+": idea_bounded("prev"),
         "(next bounded) {jetbrains.alphabet}+": idea_bounded("next"),
-        "search everywhere [for] [<dgndictation>]": [
+        "search everywhere [for] [<dgndictation>++]": [
             idea("action SearchEverywhere"),
             text,
         ],
-        "visit [<dgndictation>]": [
-            idea("action SearchEverywhere"),
-            text,
-        ],
-        "recent [<dgndictation>]": [
-            idea("action RecentFiles"),
-            text,
-        ],
+        "visit [<dgndictation>++]": [idea("action SearchEverywhere"), text],
+        "recent [<dgndictation>++]": [idea("action RecentFiles"), text],
         "search [for] [<dgndictation>]": [idea("action Find"), text],
         "search [for] this": idea("action FindWordAtCaret"),
         "next result": idea("action FindNext"),
         "(last | previous) result": idea("action FindPrevious"),
+        # Templates
         "surround [this] [<dgndictation>]": [idea("action SurroundWith"), text],
         "generate [<dgndictation>]": [idea("action Generate"), text],
         "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
+        "create template": idea("action SaveAsTemplate"),
+        # Lines / Selections
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
         f"select (lines | line) {optional_numerals}": [
@@ -235,7 +237,9 @@ ctx.keymap(
         f"select until {optional_numerals}": idea_num("extend {}", drop=2),
         f"select until line {optional_numerals}": idea_num("extend {}", drop=3),
         f"(go | jump) to end of {optional_numerals}": idea_num("goto {} 9999", drop=4),
-        f"(go | jump) to end of line {optional_numerals}": idea_num("goto {} 9999", drop=5),
+        f"(go | jump) to end of line {optional_numerals}": idea_num(
+            "goto {} 9999", drop=5
+        ),
         "(clean | clear) line": [
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
@@ -247,16 +251,17 @@ ctx.keymap(
         "(delete | clear) to start": idea("action EditorDeleteToLineStart"),
         "drag up": idea("action MoveLineUp"),
         "drag down": idea("action MoveLineDown"),
-        "duplicate": idea("action EditorDuplicate"),
+        "(duplicate | clone)": idea("action EditorDuplicate"),
         "(go | jump) back": idea("action Back"),
         "(go | jump) forward": idea("action Forward"),
         "(synchronizing | synchronize)": idea("action Synchronize"),
         "comment": idea("action CommentByLineComment"),
-        "(action | please) [<dgndictation>]": [idea("action GotoAction"), text],
+        "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
         f"(go to | jump to) {optional_numerals}": idea_num("goto {} 0", drop=2),
         f"(go to | jump to) line {optional_numerals}": idea_num("goto {} 0", drop=3),
         f"clone line {optional_numerals}": idea_num("clone {}", drop=2),
         f"grab {optional_numerals}": grab_identifier,
+        # Recording
         "(start | stop) recording": idea("action StartStopMacroRecording"),
         "edit (recording | recordings)": idea("action EditMacros"),
         "play recording": idea("action PlaybackLastMacro"),
@@ -265,6 +270,7 @@ ctx.keymap(
             text,
             Key("enter"),
         ],
+        # Marks
         "show (mark | marks | bookmark | bookmarks)": idea("action ShowBookmarks"),
         "[toggle] (mark | bookmark)": idea("action ToggleBookmark"),
         "next (mark | bookmark)": idea("action GotoNextBookmark"),
@@ -275,6 +281,40 @@ ctx.keymap(
         f"(jump | go) (mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
             "action GotoBookmark{}", drop=2, zero_okay=True
         ),
+        # Splits
+        "(vertical | vertically) split": idea("action SplitVertically"),
+        "(horizontal | horizontally) split": idea("action SplitHorizontally"),
+        "(rotate | change) split": idea("action ChangeSplitOrientation"),
+        "merge split": idea("action Unsplit"),
+        "merge all (split | splits)": idea("action UnsplitAll"),
+        "next split": idea("action NextSplitter"),
+        "(previous | last) split": idea("action LastSplitter"),
+        # Clipboard
+        # "clippings": idea("action PasteMultiple"),  # XXX Might be a long-lived action.  Replaced with Alfred.
+        "copy path": idea("action CopyPaths"),
+        "copy reference": idea("action CopyReference"),
+        "copy pretty": idea("action CopyAsRichText"),
+        # File Creation
+        "new sibling [<dgndictation>]": [idea("action NewElementSamePlace"), text],
+        "new [<dgndictation>]": [idea("action NewElement"), text],
+        # Task Management
+        "open task": [idea("action tasks.goto")],
+        "(browse | browser) task": [idea("action tasks.open.in.browser")],
+        "switch task": [idea("action tasks.switch")],
+        "close task": [idea("action tasks.close")],
+        "task server settings": [idea("action tasks.configure.servers")],
+        # Git / Github
+        "jet pull": idea("action Vcs.UpdateProject"),
+        "jet commit": idea("action CheckinProject"),
+        "jet log": idea("action Vcs.ShowTabbedFileHistory"),
+        "jet browse": idea("action Github.Open.In.Browser"),
+        "jet (gets | gist)": idea("action Github.Create.Gist"),
+        "jet (pull request | request)": idea("action Github.Create.Pull.Request"),
+        "jet (view | show | list) (requests | request)": idea(
+            "action Github.View.Pull.Request"
+        ),
+        "jet (annotate | blame)": idea("action Annotate"),
+        "jet": idea("action Vcs.QuickListPopupAction"),
     }
 )
 ctx.set_list("alphabet", alphabet.keys())
