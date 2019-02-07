@@ -52,7 +52,12 @@ def select_text_to_left_of_cursor(m):
     text_left = s.get()
     result = -1
     for needle in keys:
-        result = max(text_left.find(needle), result)
+        find = text_left.find(needle)
+        if find > result:
+            result = find
+            key = needle
+            break
+
     # print(text_left, keys, result)
     if result == -1:
         return
@@ -83,7 +88,11 @@ def select_text_to_right_of_cursor(m):
         index = text_right.find(needle)
         if index == -1:
             continue
-        result = min(index, result)
+        if index < result:
+            result = index
+            key = needle
+            break
+
     # print(text_right, keys, result, len(text_right) + 1)
     if result == len(text_right) + 1:
         return
@@ -97,8 +106,8 @@ def select_text_to_right_of_cursor(m):
 
 ctx.keymap(
     {
-        "(select previous) [<dgndictation>]": select_text_to_left_of_cursor,
-        "(select next) [<dgndictation>]": select_text_to_right_of_cursor,
+        "(select previous) [<dgndictation>++]": select_text_to_left_of_cursor,
+        "(select next) [<dgndictation>++]": select_text_to_right_of_cursor,
         "search [<dgndictation>]": [Key("cmd-f"), utils.text],
         "select all": [Key("cmd-a")],
         "select [this] line": [Key("home"), Key("shift-end")],

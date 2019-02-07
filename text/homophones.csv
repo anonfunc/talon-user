@@ -200,7 +200,7 @@ educe,adduce
 eek,eke
 effect,affect
 effects,affects
-eight,ate
+eight,ate,8
 elicit,illicit
 elude,allude
 elusive,allusive,illusive
@@ -226,6 +226,7 @@ few,phew
 fill,Phil
 fined,find
 fisher,fissure
+five,5
 flare,flair
 flea,flee
 floe,flow
@@ -233,7 +234,7 @@ flour,flower
 flue,flew,flu
 flyer,flier
 fold,foaled
-fore,for,four
+fore,for,four,4
 foregone,forgone
 foreword,forward
 forte,fort
@@ -253,6 +254,7 @@ gibe,jibe
 gild,guild
 gilder,guilder
 gilt,guilt
+git,get
 gnome,Nome
 gofer,gopher
 gored,gourd
@@ -397,12 +399,14 @@ neigh,nay
 nice,gneiss
 nickers,knickers
 night,knight
+nine,9
 none,nun
 nose,knows
 not,knot
 oar,or,ore
 ode,owed
 oh,owe
+one,1
 our,hour
 outcaste,outcast
 overdue,overdo
@@ -507,6 +511,7 @@ sees,seize,seas
 sell,cell
 series,Ceres
 session,cession
+seven,7
 sheer,shear
 shoo,shoe
 shoot,chute
@@ -516,6 +521,7 @@ side,sighed
 sighs,size
 sight,cite,site
 sink,sync
+six,6
 sleigh,slay
 sleight,slight
 slow,sloe
@@ -561,6 +567,7 @@ tents,tense
 the,thee
 theirs,there's
 there,they're,their
+three,3
 threw,through
 throne,thrown
 throws,throes
@@ -571,7 +578,7 @@ tied,tide
 tier,tear
 tigress,Tigris
 timbre,timber
-to,two,too
+to,two,too,2
 toe,tow
 tolled,told
 tool,tulle

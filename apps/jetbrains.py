@@ -196,8 +196,8 @@ ctx.keymap(
             "action GotoImplementation"
         ),
         "(visit type | type)": idea("action GotoTypeDeclaration"),
-        "(select previous) <dgndictation>": idea_find("prev"),
-        "(select next) <dgndictation>": idea_find("next"),
+        "(select previous) <dgndictation>++": idea_find("prev"),
+        "(select next) <dgndictation>++": idea_find("next"),
         "(previous bounded) {jetbrains.alphabet}+": idea_bounded("prev"),
         "(next bounded) {jetbrains.alphabet}+": idea_bounded("next"),
         "search everywhere [for] [<dgndictation>++]": [
