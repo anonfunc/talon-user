@@ -137,6 +137,7 @@ ctx.keymap(
         "jet checkout master": "git checkout master\n",
         "jet checkout [<dgndictation>]": ["git checkout ", text],
         "jet commit [<dgndictation>]": ["git commit ", text],
+        "jet commit all [<dgndictation>]": ['git commit -a -m ""', Key("left"), text],
         "jet diff": "git diff\n",
         "jet history": "git hist\n",
         "jet merge [<dgndictation>]": ["git merge ", text],

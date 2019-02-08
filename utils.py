@@ -10,7 +10,7 @@ vocab = ["nonce"]
 def parse_word(w):
     w = str(w).lstrip("\\").split("\\", 1)[0]
     w = mapping.get(w, w)
-    w = w.replace("-", "")  # hate dragon hyphenation.
+    # w = w.replace("-", "")  # hate dragon hyphenation.
     return w
 
 

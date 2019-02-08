@@ -8,7 +8,7 @@ from talon.ui import active_app
 from talon.voice import Context, Key
 
 from ..misc.basic_keys import alphabet
-from ..utils import optional_numerals, text, text_to_number, text_to_range
+from ..utils import optional_numerals, numerals, text, text_to_number, text_to_range
 
 try:
     from ..text.homophones import all_homophones
@@ -50,6 +50,22 @@ port_mapping = {
     "com.google.android.studio": 8652,
 }
 
+extendCommands = []
+
+
+def set_extend(*commands):
+    def set_inner(_):
+        global extendCommands
+        extendCommands = commands
+
+    return set_inner
+
+
+def extend_action(_):
+    global extendCommands
+    for cmd in extendCommands:
+        send_idea_command(cmd)
+
 
 def _get_nonce(port):
     try:
@@ -76,8 +92,14 @@ def get_idea_location():
     return send_idea_command("location").split()
 
 
-def idea(cmd):
-    return lambda _: send_idea_command(cmd)
+def idea(*cmds):
+    def inner(_):
+        global extendCommands
+        extendCommands = cmds
+        for cmd in cmds:
+            send_idea_command(cmd)
+
+    return inner
 
 
 def idea_num(cmd, drop=1, zero_okay=False):
@@ -90,6 +112,8 @@ def idea_num(cmd, drop=1, zero_okay=False):
             return
 
         send_idea_command(cmd.format(line))
+        global extendCommands
+        extendCommands = []
 
     return handler
 
@@ -100,6 +124,8 @@ def idea_range(cmd, drop=1):
         start, end = text_to_range(m._words[drop:])
         # print(cmd.format(start, end))
         send_idea_command(cmd.format(start, end))
+        global extendCommands
+        extendCommands = []
 
     return handler
 
@@ -126,6 +152,8 @@ def idea_find(direction):
                 search_string = "({})".format("|".join(homophone_lookup[word]))
         # print(args)
         send_idea_command(cmd.format(direction, search_string))
+        global extendCommands
+        extendCommands = [cmd.format(direction, search_string)]
 
     return handler
 
@@ -133,10 +161,14 @@ def idea_find(direction):
 def idea_bounded(direction):
     def handler(m):
         # noinspection PyProtectedMember
+        print("hello")
         keys = [alphabet[k] for k in m["jetbrains.alphabet"]]
-        search_string = r"%5B^-_ .%5D*?".join(keys)  # URL escaped Java regex!
+        search_string = "%5Cb" + r"%5B^-_ .()%5D*?".join(keys)  # URL escaped Java regex! '\b' 'A[%-_.()]*?Z"
         cmd = "find {} {}"
+        print(keys, search_string, cmd)
         send_idea_command(cmd.format(direction, search_string))
+        global extendCommands
+        extendCommands = [cmd.format(direction, search_string)]
 
     return handler
 
@@ -169,100 +201,222 @@ def is_real_jetbrains_editor(app, window):
 
 # group = ContextGroup("jetbrains")
 ctx = Context("jetbrains", func=is_real_jetbrains_editor)  # , group=group)
-ctx.vocab = ["docker", "GitHub"]
+ctx.vocab = ["docker", "GitHub", "refactor"]
 ctx.vocab_remove = ["doctor", "Doctor"]
 ctx.keymap(
     {
-        "complete [<dgndictation>]": [idea("action CodeCompletion"), text],
-        "smarter [<dgndictation>]": [idea("action SmartTypeCompletion"), text],
+        # Misc verbs
+        "complete": [idea("action CodeCompletion")],
+        "complete <dgndictation>++ [over]": [idea("action CodeCompletion"), text],
+        "smart": [idea("action SmartTypeCompletion"), text],
+        "smart <dgndictation>++ [over]": [idea("action SmartTypeCompletion"), text],
         "finish": idea("action EditorCompleteStatement"),
-        "zoom": idea("action HideAllWindows"),
-        "find (usage | usages)": idea("action FindUsages"),
-        "(refactor | reflector) [<dgndictation>]": [
+        "toggle tools": idea("action HideAllWindows"),
+        "drag up": idea("action MoveLineUp"),
+        "drag down": idea("action MoveLineDown"),
+        "clone": idea("action EditorDuplicate"),
+        f"clone line {optional_numerals}": [idea_num("clone {}", drop=2)],
+        f"grab {optional_numerals}": [grab_identifier, set_extend()],
+        # "(synchronizing | synchronize)": idea("action Synchronize"),
+        "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
+        "extend": extend_action,
+        # Refactoring
+        "refactor": idea("action Refactorings.QuickListPopupAction"),
+        "refactor <dgndictation>++ [over]": [
             idea("action Refactorings.QuickListPopupAction"),
             text,
         ],
-        "fix this [<dgndictation>]": [idea("action ShowIntentionActions"), text],
-        "fix next [error]": [
-            idea("action GotoNextError"),
-            idea("action ShowIntentionActions"),
+        "extract variable": idea("action IntroduceVariable"),
+        "extract field": idea("action IntroduceField"),
+        "extract constant": idea("action IntroduceConstant"),
+        "extract parameter": idea("action IntroduceParameter"),
+        "extract interface": idea("action ExtractInterface"),
+        "extract method": idea("action ExtractMethod"),
+        # Quick Fix / Intentions
+        "fix this": idea("action ShowIntentionActions"),
+        "fix this <dgndictation>++ [over]": [idea("action ShowIntentionActions"), text],
+        "fix next error": [idea("action GotoNextError", "action ShowIntentionActions")],
+        "fix previous error": [
+            idea("action GotoPreviousError", "action ShowIntentionActions")
         ],
-        "fix previous [error]": [
-            idea("action GotoPreviousError"),
-            idea("action ShowIntentionActions"),
+        f"fix line {numerals}": [
+            idea_num("goto {} 0", drop=2),
+            idea("action GotoNextError", "action ShowIntentionActions"),
         ],
-        "(visit declaration | follow)": idea("action GotoDeclaration"),
-        "(visit implementers | visit implementations | implementation | ample)": idea(
-            "action GotoImplementation"
-        ),
-        "(visit type | type)": idea("action GotoTypeDeclaration"),
-        "(select previous) <dgndictation>++": idea_find("prev"),
-        "(select next) <dgndictation>++": idea_find("next"),
-        "(previous bounded) {jetbrains.alphabet}+": idea_bounded("prev"),
-        "(next bounded) {jetbrains.alphabet}+": idea_bounded("next"),
-        "search everywhere [for] [<dgndictation>++]": [
+        # Go: move the caret
+        "(go declaration | follow)": idea("action GotoDeclaration"),
+        "go implementation": idea("action GotoImplementation"),
+        "go usage": idea("action FindUsages"),
+        "go type": idea("action GotoTypeDeclaration"),
+        "go next result": idea("action FindNext"),
+        "go last result": idea("action FindPrevious"),
+        f"go line end {numerals}": idea_num("goto {} 9999", drop=3),
+        "go last <dgndictation>": [
+            idea_find("prev"),
+            Key("right"),
+            set_extend(extendCommands + ["action EditorRight"]),
+        ],
+        "go next <dgndictation>": [
+            idea_find("next"),
+            Key("left"),
+            set_extend(extendCommands + ["action EditorLeft"]),
+        ],
+        "go last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+            Key("right"),
+        ],
+        "go next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+            Key("left"),
+        ],
+        "go back": idea("action Back"),
+        "go forward": idea("action Forward"),
+        f"go line start {numerals}": idea_num("goto {} 0", drop=3),
+        f"go line end {numerals}": idea_num("goto {} 9999", drop=3),
+        # This will put the cursor past the indentation
+        f"go line {numerals}": [
+            idea_num("goto {} 9999", drop=2),
+            idea("action EditorLineEnd"),
+            idea("action EditorLineStart"),
+            set_extend(),
+        ],
+        # Select
+        "select last <dgndictation>": [
+            idea_find("prev"),
+        ],
+        "select next <dgndictation>": [
+            idea_find("next"),
+        ],
+        "select last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+        ],
+        "select next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+        ],
+        "select last": idea("action EditorUnSelectWord"),
+        "select this": idea("action EditorSelectWord"),
+        "select line": [
+            idea("action EditorLineStart", "action EditorLineEndWithSelection"),
+            set_extend(
+                "action EditorLineStart",
+                "action EditorLineStart",
+                "action EditorLineEndWithSelection",
+            ),
+        ],
+        f"select line {numerals}": [
+            idea_num("goto {} 0", drop=2),
+            idea("action EditorLineStart", "action EditorLineEndWithSelection"),
+            set_extend(
+                "action EditorLineStart",
+                "action EditorLineStart",
+                "action EditorLineEndWithSelection",
+            ),
+        ],
+        f"select lines {numerals} until {numerals}": idea_range("range {} {}", drop=2),
+        f"select until line {numerals}": idea_num("extend {}", drop=3),
+        # Search
+        "search everywhere": idea("action SearchEverywhere"),
+        "search everywhere <dgndictation>++ [over]": [
             idea("action SearchEverywhere"),
             text,
+            set_extend(),
         ],
-        "visit [<dgndictation>++]": [idea("action SearchEverywhere"), text],
-        "recent [<dgndictation>++]": [idea("action RecentFiles"), text],
-        "search [for] [<dgndictation>]": [idea("action Find"), text],
-        "search [for] this": idea("action FindWordAtCaret"),
-        "next result": idea("action FindNext"),
-        "(last | previous) result": idea("action FindPrevious"),
-        # Templates
-        "surround [this] [<dgndictation>]": [idea("action SurroundWith"), text],
-        "generate [<dgndictation>]": [idea("action Generate"), text],
-        "template [<dgndictation>]": [idea("action InsertLiveTemplate"), text],
+        "search recent": [idea("action RecentFiles"), set_extend()],
+        "search recent <dgndictation>++ [over]": [
+            idea("action RecentFiles"),
+            text,
+            set_extend(),
+        ],
+        "search": idea("action Find"),
+        "search <dgndictation>++ [over]": [idea("action Find"), text],
+        "search this": idea("action FindWordAtCaret"),
+        # Templates: surround, generate, template.
+        "surround [this]": idea("action SurroundWith"),
+        "surround [this] <dgndictation>++ [over]": [idea("action SurroundWith"), text],
+        "generate": idea("action Generate"),
+        "generate <dgndictation>++ [over]": [idea("action Generate"), text],
+        "template": idea("action InsertLiveTemplate"),
+        "template <dgndictation>++ [over]": [idea("action InsertLiveTemplate"), text],
         "create template": idea("action SaveAsTemplate"),
         # Lines / Selections
-        "select less": idea("action EditorUnSelectWord"),
-        "select more": idea("action EditorSelectWord"),
-        f"select (lines | line) {optional_numerals}": [
+        "clear line": [idea("action EditorLineEnd", "action EditorDeleteToLineStart")],
+        f"clear line {numerals}": [
             idea_num("goto {} 0", drop=2),
-            idea("action EditorLineStart"),
-            idea("action EditorLineEndWithSelection"),
-        ],
-        "select block": [
-            idea("action EditorCodeBlockStart"),
-            idea("action EditorCodeBlockEndWithSelection"),
-        ],
-        "select this line": [
-            idea("action EditorLineStart"),
-            idea("action EditorLineEndWithSelection"),
-        ],
-        f"select lines {optional_numerals} until {optional_numerals}": idea_range(
-            "range {} {}", drop=2
-        ),
-        f"select until {optional_numerals}": idea_num("extend {}", drop=2),
-        f"select until line {optional_numerals}": idea_num("extend {}", drop=3),
-        f"(go | jump) to end of {optional_numerals}": idea_num("goto {} 9999", drop=4),
-        f"(go | jump) to end of line {optional_numerals}": idea_num(
-            "goto {} 9999", drop=5
-        ),
-        "(clean | clear) line": [
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
         ],
-        "(delete | remove) line": idea(
-            "action EditorDeleteLine"
-        ),  # xxx optional line number
-        "(delete | clear) to end": idea("action EditorDeleteToLineEnd"),
-        "(delete | clear) to start": idea("action EditorDeleteToLineStart"),
-        "drag up": idea("action MoveLineUp"),
-        "drag down": idea("action MoveLineDown"),
-        "(duplicate | clone)": idea("action EditorDuplicate"),
-        "(go | jump) back": idea("action Back"),
-        "(go | jump) forward": idea("action Forward"),
-        "(synchronizing | synchronize)": idea("action Synchronize"),
-        "comment": idea("action CommentByLineComment"),
-        "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
-        f"(go to | jump to) {optional_numerals}": idea_num("goto {} 0", drop=2),
-        f"(go to | jump to) line {optional_numerals}": idea_num("goto {} 0", drop=3),
-        f"clone line {optional_numerals}": idea_num("clone {}", drop=2),
-        f"grab {optional_numerals}": grab_identifier,
+        "clear this": [idea("action EditorSelectWord"), idea("action EditorDelete")],
+        "clear last <dgndictation>": [
+            idea_find("prev"),
+            idea("action EditorDelete"),
+            set_extend(extendCommands + ["action EditorDelete"]),
+        ],
+        "clear next <dgndictation>": [
+            idea_find("next"),
+            idea("action EditorDelete"),
+            set_extend(extendCommands + ["action EditorDelete"]),
+        ],
+        "clear last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+            idea("action EditorDelete"),
+            set_extend(extendCommands + ["action EditorDelete"]),
+        ],
+        "clear next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+            idea("action EditorDelete"),
+            set_extend(extendCommands + ["action EditorDelete"]),
+        ],
+        "clear line end": idea("action EditorDeleteToLineEnd"),
+        "clear line start": idea("action EditorDeleteToLineStart"),
+        f"clear lines {numerals} until {numerals}": [
+            idea_range("range {} {}", drop=2),
+            idea("action EditorDelete"),
+        ],
+        f"clear until line{numerals}": [
+            idea_num("extend {}", drop=3),
+            idea("action EditorDelete"),
+        ],
+        # Commenting
+        "comment [(this | line)]": idea("action CommentByLineComment"),
+        f"comment line {numerals}": [
+            idea_num("goto {} 0", drop=2),
+            idea("action EditorLineEnd"),
+            idea("action CommentByLineComment"),
+        ],
+        "comment last <dgndictation>": [
+            idea_find("prev"),
+            idea("action EditorLineStart"),
+            idea("action CommentByLineComment"),
+        ],
+        "comment next <dgndictation>": [
+            idea_find("next"),
+            idea("action EditorLineStart"),
+            idea("action CommentByLineComment"),
+        ],
+        "comment last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+            idea("action EditorLineStart"),
+            idea("action CommentByLineComment"),
+        ],
+        "comment next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+            idea("action EditorLineStart"),
+            idea("action CommentByLineComment"),
+        ],
+        "comment line end": [
+            idea("action EditorLineEndWithSelection"),
+            idea("action CommentByLineComment"),
+        ],
+        f"comment lines {numerals} until {numerals}": [
+            idea_range("range {} {}", drop=2),
+            idea("action CommentByLineComment"),
+        ],
+        f"comment until line {numerals}": [
+            idea_num("extend {}", drop=3),
+            idea("action CommentByLineComment"),
+        ],
         # Recording
-        "(start | stop) recording": idea("action StartStopMacroRecording"),
+        "toggle recording": idea("action StartStopMacroRecording"),
         "edit (recording | recordings)": idea("action EditMacros"),
         "play recording": idea("action PlaybackLastMacro"),
         "play recording <dgndictation>": [
@@ -271,39 +425,44 @@ ctx.keymap(
             Key("enter"),
         ],
         # Marks
-        "show (mark | marks | bookmark | bookmarks)": idea("action ShowBookmarks"),
-        "[toggle] (mark | bookmark)": idea("action ToggleBookmark"),
-        "next (mark | bookmark)": idea("action GotoNextBookmark"),
-        "(last | previous) (mark | bookmark)": idea("action GotoPreviousBookmark"),
-        f"(mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
+        "go mark": idea("action ShowBookmarks"),
+        "toggle mark": idea("action ToggleBookmark"),
+        "go next mark": idea("action GotoNextBookmark"),
+        "go last mark": idea("action GotoPreviousBookmark"),
+        f"toggle mark (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
             "action ToggleBookmark{}", drop=1, zero_okay=True
         ),
-        f"(jump | go) (mark | bookmark) (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
+        f"go mark (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
             "action GotoBookmark{}", drop=2, zero_okay=True
         ),
         # Splits
-        "(vertical | vertically) split": idea("action SplitVertically"),
-        "(horizontal | horizontally) split": idea("action SplitHorizontally"),
-        "(rotate | change) split": idea("action ChangeSplitOrientation"),
-        "merge split": idea("action Unsplit"),
-        "merge all (split | splits)": idea("action UnsplitAll"),
-        "next split": idea("action NextSplitter"),
-        "(previous | last) split": idea("action LastSplitter"),
+        "split vertically": idea("action SplitVertically"),
+        "split horizontally": idea("action SplitHorizontally"),
+        "split flip": idea("action ChangeSplitOrientation"),
+        "clear split": idea("action Unsplit"),
+        "clear all splits": idea("action UnsplitAll"),
+        "go next split": idea("action NextSplitter"),
+        "go last split": idea("action LastSplitter"),
         # Clipboard
         # "clippings": idea("action PasteMultiple"),  # XXX Might be a long-lived action.  Replaced with Alfred.
         "copy path": idea("action CopyPaths"),
         "copy reference": idea("action CopyReference"),
         "copy pretty": idea("action CopyAsRichText"),
         # File Creation
-        "new sibling [<dgndictation>]": [idea("action NewElementSamePlace"), text],
-        "new [<dgndictation>]": [idea("action NewElement"), text],
+        "create sibling": idea("action NewElementSamePlace"),
+        "create sibling <dgndictation>++ [over]": [
+            idea("action NewElementSamePlace"),
+            text,
+        ],
+        "create file": idea("action NewElement"),
+        "create file <dgndictation>++ [over]": [idea("action NewElement"), text],
         # Task Management
-        "open task": [idea("action tasks.goto")],
-        "(browse | browser) task": [idea("action tasks.open.in.browser")],
+        "select task": [idea("action tasks.goto")],
+        "go browser task": [idea("action tasks.open.in.browser")],
         "switch task": [idea("action tasks.switch")],
-        "close task": [idea("action tasks.close")],
-        "task server settings": [idea("action tasks.configure.servers")],
-        # Git / Github
+        "clear task": [idea("action tasks.close")],
+        "fix task settings": [idea("action tasks.configure.servers")],
+        # Git / Github (not using verb-noun-adjective pattern, mirroring terminal commands.)
         "jet pull": idea("action Vcs.UpdateProject"),
         "jet commit": idea("action CheckinProject"),
         "jet log": idea("action Vcs.ShowTabbedFileHistory"),

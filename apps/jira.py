@@ -11,7 +11,14 @@ def delay(amount):
 
 # I don't want to interleave jira navigation with other commands, like dictation.
 group = ContextGroup("jira")
-ctx = Context("jira", func=lambda app, win: win.title.endswith(" JIRA2"), group=group)
+
+browsers = {"Google Chrome", "Firefox", "Safari"}
+
+def isJira(app, win):
+    return app.name in browsers and " JIRA2" in win.title
+
+
+ctx = Context("jira", func=isJira, group=group)
 ctx.vocab = ["sub-task", "Dwight"]
 ctx.keymap(
     {
