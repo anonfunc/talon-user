@@ -11,7 +11,7 @@ from ..utils import parse_word, join_words
 
 # UPSCALE = 1
 
-RETINA_SIZE = (3360, 2100)
+RETINA_SIZE = (1680, 1050)  # Hack.  If I'm exactly this resolution, assume I'm in retina mode.
 RETINA_FACTOR = 2
 
 def ocr_screen():
@@ -30,14 +30,15 @@ def move_to_ocr(m):
     # noinspection PyProtectedMember
     start = time.time()
     screen = ui.main_screen()
+
     factor = 1
-    if (screen.width, screen.height) == RETINA_SIZE:
+    if (int(screen.width), int(screen.height)) == RETINA_SIZE:
         factor = RETINA_FACTOR
-    midpoint = (screen.width * RETINA_FACTOR/ 2, screen.height * RETINA_FACTOR / 2)
+    midpoint = (screen.width / 2, screen.height / 2)
     search = join_words(list(map(parse_word, m.dgnwords[0]._words)))
     print(f"Starting teleport to {search}")
     hocr = ocr_screen()
-    print("... OCR'd screen")
+    print("... OCR'd screen: " + hocr)
     tree = ElementTree.XML(hocr)  # type: list[ElementTree.Element]
     # print(list(tree[1]))
     best_pos = None
@@ -48,7 +49,7 @@ def move_to_ocr(m):
             if search in span.text.lower():
                 # title is something like"bbox 72 3366 164 3401; x_wconf 95"
                 title = span.attrib["title"]  # type: str
-                x, y, side, bottom = [int(i) for i in title.split(";")[0].split()[1:]]
+                x, y, side, bottom = [int(i)/factor for i in title.split(";")[0].split()[1:]]
                 candidate = (x + side) / 2, (y + bottom) / 2
                 dist = distance(candidate, midpoint)
                 if dist < best_distance:
@@ -56,7 +57,7 @@ def move_to_ocr(m):
                     best_pos = candidate
     if best_pos is not None:
         print(f"... Found match, moving to {best_pos}.  {time.time() - start} seconds.")
-        ctrl.mouse_move(best_pos[0]/factor, best_pos[1]/factor)
+        ctrl.mouse_move(best_pos[0], best_pos[1])
         return
     print(f"... No match. {time.time() - start} seconds.")
 
