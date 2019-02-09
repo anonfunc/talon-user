@@ -17,7 +17,7 @@ RETINA_FACTOR = 2
 def ocr_screen():
     subprocess.check_call(["screencapture", "-t", "png", "-x", "/tmp/capture.png"])
     hocr = subprocess.check_output(
-        ["/usr/local/bin/tesseract", "/tmp/capture.png", "stdout", "hocr"]
+        ["/usr/local/bin/tesseract", "-l", "eng", "--dpi", "72", "--psm", "4", "/tmp/capture.png", "stdout", "hocr"]
     ).decode()  # type: str
     return "\n".join(hocr.splitlines()[1:])
 
@@ -38,7 +38,8 @@ def move_to_ocr(m):
     search = join_words(list(map(parse_word, m.dgnwords[0]._words)))
     print(f"Starting teleport to {search}")
     hocr = ocr_screen()
-    print("... OCR'd screen: " + hocr)
+    print(f"... OCR'd screen: {time.time() - start} seconds.")
+    start = time.time()
     tree = ElementTree.XML(hocr)  # type: list[ElementTree.Element]
     # print(list(tree[1]))
     best_pos = None
