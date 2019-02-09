@@ -55,7 +55,7 @@ ctx.keymap(
         "indirect": "&",
         "dereference": "*",
         "(op equals | assign)": " = ",
-        "set to": " := ",
+        "[op] set to": " := ",
         "op (minus | subtract)": " - ",
         "op (plus | add)": " + ",
         "op (times | multiply)": " * ",

@@ -26,6 +26,7 @@ formatters = {
     "lowcaps": (False, lambda i, word, _: word.lower()),
     "string": (False, surround('"')),
     "ticks": (False, surround("'")),
+    "backticks": (False, surround("`")),
     "padded": (False, surround(" ")),
 }
 

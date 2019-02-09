@@ -163,7 +163,9 @@ def idea_bounded(direction):
         # noinspection PyProtectedMember
         print("hello")
         keys = [alphabet[k] for k in m["jetbrains.alphabet"]]
-        search_string = "%5Cb" + r"%5B^-_ .()%5D*?".join(keys)  # URL escaped Java regex! '\b' 'A[%-_.()]*?Z"
+        search_string = "%5Cb" + r"%5B^-_ .()%5D*?".join(
+            keys
+        )  # URL escaped Java regex! '\b' 'A[%-_.()]*?Z"
         cmd = "find {} {}"
         print(keys, search_string, cmd)
         send_idea_command(cmd.format(direction, search_string))
@@ -214,8 +216,9 @@ ctx.keymap(
         "toggle tools": idea("action HideAllWindows"),
         "drag up": idea("action MoveLineUp"),
         "drag down": idea("action MoveLineDown"),
-        "clone": idea("action EditorDuplicate"),
-        f"clone line {optional_numerals}": [idea_num("clone {}", drop=2)],
+        "clone this": idea("action EditorDuplicate"),
+        "clone line": idea("action EditorDuplicate"),
+        f"clone line {numerals}": [idea_num("clone {}", drop=2)],
         f"grab {optional_numerals}": [grab_identifier, set_extend()],
         # "(synchronizing | synchronize)": idea("action Synchronize"),
         "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
@@ -261,14 +264,8 @@ ctx.keymap(
             Key("left"),
             set_extend(extendCommands + ["action EditorLeft"]),
         ],
-        "go last bounded {jetbrains.alphabet}+": [
-            idea_bounded("prev"),
-            Key("right"),
-        ],
-        "go next bounded {jetbrains.alphabet}+": [
-            idea_bounded("next"),
-            Key("left"),
-        ],
+        "go last bounded {jetbrains.alphabet}+": [idea_bounded("prev"), Key("right")],
+        "go next bounded {jetbrains.alphabet}+": [idea_bounded("next"), Key("left")],
         "go back": idea("action Back"),
         "go forward": idea("action Forward"),
         f"go line start {numerals}": idea_num("goto {} 0", drop=3),
@@ -281,18 +278,10 @@ ctx.keymap(
             set_extend(),
         ],
         # Select
-        "select last <dgndictation>": [
-            idea_find("prev"),
-        ],
-        "select next <dgndictation>": [
-            idea_find("next"),
-        ],
-        "select last bounded {jetbrains.alphabet}+": [
-            idea_bounded("prev"),
-        ],
-        "select next bounded {jetbrains.alphabet}+": [
-            idea_bounded("next"),
-        ],
+        "select last <dgndictation>": [idea_find("prev")],
+        "select next <dgndictation>": [idea_find("next")],
+        "select last bounded {jetbrains.alphabet}+": [idea_bounded("prev")],
+        "select next bounded {jetbrains.alphabet}+": [idea_bounded("next")],
         "select last": idea("action EditorUnSelectWord"),
         "select this": idea("action EditorSelectWord"),
         "select line": [
@@ -328,7 +317,7 @@ ctx.keymap(
             set_extend(),
         ],
         "search": idea("action Find"),
-        "search <dgndictation>++ [over]": [idea("action Find"), text],
+        "search <dgndictation> [over]": [idea("action Find"), text],
         "search this": idea("action FindWordAtCaret"),
         # Templates: surround, generate, template.
         "surround [this]": idea("action SurroundWith"),
