@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import time
 import xml.etree.ElementTree as ElementTree
 from math import sqrt
 
@@ -27,10 +28,11 @@ def distance(point1, point2):
 
 def move_to_ocr(m):
     # noinspection PyProtectedMember
+    start = time.time()
     screen = ui.main_screen()
     factor = 1
-    # if (screen.width, screen.height) == RETINA_SIZE:
-    #     factor = RETINA_FACTOR
+    if (screen.width, screen.height) == RETINA_SIZE:
+        factor = RETINA_FACTOR
     midpoint = (screen.width * RETINA_FACTOR/ 2, screen.height * RETINA_FACTOR / 2)
     search = join_words(list(map(parse_word, m.dgnwords[0]._words)))
     print(f"Starting teleport to {search}")
@@ -53,10 +55,10 @@ def move_to_ocr(m):
                     print(search, span.text, span.attrib["title"])
                     best_pos = candidate
     if best_pos is not None:
-        print(f"... Found match, moving to {best_pos}")
-        ctrl.mouse_move(best_pos[0]/RETINA_FACTOR, best_pos[1]/RETINA_FACTOR)
+        print(f"... Found match, moving to {best_pos}.  {time.time() - start} seconds.")
+        ctrl.mouse_move(best_pos[0]/factor, best_pos[1]/factor)
         return
-    print("... No match.")
+    print(f"... No match. {time.time() - start} seconds.")
 
 
 ctx = Context("ocr")
