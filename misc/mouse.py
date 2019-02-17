@@ -1,7 +1,7 @@
 import time
 
 from talon import cron, ctrl, tap
-from talon.voice import Context, Key
+from talon.voice import Context
 from talon_plugins import eye_mouse, eye_zoom_mouse
 
 ctx = Context("mouse")
@@ -11,29 +11,49 @@ mouse_history = [(x, y, time.time())]
 force_move = None
 
 
-def on_move(typ, e):
-    mouse_history.append((e.x, e.y, time.time()))
+def on_move(_, e):
+    time_ = (e.x, e.y, time.time())
+    # print(time_)
+    mouse_history.append(time_)
     if force_move:
         e.x, e.y = force_move
         return True
+    return False
 
 
 tap.register(tap.MMOVE, on_move)
 
 
-def click_pos(m):
+# noinspection PyProtectedMember
+def click_pos(m, from_end=False):
     word = m._words[0]
-    start = (word.start + min((word.end - word.start) / 2, 0.100)) / 1000.0
-    diff, pos = min([(abs(start - pos[2]), pos) for pos in mouse_history])
-    return pos[:2]
+    if from_end:
+        word = m._words[-1]
+    # print(f"word is {word} {word.start} {word.end}")
+    # start = (word.start + min((word.end - word.start) / 2, 0.100)) / 1000.0
+    word_time = word.end / 1000.0
+    # if from_end:
+    #     word_time = word.end / 1000.0
+    # print(f"word start is {word_time}, now is {time.time()}")
+    for pos in reversed(mouse_history):
+        if pos[2] < word_time:
+            # print(f"pos is {pos}")
+            return pos[:2]
+    return mouse_history[-1][:2]
 
 
-def delayed_click(m, button=0, times=1):
+def delayed_click(m, button=0, times=1, from_end=False, mods=None):
+    if mods is None:
+        mods = []
     old = eye_mouse.config.control_mouse
     eye_mouse.config.control_mouse = False
-    x, y = click_pos(m)
+    x, y = click_pos(m, from_end=from_end)
     ctrl.mouse(x, y)
+    for key in mods:
+        ctrl.key_press(key, down=True)
     ctrl.mouse_click(x, y, button=button, times=times, wait=16000)
+    for key in mods[::-1]:
+        ctrl.key_press(key, up=True)
     time.sleep(0.032)
     eye_mouse.config.control_mouse = old
 
@@ -127,14 +147,13 @@ hideJob = None
 
 
 def toggle_cursor(show):
-
     def _toggle(_):
         global hideJob
         ctrl.cursor_visible(show)
         if show:
             cron.cancel(hideJob)
         else:
-            hideJob = cron.interval('500ms', lambda: ctrl.cursor_visible(show))
+            hideJob = cron.interval("500ms", lambda: ctrl.cursor_visible(show))
 
     return _toggle
 
@@ -169,8 +188,6 @@ click_keymap = {
 }
 keymap.update(click_keymap)
 
-ctx.keymap(
-    keymap
-)
+ctx.keymap(keymap)
 
 ctrl.cursor_visible(True)

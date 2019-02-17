@@ -3,10 +3,11 @@
 import os
 
 from talon import app, clip, cron
-from talon.voice import Context, Key, Str, Word, press
+from talon.voice import Context, Str, press
 from talon.webview import Webview
 
 from .. import utils
+from ..misc.popups import popup_template, list_template, dict_to_html
 
 ########################################################################
 # global settings
@@ -53,65 +54,8 @@ active_word_list = None
 is_selection = False
 
 webview = Webview()
-css_template = """
-<style type="text/css">
-body {
-    padding: 0;
-    margin: 0;
-    font-size: 150%;
-    min-width: 600px;
-}
 
-td {
-    text-align: left;
-    margin: 0;
-    padding: 5px 10px;
-}
-
-h3 {
-    padding: 5px 0px;
-}
-
-table {
-    counter-reset: rowNumber;
-}
-
-table .count {
-    counter-increment: rowNumber;
-}
-
-.count td:first-child::after {
-    content: counter(rowNumber);
-    min-with: 1em;
-    margin-right: 0.5em;
-}
-
-.pick {
-    font-weight: normal;
-    font-style: italic;
-}
-
-.cancel {
-    text-align: center;
-}
-
-</style>
-"""
-
-phones_template = (
-    css_template
-    + """
-<div class="contents">
-<h3>homophones</h3>
-<table>
-{% for word in homophones %}
-<tr class="count"><td class="pick">🔊 pick </td><td>{{ word }}</td></tr>
-{% endfor %}
-<tr><td colspan="2" class="pick cancel">🔊 cancel</td></tr>
-</table>
-</div>
-"""
-)
+phones_template = popup_template + list_template("homophones")
 
 
 def close_homophones():
@@ -228,23 +172,16 @@ def raise_homophones(m, force_raise=False, is_selection=False):
     pick_context.load()
 
 
-help_template = (
-    css_template
-    + """
-<div class="contents">
-<h3>homophones help</h3>
-<table>
-<tr><td class="pick">🔊 phones</td><td>look up homophones for selected text</td></tr>
-<tr><td class="pick">🔊 phones [word]</td><td>look up homophones for a given word</td></tr>
-<tr><td class="pick">🔊 pick [number]</td><td>make a selection from the homophone list</td></tr>
-<tr><td class="pick">🔊 ship [number]</td><td>make a selection and capitalize it</td></tr>
-<tr><td class="pick">🔊 yeller [number]</td><td>make a selection and uppercase it</td></tr>
-<tr><td class="pick">🔊 lower [number]</td><td>make a selection and lowercase it</td></tr>
-<tr><td colspan="2" class="pick cancel">🔊 cancel</td></tr>
-</table>
-</div>
-"""
-)
+help_data = {
+    "phones": "look up homophones for selected text",
+    "phones [word]": "look up homophones for a given word",
+    "pick [number]": "make a selection from the homophone list",
+    "ship [number]": "make a selection and capitalize it",
+    "yeller [number]": "make a selection and uppercase it",
+    "lower [number]": "make a selection and lowercase it",
+}
+
+help_template = popup_template + dict_to_html("homophones help", help_data)
 
 
 def homophones_help(m):

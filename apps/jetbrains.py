@@ -26,8 +26,8 @@ try:
 except ImportError:
     print("Fallback mouse click logic")
 
-    def delayed_click():
-        ctrl.mouse_click(button=0)
+    def delayed_click(_, button=0, times=1, from_end=False, mods=None):
+        ctrl.mouse_click(button=button)
 
 
 # Each IDE gets its own port, as otherwise you wouldn't be able
@@ -51,7 +51,8 @@ port_mapping = {
 }
 
 extendCommands = []
-
+toHereCommands = []
+old_line, old_col = 0, 0
 
 def set_extend(*commands):
     def set_inner(_):
@@ -65,6 +66,19 @@ def extend_action(_):
     global extendCommands
     for cmd in extendCommands:
         send_idea_command(cmd)
+
+
+def set_to_here(*commands):
+    global toHereCommands, old_line, old_col
+    old_line, old_col = get_idea_location()
+    toHereCommands = commands
+
+
+def to_here(m):
+    global toHereCommands
+    for cmd in toHereCommands:
+        cmd(m)
+    toHereCommands = []
 
 
 def _get_nonce(port):
@@ -223,6 +237,7 @@ ctx.keymap(
         # "(synchronizing | synchronize)": idea("action Synchronize"),
         "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
         "extend": extend_action,
+        "to here": to_here,
         # Refactoring
         "refactor": idea("action Refactorings.QuickListPopupAction"),
         "refactor <dgndictation>++ [over]": [
@@ -253,7 +268,6 @@ ctx.keymap(
         "go type": idea("action GotoTypeDeclaration"),
         "go next result": idea("action FindNext"),
         "go last result": idea("action FindPrevious"),
-        f"go line end {numerals}": idea_num("goto {} 9999", drop=3),
         "go last <dgndictation>": [
             idea_find("prev"),
             Key("right"),
@@ -267,6 +281,7 @@ ctx.keymap(
         "go last bounded {jetbrains.alphabet}+": [idea_bounded("prev"), Key("right")],
         "go next bounded {jetbrains.alphabet}+": [idea_bounded("next"), Key("left")],
         "go back": idea("action Back"),
+        "go here": [lambda m: delayed_click(m, from_end=True)],
         "go forward": idea("action Forward"),
         f"go line start {numerals}": idea_num("goto {} 0", drop=3),
         f"go line end {numerals}": idea_num("goto {} 9999", drop=3),
@@ -278,6 +293,9 @@ ctx.keymap(
             set_extend(),
         ],
         # Select
+        "select here": [lambda m: delayed_click(m, from_end=True), idea("action EditorLineStart", "action EditorLineEndWithSelection")],
+        "select from here": lambda m: set_to_here(lambda _: delayed_click(m, from_end=True),
+                                                  lambda m2: delayed_click(m2, from_end=True, mods=["shift"])),
         "select last <dgndictation>": [idea_find("prev")],
         "select next <dgndictation>": [idea_find("next")],
         "select last bounded {jetbrains.alphabet}+": [idea_bounded("prev")],
@@ -334,6 +352,11 @@ ctx.keymap(
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
         ],
+        "clear here": [lambda m: delayed_click(m, from_end=True), idea("action EditorLineStart", "action EditorDelete")],
+        "clear from here": [(lambda m: set_to_here(lambda _: delayed_click(m, from_end=True),
+                                                   lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+                                                   lambda _: time.sleep(0.2),
+                                                   idea("action EditorDelete")))],
         "clear this": [idea("action EditorSelectWord"), idea("action EditorDelete")],
         "clear last <dgndictation>": [
             idea_find("prev"),
@@ -367,6 +390,11 @@ ctx.keymap(
         ],
         # Commenting
         "comment [(this | line)]": idea("action CommentByLineComment"),
+        "comment here": [lambda m: delayed_click(m, from_end=True), idea("action EditorLineStart", "action CommentByLineComment")],
+        "comment from here": lambda m: set_to_here(lambda _: delayed_click(m, from_end=True),
+                                                  lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+                                                  lambda _: time.sleep(0.2),
+                                                  idea("action CommentByLineComment")),
         f"comment line {numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineEnd"),
@@ -416,6 +444,7 @@ ctx.keymap(
         # Marks
         "go mark": idea("action ShowBookmarks"),
         "toggle mark": idea("action ToggleBookmark"),
+        "toggle mark here": [lambda m: delayed_click(m, from_end=True), idea("action ToggleBookmark")],
         "go next mark": idea("action GotoNextBookmark"),
         "go last mark": idea("action GotoPreviousBookmark"),
         f"toggle mark (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
