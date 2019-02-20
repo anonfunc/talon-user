@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 
@@ -8,7 +9,7 @@ from talon.ui import active_app
 from talon.voice import Context, Key
 
 from ..misc.basic_keys import alphabet
-from ..utils import optional_numerals, numerals, text, text_to_number, text_to_range
+from ..utils import optional_numerals, numerals, text, text_to_number, text_to_range, parse_word
 
 try:
     from ..text.homophones import all_homophones
@@ -53,6 +54,7 @@ port_mapping = {
 extendCommands = []
 toHereCommands = []
 old_line, old_col = 0, 0
+
 
 def set_extend(*commands):
     def set_inner(_):
@@ -144,20 +146,10 @@ def idea_range(cmd, drop=1):
     return handler
 
 
-def idea_words(cmd, join=" "):
-    def handler(m):
-        # noinspection PyProtectedMember
-        args = [str(w) for w in m.dgndictation[0]._words]
-        # print(args)
-        send_idea_command(cmd.format(join.join(args)))
-
-    return handler
-
-
 def idea_find(direction):
     def handler(m):
         # noinspection PyProtectedMember
-        args = [str(w) for w in m.dgndictation[0]._words]
+        args = [parse_word(w) for w in m.dgndictation[0]._words]
         search_string = " ".join(args)
         cmd = "find {} {}"
         if len(args) == 1:
@@ -223,9 +215,11 @@ ctx.keymap(
     {
         # Misc verbs
         "complete": [idea("action CodeCompletion")],
-        "complete <dgndictation>++ [over]": [idea("action CodeCompletion"), text],
-        "smart": [idea("action SmartTypeCompletion"), text],
-        "smart <dgndictation>++ [over]": [idea("action SmartTypeCompletion"), text],
+        "perfect": [idea("action CodeCompletion", "action CodeCompletion")],   # perfect == extra complete
+        "smart": [idea("action SmartTypeCompletion")],
+        # Variants which take text?  Replaced mostly with "call" formatter.
+        # "complete <dgndictation>++ [over]": [idea("action CodeCompletion"), text],
+        # "smart <dgndictation>++ [over]": [idea("action SmartTypeCompletion"), text],
         "finish": idea("action EditorCompleteStatement"),
         "toggle tools": idea("action HideAllWindows"),
         "drag up": idea("action MoveLineUp"),
@@ -254,13 +248,14 @@ ctx.keymap(
         "fix this": idea("action ShowIntentionActions"),
         "fix this <dgndictation>++ [over]": [idea("action ShowIntentionActions"), text],
         "fix next error": [idea("action GotoNextError", "action ShowIntentionActions")],
-        "fix previous error": [
+        "fix last error": [
             idea("action GotoPreviousError", "action ShowIntentionActions")
         ],
         f"fix line {numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action GotoNextError", "action ShowIntentionActions"),
         ],
+        "fix (format | formatting)": idea("action ReformatCode"),
         # Go: move the caret
         "(go declaration | follow)": idea("action GotoDeclaration"),
         "go implementation": idea("action GotoImplementation"),
@@ -281,7 +276,7 @@ ctx.keymap(
         "go last bounded {jetbrains.alphabet}+": [idea_bounded("prev"), Key("right")],
         "go next bounded {jetbrains.alphabet}+": [idea_bounded("next"), Key("left")],
         "go back": idea("action Back"),
-        "go here": [lambda m: delayed_click(m, from_end=True)],
+        "go [to] here": [lambda m: delayed_click(m, from_end=True)],
         "go forward": idea("action Forward"),
         f"go line start {numerals}": idea_num("goto {} 0", drop=3),
         f"go line end {numerals}": idea_num("goto {} 9999", drop=3),
@@ -293,14 +288,21 @@ ctx.keymap(
             set_extend(),
         ],
         # Select
-        "select here": [lambda m: delayed_click(m, from_end=True), idea("action EditorLineStart", "action EditorLineEndWithSelection")],
-        "select from here": lambda m: set_to_here(lambda _: delayed_click(m, from_end=True),
-                                                  lambda m2: delayed_click(m2, from_end=True, mods=["shift"])),
+        "select here": [
+            lambda m: delayed_click(m, from_end=True),
+            idea("action EditorLineStart", "action EditorLineEndWithSelection"),
+        ],
+        "select to here": [lambda m: delayed_click(m, from_end=True, mods=["shift"])],
+        "select from here": lambda m: set_to_here(
+            lambda _: delayed_click(m, from_end=True),
+            lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+        ),
         "select last <dgndictation>": [idea_find("prev")],
         "select next <dgndictation>": [idea_find("next")],
         "select last bounded {jetbrains.alphabet}+": [idea_bounded("prev")],
         "select next bounded {jetbrains.alphabet}+": [idea_bounded("next")],
-        "select last": idea("action EditorUnSelectWord"),
+        "select less": idea("action EditorUnSelectWord"),
+        "select more": idea("action EditorSelectWord"),
         "select this": idea("action EditorSelectWord"),
         "select line": [
             idea("action EditorLineStart", "action EditorLineEndWithSelection"),
@@ -336,6 +338,8 @@ ctx.keymap(
         ],
         "search": idea("action Find"),
         "search <dgndictation> [over]": [idea("action Find"), text],
+        "search in path": idea("action FindInPath"),
+        "search in path <dgndictation> [over]": [idea("action FindInPath"), text],
         "search this": idea("action FindWordAtCaret"),
         # Templates: surround, generate, template.
         "surround [this]": idea("action SurroundWith"),
@@ -352,11 +356,24 @@ ctx.keymap(
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
         ],
-        "clear here": [lambda m: delayed_click(m, from_end=True), idea("action EditorLineStart", "action EditorDelete")],
-        "clear from here": [(lambda m: set_to_here(lambda _: delayed_click(m, from_end=True),
-                                                   lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
-                                                   lambda _: time.sleep(0.2),
-                                                   idea("action EditorDelete")))],
+        "clear here": [
+            lambda m: delayed_click(m, from_end=True),
+            idea("action EditorLineStart", "action EditorDelete"),
+        ],
+        "clear to here": [
+            lambda m: delayed_click(m, from_end=True, mods=["shift"]),
+            idea("action EditorDelete"),
+        ],
+        "clear from here": [
+            (
+                lambda m: set_to_here(
+                    lambda _: delayed_click(m, from_end=True),
+                    lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+                    lambda _: time.sleep(0.2),
+                    idea("action EditorDelete"),
+                )
+            )
+        ],
         "clear this": [idea("action EditorSelectWord"), idea("action EditorDelete")],
         "clear last <dgndictation>": [
             idea_find("prev"),
@@ -389,12 +406,21 @@ ctx.keymap(
             idea("action EditorDelete"),
         ],
         # Commenting
-        "comment [(this | line)]": idea("action CommentByLineComment"),
-        "comment here": [lambda m: delayed_click(m, from_end=True), idea("action EditorLineStart", "action CommentByLineComment")],
-        "comment from here": lambda m: set_to_here(lambda _: delayed_click(m, from_end=True),
-                                                  lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
-                                                  lambda _: time.sleep(0.2),
-                                                  idea("action CommentByLineComment")),
+        "comment line": idea("action CommentByLineComment"),
+        "comment here": [
+            lambda m: delayed_click(m, from_end=True),
+            idea("action EditorLineStart", "action CommentByLineComment"),
+        ],
+        "comment to here": [
+            lambda m: delayed_click(m, from_end=True, mods=["shift"]),
+            idea("action CommentByLineComment"),
+        ],
+        "comment from here": lambda m: set_to_here(
+            lambda _: delayed_click(m, from_end=True),
+            lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+            lambda _: time.sleep(0.2),
+            idea("action CommentByLineComment"),
+        ),
         f"comment line {numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineEnd"),
@@ -444,7 +470,10 @@ ctx.keymap(
         # Marks
         "go mark": idea("action ShowBookmarks"),
         "toggle mark": idea("action ToggleBookmark"),
-        "toggle mark here": [lambda m: delayed_click(m, from_end=True), idea("action ToggleBookmark")],
+        "toggle mark here": [
+            lambda m: delayed_click(m, from_end=True),
+            idea("action ToggleBookmark"),
+        ],
         "go next mark": idea("action GotoNextBookmark"),
         "go last mark": idea("action GotoPreviousBookmark"),
         f"toggle mark (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
@@ -475,7 +504,7 @@ ctx.keymap(
         "create file": idea("action NewElement"),
         "create file <dgndictation>++ [over]": [idea("action NewElement"), text],
         # Task Management
-        "select task": [idea("action tasks.goto")],
+        "go task": [idea("action tasks.goto")],
         "go browser task": [idea("action tasks.open.in.browser")],
         "switch task": [idea("action tasks.switch")],
         "clear task": [idea("action tasks.close")],
@@ -492,6 +521,64 @@ ctx.keymap(
         ),
         "jet (annotate | blame)": idea("action Annotate"),
         "jet": idea("action Vcs.QuickListPopupAction"),
+        # Matching generic editor interface as well.
+        # moving
+        # left, right, up and down already defined
+        "go word left": idea("action EditorPreviousWord"),
+        "go word right": idea("action EditorNextWord"),
+        "go camel left": idea("action EditorPreviousWordInDifferentHumpsMode"),
+        "go camel right": idea("action EditorNextWordInDifferentHumpsMode"),
+        "go line start": idea("action EditorLineStart"),
+        "go line end": idea("action EditorLineEnd"),
+        "go way left": idea("action EditorLineStart"),
+        "go way right": idea("action EditorLineEnd"),
+        "go way down": idea("action EditorTextEnd"),
+        "go way up": idea("action EditorTextStart"),
+        # selecting
+        "select all": idea("action $SelectAll"),
+        "select left": idea("action EditorLeftWithSelection"),
+        "select right": idea("action EditorRightWithSelection"),
+        "select up": idea("action EditorUpWithSelection"),
+        "select down": idea("action EditorDownWithSelection"),
+        "select word left": idea("action EditorPreviousWordWithSelection"),
+        "select word right": idea("action EditorNextWordWithSelection"),
+        "select camel left": idea(
+            "action EditorPreviousWordInDifferentHumpsModeWithSelection"
+        ),
+        "select camel right": idea(
+            "action EditorNextWordInDifferentHumpsModeWithSelection"
+        ),
+        "select way left": idea("action EditorLineStartWithSelection"),
+        "select way right": idea("action EditorLineEndWithSelection"),
+        "select way up": idea("action EditorTextStartWithSelection"),
+        "select way down": idea("action EditorTextEndWithSelection"),
+        # deleting
+        "clear left": idea("action EditorBackSpace"),
+        "clear right": idea("action EditorDelete"),
+        "clear up": idea("action EditorUpWithSelection", "action EditorBackSpace"),
+        "clear down": idea("action EditorDownWithSelection", "action EditorBackSpace"),
+        "clear word left": idea(
+            "action EditorPreviousWordWithSelection", "action EditorBackSpace"
+        ),
+        "clear word right": idea(
+            "action EditorNextWordWithSelection", "action EditorBackSpace"
+        ),
+        "clear camel left": idea(
+            "action EditorPreviousWordInDifferentHumpsModeWithSelection",
+            "action EditorBackSpace",
+        ),
+        "clear camel right": idea(
+            "action EditorNextWordInDifferentHumpsModeWithSelection",
+            "action EditorBackSpace",
+        ),
+        "clear way left": idea("action EditorDeleteToLineStart"),
+        "clear way right": idea("action EditorDeleteToLineEnd"),
+        "clear way up": idea(
+            "action EditorTextStartWithSelection", "action EditorBackSpace"
+        ),
+        "clear way down": idea(
+            "action EditorTextEndWithSelection", "action EditorBackSpace"
+        ),
     }
 )
 ctx.set_list("alphabet", alphabet.keys())

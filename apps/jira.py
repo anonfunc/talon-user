@@ -2,6 +2,7 @@ import time
 
 from talon.voice import Context, ContextGroup, Key
 
+from .tridactyl import tKey
 from ..utils import text
 
 
@@ -22,19 +23,19 @@ ctx = Context("jira", func=isJira, group=group)
 ctx.vocab = ["sub-task", "Dwight"]
 ctx.keymap(
     {
-        "dashboard": Key("g d"),
-        "boards": Key("g b"),
-        "issues": Key("g i"),
-        "find": Key("/"),
-        "create": Key("c"),
-        "assign [to] <dgndictation> [over]": [Key("a"), delay(0.6), text],
-        "assign to me": Key("i"),
-        "comment": Key("m"),
-        "edit": Key("e"),
-        "action <dgndictation> [over]": [Key("."), delay(0.6), text],
-        "submit": Key("ctrl+return"),
-        "copy link": Key("cmd+l cmd+c"),
-        "copy id": Key("cmd+l right alt+shift+left alt+shift+left cmd+c"),
+        "go dashboard": tKey("g d"),
+        "go boards": tKey("g a"),
+        "go issues": tKey("g i"),
+        "search": tKey("/"),
+        "go create": tKey("c"),
+        "assign [to] <dgndictation> [over]": [tKey("a"), delay(0.6), text],
+        "assign to me": tKey("i"),
+        "comment": tKey("m"),
+        "edit": tKey("e"),
+        "(action | please) <dgndictation> [over]": [tKey("."), delay(0.6), text],
+        "submit": tKey("ctrl+return"),
+        "copy link": tKey("cmd+l cmd+c"),
+        "copy id": tKey("cmd+l right alt+shift+left alt+shift+left cmd+c"),
     }
 )
 group.load()

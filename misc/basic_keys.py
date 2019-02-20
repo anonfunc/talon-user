@@ -16,6 +16,7 @@ symbols = {
     "back tick": "`",
     "comma": ",",
     "dot": ".",
+    "point": ".",
     "period": ".",
     "semi": ";",
     "semicolon": ";",

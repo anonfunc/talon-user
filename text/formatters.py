@@ -16,6 +16,8 @@ formatters = {
     # Golang private/public conventions prefer SendHTML to SendHtml sendHtml
     "private": (True, lambda i, word, _: word if i == 0 else word if word.upper() == word else word.capitalize()),
     "public": (True, lambda i, word, _: word if word.upper() == word else word.capitalize()),
+    # Call method: for driving jetbrains style fuzzy Complete -> .fuzCom
+    "call": (True,  lambda i, word, _: "." + word[0:3] if i == 0 else word[0:3].capitalize()),
     "snake": (True, lambda i, word, _: word if i == 0 else "_" + word),
     "smash": (True, lambda i, word, _: word),
     "spine": (True, lambda i, word, _: word if i == 0 else "-" + word),
@@ -35,7 +37,7 @@ def format_text(m):
     fmt = []
     # noinspection PyProtectedMember
     for w in m._words:
-        if isinstance(w, Word):
+        if isinstance(w, Word) and str(w.word) != "over":
             # noinspection PyUnresolvedReferences
             fmt.append(w.word)
     # noinspection PyProtectedMember
@@ -62,8 +64,6 @@ ctx = Context("formatters")
 ctx.vocab = vocab
 ctx.keymap(
     {
-        # 'word <dgnwords>': word,
-        "(%s)+ <dgndictation> [over]"
-        % (" | ".join(formatters)): format_text
+        f"({' | '.join(formatters)})+ <dgndictation> [over]": format_text
     }
 )

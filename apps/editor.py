@@ -2,6 +2,7 @@ import talon.clip as clip
 from talon.voice import Context, Key, press
 
 from .. import utils
+from ..apps.jetbrains import port_mapping
 
 try:
     from ..text.homophones import all_homophones
@@ -14,25 +15,38 @@ except ImportError:
     homophone_lookup = {"right": ["right", "write"], "write": ["right", "write"]}
     all_homophones = homophone_lookup.keys()
 
+extension = None
 
-supported_apps = {
-    "com.jetbrains.intellij",
-    "com.jetbrains.intellij.ce",
-    "com.jetbrains.AppCode",
-    "com.jetbrains.CLion",
-    "com.jetbrains.datagrip",
-    "com.jetbrains.goland",
-    "com.jetbrains.PhpStorm",
-    "com.jetbrains.pycharm",
-    "com.jetbrains.rider",
-    "com.jetbrains.rubymine",
-    "com.jetbrains.WebStorm",
-    "com.google.android.studio",
-    "com.microsoft.VSCode",
-}
+
+def extendable(d):
+    def wrapper(m):
+        global extension
+        extension = Key(d)
+        extension(m)
+
+    return wrapper
+
+
+def set_extension(d):
+    def wrapper(_):
+        global extension
+        extension = d
+
+    return wrapper
+
+
+supported_apps = {"com.microsoft.VSCode"}
+supported_apps.update(port_mapping.keys())
+
+
+def not_supported_editor(app, window):
+    if str(app.bundle) in supported_apps:
+        return False
+    return True
+
 
 ctx = Context(
-    "notsupported", func=lambda app, _: not any(app.bundle == b for b in supported_apps)
+    "notsupported", func=not_supported_editor
 )
 
 
@@ -67,6 +81,7 @@ def select_text_to_left_of_cursor(m):
     # now select the matching key text
     for i in range(0, len(key)):
         press("shift-right")
+    set_extension(lambda _: select_text_to_left_of_cursor(m))
 
 
 # jcooper-korg from talon slack
@@ -102,18 +117,56 @@ def select_text_to_right_of_cursor(m):
     # now select the matching key text
     for i in range(0, len(key)):
         press("shift-right")
+    set_extension(lambda _: select_text_to_right_of_cursor(m))
 
 
 ctx.keymap(
     {
-        "(select previous) [<dgndictation>++]": select_text_to_left_of_cursor,
-        "(select next) [<dgndictation>++]": select_text_to_right_of_cursor,
-        "search [<dgndictation>]": [Key("cmd-f"), utils.text],
+        # moving
+        # left, right, up and down already defined
+        "go word left": extendable("alt-left"),
+        "go word right": extendable("alt-right"),
+        "go line start": extendable("cmd-left"),
+        "go line end": extendable("cmd-right"),
+        "go way left": extendable("cmd-left"),
+        "go way right": extendable("cmd-right"),
+        "go way down": extendable("cmd-down"),
+        "go way up": extendable("cmd-up"),
+        # selecting
         "select all": [Key("cmd-a")],
-        "select [this] line": [Key("home"), Key("shift-end")],
-        "(clean | clear) line": [Key("home"), Key("shift-end"), Key("delete")],
-        "delete line": [Key("home"), Key("shift-end"), Key("delete"), Key("delete")],
-        "delete to end": [Key("shift-end"), Key("delete")],
-        "delete to start": [Key("shift-home"), Key("delete")],
+        "select last <dgndictation>": select_text_to_left_of_cursor,
+        "select next <dgndictation>": select_text_to_right_of_cursor,
+        "select line": extendable("cmd-left cmd-left cmd-shift-right"),
+        "select left": extendable("shift-left"),
+        "select right": extendable("shift-right"),
+        "select up": extendable("shift-up"),
+        "select down": extendable("shift-down"),
+        "select word left": [
+            Key("left shift-right left alt-left alt-right shift-alt-left"),
+            set_extension(Key("shift-alt-left")),
+        ],
+        "select word right": [
+            Key("right shift-left right alt-right alt-left shift-alt-right"),
+            set_extension(Key("shift-alt-right")),
+        ],
+        "extend": extension,
+        "select way left": extendable("cmd-shift-left"),
+        "select way right": extendable("cmd-shift-right"),
+        "select way up": extendable("cmd-shift-up"),
+        "select way down": extendable("cmd-shift-down"),
+        # deleting
+        "clear line": extendable("cmd-left cmd-left cmd-shift-right delete cmd-right"),
+        "clear left": extendable("backspace"),
+        "clear right": extendable("delete"),
+        "clear up": extendable("shift-up delete"),
+        "clear down": extendable("shift-down delete"),
+        "clear word left": extendable("alt-backspace"),
+        "clear word right": extendable("alt-delete"),
+        "clear way left": extendable("cmd-shift-left delete"),
+        "clear way right": extendable("cmd-shift-right delete"),
+        "clear way up": extendable("cmd-shift-up delete"),
+        "clear way down": extendable("cmd-shift-down delete"),
+        # searching
+        "search [<dgndictation>]": [Key("cmd-f"), utils.text],
     }
 )

@@ -11,8 +11,9 @@ import talon.clip as clip
 from talon import applescript
 from talon.voice import Context, Key, Str, press
 
+from ..misc.basic_keys import alphabet
 from ..misc.mouse import delayed_click
-from ..utils import text
+from ..utils import text, word
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
@@ -114,12 +115,21 @@ def grab_thing(m):
         clip.set(old_clip)
 
 
+def letter(m):
+    try:
+        Str([alphabet[k] for k in m["terminal.alphabet"]])(None)
+    except KeyError:
+        pass
+
+
+
 mapping = {"semicolon": ";", r"new-line": "\n", r"new-paragraph": "\n\n"}
 
 ctx.keymap(
     {
         "(cd {terminal.subdirs} | cd)": change_dir,
         "list": list_dir,
+        "clear": Key("ctrl-l"),
         "parent": parent,
         "home": ["cd \n", update_ctx],
         "make dir": "mkdir -p ",
@@ -130,10 +140,10 @@ ctx.keymap(
         "make [<dgndictation>]": ["make ", text],
         "mage [<dgndictation>]": ["mage ", text],
         # git
-        "jet [<dgndictation>]": ["git ", text],
-        "jet add [<dgndictation>]": ["git add ", text],
+        "jet [<dgndictation>]": ["git ", text, " "],
+        "jet add": ["git add "],
         "jet branch": "git br\n",
-        "jet clone [<dgndictation>]": ["git clone ", text],
+        "jet clone": ["git clone "],
         "jet checkout master": "git checkout master\n",
         "jet checkout [<dgndictation>]": ["git checkout ", text],
         "jet commit [<dgndictation>]": ["git commit ", text],
@@ -147,10 +157,13 @@ ctx.keymap(
             text,
         ],
         "jet push [<dgndictation>]": ["git push ", text],
+        "jet reset": "git reset ",
         "jet rebase": "git rebase -i HEAD~",
         "jet stash": "git stash\n",
         "jet status": "git status\n",
         "jet stat": "git status --short\n",
+        "ref head": "HEAD",
+        "ref parent": "HEAD^",
         # common
         "gradle": "./gradlew ",
         "gradle deploy": "./gradlew deploy",
@@ -159,5 +172,11 @@ ctx.keymap(
         "grab": grab_thing,
         "follow": grab_change_directory,
         "jump [<dgndictation>]": ["zz ", text, "\n"],
+        # Options
+        "dash {terminal.alphabet}": ["-", letter],
+        "dash dash <dgnwords>": ["--", word],
+        "dash <dgnwords>": ["-", word],
     }
 )
+
+ctx.set_list("alphabet", alphabet.keys())

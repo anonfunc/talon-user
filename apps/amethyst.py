@@ -30,21 +30,21 @@ def number(control=False, mod_one=False):
 ctx.keymap(
     {
         "next layout": mod1("space"),
-        "(last | previous) layout": mod2("down"),  # REBIND in AMETHYST
+        "last layout": mod2("down"),  # REBIND in AMETHYST
         "focus first": mod1("w"),
         "move [to] first": mod2("w"),
-        "send [to] first": [mod2("w"), mod1("w")],
+        # "send [to] first": [mod2("w"), mod1("w")],
         "focus second": mod1("e"),
         "move [to] second": mod2("e"),
-        "send [to] second": [mod2("e"), mod1("e")],
+        # "send [to] second": [mod2("e"), mod1("e")],
         # "third focus": mod1("r")
         # "third move": mod2("r")
         "shrink pane": mod1("h"),
         "grow pane": mod1("l"),
-        "(more | increase) windows": mod1(","),
-        "(fewer | decrease) windows": mod1("."),
-        "focus (last | previous | counter clockwise)": mod1("j"),
-        "move (last | previous | counter clockwise)": mod2("j"),
+        "more windows": mod1(","),
+        "fewer windows": mod1("."),
+        "focus (last | counter clockwise)": mod1("j"),
+        "move (last |  counter clockwise)": mod2("j"),
         "focus (next | clockwise)": mod1("k"),
         "move (next | clockwise)": mod2("k"),
         # "move (next | clockwise) space": mod2("h"),
@@ -52,20 +52,21 @@ ctx.keymap(
         "move [to] main": mod1("return"),
         "toggle (float | floating)": mod1("t"),
         "toggle (amethyst | tiling)": mod2("t"),
-        "show layouts": mod1("i"),
+        "show (layouts | layout)": mod1("i"),
         "tall layout": mod1("a"),
         "wide layout": mod1("s"),
         "(full | full screen) layout": mod1("d"),
         "(call on | column) layout": mod1("f"),
-        f"move [to] next space": mod2("right"),
-        f"move [to] (previous | last) space": mod2("left"),
+        "binary layout": mod1("g"),
+        f"move to next space": mod2("right"),
+        f"move to last space": mod2("left"),
         # Needs space shortcuts
-        f"(move | send) [to] space {numerals}": number(mod_one=True, control=True),
+        f"(move | send) to space {numerals}": number(mod_one=True, control=True),
         # Not strictly Amethyst
         f"focus space {numerals}": number(control=True),
         "mission control": Key("ctrl-up"),
         "(app | application) windows": Key("ctrl-down"),
-        f"focus [to] next space": Key("ctrl-right"),
-        f"focus [to] (previous | last) space": Key("ctrl-left"),
+        f"focus next space": Key("ctrl-right"),
+        f"focus last space": Key("ctrl-left"),
     }
 )

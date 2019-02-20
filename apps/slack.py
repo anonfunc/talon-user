@@ -5,13 +5,13 @@ from ..utils import text
 ctx = Context("slack", bundle="com.tinyspeck.slackmacgap")
 ctx.keymap(
     {
-        "jump": Key("cmd-k"),
-        "(dm's | direct messages | messages)": Key("cmd-shift-k"),
-        "(and read | unread)": Key("cmd-shift-a"),
-        "(threads | all threads)": Key("cmd-shift-t"),
+        "go jump": Key("cmd-k"),
+        "go (dm's | direct messages | messages)": Key("cmd-shift-k"),
+        "go (and read | unread)": Key("cmd-shift-a"),
+        "go (threads | thread)": Key("cmd-shift-t"),
         "react [<dgndictation>]": [Key("cmd-shift-\\"), text],
-        "zoom": Key("cmd-."),
-        "(previous | last) unread": Key("alt-shift-up"),
-        "next unread": Key("alt-shift-down"),
+        "toggle zoom": Key("cmd-."),
+        "go last unread": Key("alt-shift-up"),
+        "go next unread": Key("alt-shift-down"),
     }
 )
