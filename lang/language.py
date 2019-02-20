@@ -1,3 +1,7 @@
+# Language:
+# Programming specific dictation, mostly that which could vary by language.
+# Mostly keyword commands of the form "state <something>" so that the keywords in the syntax
+# can be expressed with no ambiguity.  (Consider `state else` -> "else" vs `word else` -> "elves".)
 from talon.voice import Context, Key
 
 
@@ -53,9 +57,13 @@ ctx.keymap(
 ctx = Context("golang", func=extension_context(".go"))
 ctx.keymap(
     {
+        # Many of these add extra terrible spacing under the assumption that
+        # gofmt/goimports will erase it.
         "state (funk | func | fun)": "func ",
         "state var": "var ",
         "state break": "break",
+        "state (chan | channel)": " chan ",
+        "state go": "go ",
         "state if": "if ",
         "state else if": " else if ",
         "state else": " else ",
@@ -64,21 +72,22 @@ ctx.keymap(
         "state for range": "forr ",
         "state format": "fmt",
         "state switch": "switch ",
-        "state (const | constant)": "const ",
-        "state case": "case ",
-        "state type": "type ",
-        "state true": "true",
-        "state false": "false",
+        "state select": "select ",
+        "state (const | constant)": " const ",
+        "state case": " case ",
+        "state type": " type ",
+        "state true": " true ",
+        "state false": " false ",
         "state (start | struct | struck)": " struct ",
         "state interface": " interface{} ",
         "state string": " string ",
         "state (int | integer | ant)": " int ",
         "state (int | integer | ant) 64": " int64 ",
-        "state slice": "[]",
-        "state tag": ["``", Key("left")],
-        "state return": "return ",
+        "state slice": " []",
+        "state tag": [" ``", Key("left")],
+        "state return": " return ",
         "map of string to string": " map[string]string ",
-        "go dot": Key("cmd-right ."),
+        "receive": " <- ",
     }
 )
 

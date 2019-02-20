@@ -1,4 +1,7 @@
-from talon.voice import Context, Str, Word
+import re
+
+import talon.clip as clip
+from talon.voice import Context, Str, Word, press
 
 from ..utils import parse_word, surround, vocab
 
@@ -33,6 +36,11 @@ formatters = {
 }
 
 
+def normalize(identifier):
+    # https://stackoverflow.com/questions/29916065/how-to-do-camelcase-split-in-python
+    return re.sub(r'[-_]', ' ', re.sub('(?!^)([A-Z0-9][a-z0-9]*)', r' \1', identifier))
+
+
 def format_text(m):
     fmt = []
     # noinspection PyProtectedMember
@@ -40,8 +48,13 @@ def format_text(m):
         if isinstance(w, Word) and str(w.word) != "over":
             # noinspection PyUnresolvedReferences
             fmt.append(w.word)
-    # noinspection PyProtectedMember
-    words = [str(s) for s in m.dgndictation[0]._words]
+    try:
+        # noinspection PyProtectedMember
+        words = [str(s) for s in m.dgndictation[0]._words]
+    except AttributeError:
+        with clip.capture() as s:
+            press("cmd-c", wait=2000)
+        words = normalize(s.get()).split()
 
     tmp = []
     spaces = True
@@ -64,6 +77,6 @@ ctx = Context("formatters")
 ctx.vocab = vocab
 ctx.keymap(
     {
-        f"({' | '.join(formatters)})+ <dgndictation> [over]": format_text
+        f"({' | '.join(formatters)})+ [<dgndictation>] [over]": format_text
     }
 )
