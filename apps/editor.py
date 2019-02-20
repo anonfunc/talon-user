@@ -35,6 +35,13 @@ def set_extension(d):
     return wrapper
 
 
+def do_extension(m):
+    # noinspection PyProtectedMember
+    count = max(utils.text_to_number([utils.parse_word(w) for w in m._words[1:]]), 1)
+    for _ in range(count):
+        extension(m)
+
+
 supported_apps = {"com.microsoft.VSCode"}
 supported_apps.update(port_mapping.keys())
 
@@ -45,9 +52,7 @@ def not_supported_editor(app, window):
     return True
 
 
-ctx = Context(
-    "notsupported", func=not_supported_editor
-)
+ctx = Context("notsupported", func=not_supported_editor)
 
 
 # jcooper-korg from talon slack
@@ -149,7 +154,7 @@ ctx.keymap(
             Key("right shift-left right alt-right alt-left shift-alt-right"),
             set_extension(Key("shift-alt-right")),
         ],
-        "extend": extension,
+        f"extend {utils.optional_numerals}": do_extension,
         "select way left": extendable("cmd-shift-left"),
         "select way right": extendable("cmd-shift-right"),
         "select way up": extendable("cmd-shift-up"),

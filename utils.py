@@ -82,8 +82,7 @@ optional_numerals = " (" + " | ".join(sorted(numeral_map.keys())) + ")*"
 
 
 def text_to_number(words):
-    tmp = [str(s).lower() for s in words]
-    words = [parse_word(w) for w in tmp]
+    words = [parse_word(w).lower() for w in words]
 
     result = 0
     factor = 1

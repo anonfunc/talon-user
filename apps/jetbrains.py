@@ -9,7 +9,7 @@ from talon.ui import active_app
 from talon.voice import Context, Key
 
 from ..misc.basic_keys import alphabet
-from ..utils import optional_numerals, numerals, text, text_to_number, text_to_range, parse_word
+from ..utils import optional_numerals, numerals, text, text_to_number, text_to_range, parse_word, parse_words
 
 try:
     from ..text.homophones import all_homophones
@@ -64,10 +64,13 @@ def set_extend(*commands):
     return set_inner
 
 
-def extend_action(_):
+def extend_action(m):
     global extendCommands
-    for cmd in extendCommands:
-        send_idea_command(cmd)
+    # noinspection PyProtectedMember
+    count = max(text_to_number([parse_word(w) for w in m._words[1:]]), 1)
+    for _ in range(count):
+        for cmd in extendCommands:
+            send_idea_command(cmd)
 
 
 def set_to_here(*commands):
@@ -109,7 +112,7 @@ def get_idea_location():
 
 
 def idea(*cmds):
-    def inner(_):
+    def inner(m):
         global extendCommands
         extendCommands = cmds
         for cmd in cmds:
@@ -149,7 +152,7 @@ def idea_range(cmd, drop=1):
 def idea_find(direction):
     def handler(m):
         # noinspection PyProtectedMember
-        args = [parse_word(w) for w in m.dgndictation[0]._words]
+        args = parse_words(m)
         search_string = " ".join(args)
         cmd = "find {} {}"
         if len(args) == 1:
@@ -230,7 +233,7 @@ ctx.keymap(
         f"grab {optional_numerals}": [grab_identifier, set_extend()],
         # "(synchronizing | synchronize)": idea("action Synchronize"),
         "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
-        "extend": extend_action,
+        f"extend {optional_numerals}": extend_action,
         "to here": to_here,
         # Refactoring
         "refactor": idea("action Refactorings.QuickListPopupAction"),
@@ -304,6 +307,12 @@ ctx.keymap(
         "select less": idea("action EditorUnSelectWord"),
         "select more": idea("action EditorSelectWord"),
         "select this": idea("action EditorSelectWord"),
+        "multi-select up": idea("action EditorCloneCaretAbove"),
+        "multi-select down": idea("action EditorCloneCaretBelow"),
+        "multi-select fewer": idea("action UnselectPreviousOccurrence"),
+        "multi-select more": idea("action SelectNextOccurrence"),
+        "multi-select all": idea("action SelectAllOccurrences"),
+
         "select line": [
             idea("action EditorLineStart", "action EditorLineEndWithSelection"),
             set_extend(

@@ -13,7 +13,7 @@ from talon.voice import Context, Key, Str, press
 
 from ..misc.basic_keys import alphabet
 from ..misc.mouse import delayed_click
-from ..utils import text, word
+from ..utils import text, word, parse_word
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
@@ -46,10 +46,10 @@ def update_ctx(_=None, newdir=None):
 
 
 def change_dir(m):
-    print("{}".format(" ".join([str(w) for w in m._words])))
+    # print("{}".format(" ".join([str(w) for w in m._words])))
     name = None
     if len(m._words) > 1:
-        name = str(m._words[1])
+        name = parse_word(m._words[1])
     if name in subdirs:
         Str("cd {}; ls\n".format(subdirs[name]))(None)
         update_ctx(newdir=subdirs[name])

@@ -7,7 +7,7 @@ import requests
 from talon import ctrl
 from talon.voice import Context
 
-from ...utils import optional_numerals, text, text_to_number, text_to_range
+from ...utils import optional_numerals, text, text_to_number, text_to_range, parse_words
 
 try:
     from ...misc.mouse import delayed_click
@@ -127,7 +127,7 @@ def vscode_command(*cmds):
 def vscode_search(direction):
     def handler(m):
         # noinspection PyProtectedMember
-        pattern = " ".join([str(w) for w in m.dgndictation[0]._words])
+        pattern = " ".join(parse_words(m))
         port, username, password = get_rest_api_settings()
         if port:
             response = requests.post(

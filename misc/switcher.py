@@ -1,12 +1,14 @@
 from talon import ui
 from talon.voice import Context, Key, Rep, Str, Word, press
 
+from ..utils import parse_word
+
 apps = {}
 
 
 def switch_app(m):
     # noinspection PyProtectedMember
-    name = str(m._words[1])
+    name = parse_word(m._words[1])
     full = apps.get(name)
     if not full:
         return

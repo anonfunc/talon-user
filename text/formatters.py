@@ -3,7 +3,7 @@ import re
 import talon.clip as clip
 from talon.voice import Context, Str, Word, press
 
-from ..utils import parse_word, surround, vocab
+from ..utils import parse_word, surround, vocab, parse_words
 
 formatters = {
     # Smashed
@@ -45,12 +45,12 @@ def format_text(m):
     fmt = []
     # noinspection PyProtectedMember
     for w in m._words:
-        if isinstance(w, Word) and str(w.word) != "over":
+        if isinstance(w, Word) and parse_word(w.word) != "over":
             # noinspection PyUnresolvedReferences
             fmt.append(w.word)
     try:
         # noinspection PyProtectedMember
-        words = [str(s) for s in m.dgndictation[0]._words]
+        words = parse_words(m)
     except AttributeError:
         with clip.capture() as s:
             press("cmd-c", wait=2000)
