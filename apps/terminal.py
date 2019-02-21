@@ -13,7 +13,7 @@ from talon.voice import Context, Key, Str, press
 
 from ..misc.basic_keys import alphabet
 from ..misc.mouse import delayed_click
-from ..utils import text, word, parse_word
+from ..utils import text, word, parse_word, insert
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
@@ -51,14 +51,14 @@ def change_dir(m):
     if len(m._words) > 1:
         name = parse_word(m._words[1])
     if name in subdirs:
-        Str("cd {}; ls\n".format(subdirs[name]))(None)
+        insert("cd {}; ls\n".format(subdirs[name]))
         update_ctx(newdir=subdirs[name])
     else:
-        Str("cd ")(None)
+        insert("cd ")
 
 
 def list_dir(_):
-    Str("ls\n")(None)
+    insert("ls\n")
     update_ctx()
 
 
@@ -75,12 +75,12 @@ def current_dir():
 
 
 def parent(_):
-    Str("cd ..; ls\n")(None)
+    insert("cd ..; ls\n")
     update_ctx(newdir="..")
 
 
 def home(_):
-    Str("cd ..; ls\n")(None)
+    insert("cd ..; ls\n")
     update_ctx(newdir=os.path.expanduser("~"))
 
 
@@ -100,7 +100,7 @@ def grab_change_directory(m):
         new_path = os.path.join(cwd, new_dir.strip("'"))
 
     if os.path.isdir(new_path):
-        Str("cd {}; ls\n".format(new_dir))(None)
+        insert("cd {}; ls\n".format(new_dir))
         update_ctx(newdir=new_dir)
     else:
         print("{} not in {}".format(new_dir, subdirs))
@@ -117,7 +117,7 @@ def grab_thing(m):
 
 def letter(m):
     try:
-        Str([alphabet[k] for k in m["terminal.alphabet"]])(None)
+        insert([alphabet[k] for k in m["terminal.alphabet"]])
     except KeyError:
         pass
 

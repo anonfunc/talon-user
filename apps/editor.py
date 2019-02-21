@@ -52,7 +52,7 @@ def not_supported_editor(app, window):
     return True
 
 
-ctx = Context("notsupported", func=not_supported_editor)
+ctx = Context("editor", func=not_supported_editor)
 
 
 # jcooper-korg from talon slack
@@ -128,7 +128,6 @@ def select_text_to_right_of_cursor(m):
 ctx.keymap(
     {
         # moving
-        # left, right, up and down already defined
         "go word left": extendable("alt-left"),
         "go word right": extendable("alt-right"),
         "go line start": extendable("cmd-left"),
@@ -139,6 +138,7 @@ ctx.keymap(
         "go way up": extendable("cmd-up"),
         # selecting
         "select all": [Key("cmd-a")],
+        "(correct | select phrase)": utils.select_last_insert,
         "select last <dgndictation>": select_text_to_left_of_cursor,
         "select next <dgndictation>": select_text_to_right_of_cursor,
         "select line": extendable("cmd-left cmd-left cmd-shift-right"),

@@ -4,12 +4,13 @@ import time
 from talon import keychain
 from talon.voice import Context, Key
 
-from ..utils import text
+from ..utils import text, select_last_insert
 
 ctx = Context("misc")
 ctx.vocab = ["Jira"]
 ctx.keymap(
     {
+        "correct": select_last_insert,
         "launch [<dgndictation>]": [Key("cmd-space"), lambda _: time.sleep(0.4), text],
         "go dark": lambda _: subprocess.check_call(
             ["open", "/System/Library/CoreServices/ScreenSaverEngine.app"]

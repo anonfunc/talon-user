@@ -78,7 +78,7 @@ def make_selection(m, is_selection, transform=lambda x: x):
         clip.set(w)
         press("cmd-v", wait=0)
     else:
-        Str(w)(None)
+        utils.insert(w)
 
 
 def get_selection():

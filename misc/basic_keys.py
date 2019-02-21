@@ -1,6 +1,8 @@
 import string
 
-from talon.voice import Context, Str, press
+from talon.voice import Context, press
+
+from ..utils import insert
 
 alpha_alt = (
     "air bat cap drum each fine gust harp sit jury crunch look made near "
@@ -21,7 +23,7 @@ symbols = {
     "semi": ";",
     "semicolon": ";",
     "tick": "'",
-    "quote": "\"",
+    "quote": '"',
     "L square": "[",
     "left square": "[",
     "square": "[",
@@ -59,10 +61,6 @@ keymap.update(alphabet)
 keymap.update(digits)
 
 
-def insert(s):
-    Str(s)(None)
-
-
 def get_modifiers(m):
     try:
         return [modifiers[mod] for mod in m["basic_keys.modifiers"]]
@@ -89,6 +87,10 @@ def uppercase_letters(m):
     insert("".join(get_keys(m)).upper())
 
 
+def letters(m):
+    insert("".join(get_keys(m)).lower())
+
+
 def press_keys(m):
     mods = get_modifiers(m)
     keys_to_press = get_keys(m)
@@ -110,7 +112,7 @@ ctx.keymap(
     }
 )
 ctx.set_list("alphabet", alphabet.keys())
-ctx.set_list("arrows", arrows.keys())
 ctx.set_list("digits", digits.keys())
 ctx.set_list("keys", keys.keys())
 ctx.set_list("modifiers", modifiers.keys())
+ctx.set_list("arrows", arrows.keys())

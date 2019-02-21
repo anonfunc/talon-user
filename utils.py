@@ -1,6 +1,6 @@
 import string
 
-from talon.voice import Str
+from talon.voice import Str, press
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
@@ -31,8 +31,20 @@ def join_words(words, sep=" "):
     return out
 
 
+last_insert = ""
+
+
 def insert(s):
+    global last_insert
+    last_insert = s
     Str(s)(None)
+
+
+def select_last_insert(_):
+    for _ in range(len(last_insert)):
+        press("left")
+    for _ in range(len(last_insert)):
+        press("shift-right")
 
 
 def text(m):

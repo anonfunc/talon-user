@@ -1,4 +1,3 @@
-import logging
 import os
 import time
 
@@ -9,7 +8,7 @@ from talon.ui import active_app
 from talon.voice import Context, Key
 
 from ..misc.basic_keys import alphabet
-from ..utils import optional_numerals, numerals, text, text_to_number, text_to_range, parse_word, parse_words
+from .. import utils
 
 try:
     from ..text.homophones import all_homophones
@@ -67,7 +66,7 @@ def set_extend(*commands):
 def extend_action(m):
     global extendCommands
     # noinspection PyProtectedMember
-    count = max(text_to_number([parse_word(w) for w in m._words[1:]]), 1)
+    count = max(utils.text_to_number([utils.parse_word(w) for w in m._words[1:]]), 1)
     for _ in range(count):
         for cmd in extendCommands:
             send_idea_command(cmd)
@@ -124,7 +123,7 @@ def idea(*cmds):
 def idea_num(cmd, drop=1, zero_okay=False):
     def handler(m):
         # noinspection PyProtectedMember
-        line = text_to_number(m._words[drop:])
+        line = utils.text_to_number(m._words[drop:])
         # print(cmd.format(line))
         if int(line) == 0 and not zero_okay:
             print("Not sending, arg was 0")
@@ -140,7 +139,7 @@ def idea_num(cmd, drop=1, zero_okay=False):
 def idea_range(cmd, drop=1):
     def handler(m):
         # noinspection PyProtectedMember
-        start, end = text_to_range(m._words[drop:])
+        start, end = utils.text_to_range(m._words[drop:])
         # print(cmd.format(start, end))
         send_idea_command(cmd.format(start, end))
         global extendCommands
@@ -152,7 +151,7 @@ def idea_range(cmd, drop=1):
 def idea_find(direction):
     def handler(m):
         # noinspection PyProtectedMember
-        args = parse_words(m)
+        args = utils.parse_words(m)
         search_string = " ".join(args)
         cmd = "find {} {}"
         if len(args) == 1:
@@ -187,7 +186,7 @@ def idea_bounded(direction):
 def grab_identifier(m):
     old_clip = clip.get()
     # noinspection PyProtectedMember
-    times = text_to_number(m._words[1:])  # hardcoded prefix length?
+    times = utils.text_to_number(m._words[1:])  # hardcoded prefix length?
     if not times:
         times = 1
     try:
@@ -218,7 +217,9 @@ ctx.keymap(
     {
         # Misc verbs
         "complete": [idea("action CodeCompletion")],
-        "perfect": [idea("action CodeCompletion", "action CodeCompletion")],   # perfect == extra complete
+        "perfect": [
+            idea("action CodeCompletion", "action CodeCompletion")
+        ],  # perfect == extra complete
         "smart": [idea("action SmartTypeCompletion")],
         # Variants which take text?  Replaced mostly with "call" formatter.
         # "complete <dgndictation>++ [over]": [idea("action CodeCompletion"), text],
@@ -229,17 +230,17 @@ ctx.keymap(
         "drag down": idea("action MoveLineDown"),
         "clone this": idea("action EditorDuplicate"),
         "clone line": idea("action EditorDuplicate"),
-        f"clone line {numerals}": [idea_num("clone {}", drop=2)],
-        f"grab {optional_numerals}": [grab_identifier, set_extend()],
+        f"clone line {utils.numerals}": [idea_num("clone {}", drop=2)],
+        f"grab {utils.optional_numerals}": [grab_identifier, set_extend()],
         # "(synchronizing | synchronize)": idea("action Synchronize"),
-        "(action | please) [<dgndictation>++]": [idea("action GotoAction"), text],
-        f"extend {optional_numerals}": extend_action,
+        "(action | please) [<dgndictation>++]": [idea("action GotoAction"), utils.text],
+        f"extend {utils.optional_numerals}": extend_action,
         "to here": to_here,
         # Refactoring
         "refactor": idea("action Refactorings.QuickListPopupAction"),
         "refactor <dgndictation>++ [over]": [
             idea("action Refactorings.QuickListPopupAction"),
-            text,
+            utils.text,
         ],
         "extract variable": idea("action IntroduceVariable"),
         "extract field": idea("action IntroduceField"),
@@ -249,12 +250,15 @@ ctx.keymap(
         "extract method": idea("action ExtractMethod"),
         # Quick Fix / Intentions
         "fix this": idea("action ShowIntentionActions"),
-        "fix this <dgndictation>++ [over]": [idea("action ShowIntentionActions"), text],
+        "fix this <dgndictation>++ [over]": [
+            idea("action ShowIntentionActions"),
+            utils.text,
+        ],
         "fix next error": [idea("action GotoNextError", "action ShowIntentionActions")],
         "fix last error": [
             idea("action GotoPreviousError", "action ShowIntentionActions")
         ],
-        f"fix line {numerals}": [
+        f"fix line {utils.numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action GotoNextError", "action ShowIntentionActions"),
         ],
@@ -281,10 +285,10 @@ ctx.keymap(
         "go back": idea("action Back"),
         "go [to] here": [lambda m: delayed_click(m, from_end=True)],
         "go forward": idea("action Forward"),
-        f"go line start {numerals}": idea_num("goto {} 0", drop=3),
-        f"go line end {numerals}": idea_num("goto {} 9999", drop=3),
+        f"go line start {utils.numerals}": idea_num("goto {} 0", drop=3),
+        f"go line end {utils.numerals}": idea_num("goto {} 9999", drop=3),
         # This will put the cursor past the indentation
-        f"go line {numerals}": [
+        f"go line {utils.numerals}": [
             idea_num("goto {} 9999", drop=2),
             idea("action EditorLineEnd"),
             idea("action EditorLineStart"),
@@ -300,6 +304,7 @@ ctx.keymap(
             lambda _: delayed_click(m, from_end=True),
             lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
         ),
+        "(correct | select phrase)": utils.select_last_insert,  # Nothing fancy for now.
         "select last <dgndictation>": [idea_find("prev")],
         "select next <dgndictation>": [idea_find("next")],
         "select last bounded {jetbrains.alphabet}+": [idea_bounded("prev")],
@@ -312,7 +317,6 @@ ctx.keymap(
         "multi-select fewer": idea("action UnselectPreviousOccurrence"),
         "multi-select more": idea("action SelectNextOccurrence"),
         "multi-select all": idea("action SelectAllOccurrences"),
-
         "select line": [
             idea("action EditorLineStart", "action EditorLineEndWithSelection"),
             set_extend(
@@ -321,7 +325,7 @@ ctx.keymap(
                 "action EditorLineEndWithSelection",
             ),
         ],
-        f"select line {numerals}": [
+        f"select line {utils.numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineStart", "action EditorLineEndWithSelection"),
             set_extend(
@@ -330,37 +334,45 @@ ctx.keymap(
                 "action EditorLineEndWithSelection",
             ),
         ],
-        f"select lines {numerals} until {numerals}": idea_range("range {} {}", drop=2),
-        f"select until line {numerals}": idea_num("extend {}", drop=3),
+        f"select lines {utils.numerals} until {utils.numerals}": idea_range(
+            "range {} {}", drop=2
+        ),
+        f"select until line {utils.numerals}": idea_num("extend {}", drop=3),
         # Search
         "search everywhere": idea("action SearchEverywhere"),
         "search everywhere <dgndictation>++ [over]": [
             idea("action SearchEverywhere"),
-            text,
+            utils.text,
             set_extend(),
         ],
         "search recent": [idea("action RecentFiles"), set_extend()],
         "search recent <dgndictation>++ [over]": [
             idea("action RecentFiles"),
-            text,
+            utils.text,
             set_extend(),
         ],
         "search": idea("action Find"),
-        "search <dgndictation> [over]": [idea("action Find"), text],
+        "search <dgndictation> [over]": [idea("action Find"), utils.text],
         "search in path": idea("action FindInPath"),
-        "search in path <dgndictation> [over]": [idea("action FindInPath"), text],
+        "search in path <dgndictation> [over]": [idea("action FindInPath"), utils.text],
         "search this": idea("action FindWordAtCaret"),
         # Templates: surround, generate, template.
         "surround [this]": idea("action SurroundWith"),
-        "surround [this] <dgndictation>++ [over]": [idea("action SurroundWith"), text],
+        "surround [this] <dgndictation>++ [over]": [
+            idea("action SurroundWith"),
+            utils.text,
+        ],
         "generate": idea("action Generate"),
-        "generate <dgndictation>++ [over]": [idea("action Generate"), text],
+        "generate <dgndictation>++ [over]": [idea("action Generate"), utils.text],
         "template": idea("action InsertLiveTemplate"),
-        "template <dgndictation>++ [over]": [idea("action InsertLiveTemplate"), text],
+        "template <dgndictation>++ [over]": [
+            idea("action InsertLiveTemplate"),
+            utils.text,
+        ],
         "create template": idea("action SaveAsTemplate"),
         # Lines / Selections
         "clear line": [idea("action EditorLineEnd", "action EditorDeleteToLineStart")],
-        f"clear line {numerals}": [
+        f"clear line {utils.numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineEnd"),
             idea("action EditorDeleteToLineStart"),
@@ -406,11 +418,11 @@ ctx.keymap(
         ],
         "clear line end": idea("action EditorDeleteToLineEnd"),
         "clear line start": idea("action EditorDeleteToLineStart"),
-        f"clear lines {numerals} until {numerals}": [
+        f"clear lines {utils.numerals} until {utils.numerals}": [
             idea_range("range {} {}", drop=2),
             idea("action EditorDelete"),
         ],
-        f"clear until line{numerals}": [
+        f"clear until line {utils.numerals}": [
             idea_num("extend {}", drop=3),
             idea("action EditorDelete"),
         ],
@@ -430,7 +442,7 @@ ctx.keymap(
             lambda _: time.sleep(0.2),
             idea("action CommentByLineComment"),
         ),
-        f"comment line {numerals}": [
+        f"comment line {utils.numerals}": [
             idea_num("goto {} 0", drop=2),
             idea("action EditorLineEnd"),
             idea("action CommentByLineComment"),
@@ -459,11 +471,11 @@ ctx.keymap(
             idea("action EditorLineEndWithSelection"),
             idea("action CommentByLineComment"),
         ],
-        f"comment lines {numerals} until {numerals}": [
+        f"comment lines {utils.numerals} until {utils.numerals}": [
             idea_range("range {} {}", drop=2),
             idea("action CommentByLineComment"),
         ],
-        f"comment until line {numerals}": [
+        f"comment until line {utils.numerals}": [
             idea_num("extend {}", drop=3),
             idea("action CommentByLineComment"),
         ],
@@ -473,7 +485,7 @@ ctx.keymap(
         "play recording": idea("action PlaybackLastMacro"),
         "play recording <dgndictation>": [
             idea("action PlaySavedMacrosAction"),
-            text,
+            utils.text,
             Key("enter"),
         ],
         # Marks
@@ -508,10 +520,10 @@ ctx.keymap(
         "create sibling": idea("action NewElementSamePlace"),
         "create sibling <dgndictation>++ [over]": [
             idea("action NewElementSamePlace"),
-            text,
+            utils.text,
         ],
         "create file": idea("action NewElement"),
-        "create file <dgndictation>++ [over]": [idea("action NewElement"), text],
+        "create file <dgndictation>++ [over]": [idea("action NewElement"), utils.text],
         # Task Management
         "go task": [idea("action tasks.goto")],
         "go browser task": [idea("action tasks.open.in.browser")],
@@ -530,9 +542,36 @@ ctx.keymap(
         ),
         "jet (annotate | blame)": idea("action Annotate"),
         "jet": idea("action Vcs.QuickListPopupAction"),
+        # Tool windows:
+        # Toggling various tool windows
+        "toggle project": idea("action ActivateProjectToolWindow"),
+        "toggle find": idea("action ActivateFindToolWindow"),
+        "toggle run": idea("action ActivateRunToolWindow"),
+        "toggle debug": idea("action ActivateDebugToolWindow"),
+        "toggle events": idea("action ActivateEventLogToolWindow"),
+        "toggle terminal": idea("action ActivateTerminalToolWindow"),
+        "toggle jet": idea("action ActivateVersionControlToolWindow"),
+        "toggle structure": idea("action ActivateStructureToolWindow"),
+        "toggle database": idea("action ActivateDatabaseToolWindow"),
+        "toggle database changes": idea("action ActivateDatabaseChangesToolWindow"),
+        "toggle make": idea("action ActivatemakeToolWindow"),
+        "toggle to do": idea("action ActivateTODOToolWindow"),
+        "toggle docker": idea("action ActivateDockerToolWindow"),
+        "toggle favorites": idea("action ActivateFavoritesToolWindow"),
+        "toggle last": idea("action JumpToLastWindow"),
+        # Pin/dock/float
+        "toggle pinned": idea("action TogglePinnedMode"),
+        "toggle docked": idea("action ToggleDockMode"),
+        "toggle floating": idea("action ToggleFloatingMode"),
+        "toggle windowed": idea("action ToggleWindowedMode"),
+        "toggle split": idea("action ToggleSideMode"),
+        # Grow / Shrink
+        "(grow | shrink) window right": idea("action ResizeToolWindowRight"),
+        "(grow | shrink) window left": idea("action ResizeToolWindowLeft"),
+        "(grow | shrink) window up": idea("action ResizeToolWindowUp"),
+        "(grow | shrink) window down": idea("action ResizeToolWindowDown"),
         # Matching generic editor interface as well.
         # moving
-        # left, right, up and down already defined
         "go word left": idea("action EditorPreviousWord"),
         "go word right": idea("action EditorNextWord"),
         "go camel left": idea("action EditorPreviousWordInDifferentHumpsMode"),
