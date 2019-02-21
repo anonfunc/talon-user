@@ -40,6 +40,10 @@ def insert(s):
     Str(s)(None)
 
 
+def i(s):
+    return lambda _: insert(s)
+
+
 def select_last_insert(_):
     for _ in range(len(last_insert)):
         press("left")

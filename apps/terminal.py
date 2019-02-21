@@ -13,7 +13,7 @@ from talon.voice import Context, Key, Str, press
 
 from ..misc.basic_keys import alphabet
 from ..misc.mouse import delayed_click
-from ..utils import text, word, parse_word, insert
+from ..utils import text, word, parse_word, insert, i
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
@@ -132,18 +132,18 @@ ctx.keymap(
         "clear": Key("ctrl-l"),
         "parent": parent,
         "home": ["cd \n", update_ctx],
-        "make dir": "mkdir -p ",
-        "remove ": "rm ",
-        "remove directory": "rm -rf ",
+        "make dir": i("mkdir -p "),
+        "remove ": i("rm "),
+        "remove directory": i("rm -rf "),
         "scroll down": [Key("shift-pagedown")],
         "scroll up": [Key("shift-pageup")],
         "make [<dgndictation>]": ["make ", text],
         "mage [<dgndictation>]": ["mage ", text],
         # git
         "jet [<dgndictation>]": ["git ", text, " "],
-        "jet add": ["git add "],
+        "jet add": [i("git add ")],
         "jet branch": "git br\n",
-        "jet clone": ["git clone "],
+        "jet clone": [i("git clone ")],
         "jet checkout master": "git checkout master\n",
         "jet checkout [<dgndictation>]": ["git checkout ", text],
         "jet commit [<dgndictation>]": ["git commit ", text],
@@ -157,18 +157,18 @@ ctx.keymap(
             text,
         ],
         "jet push [<dgndictation>]": ["git push ", text],
-        "jet reset": "git reset ",
-        "jet rebase": "git rebase -i HEAD~",
+        "jet reset": i("git reset "),
+        "jet rebase": i("git rebase -i HEAD~"),
         "jet stash": "git stash\n",
         "jet status": "git status\n",
         "jet stat": "git status --short\n",
-        "ref head": "HEAD",
-        "ref parent": "HEAD^",
+        "ref head": i("HEAD"),
+        "ref parent": i("HEAD^"),
         # common
-        "gradle": "./gradlew ",
-        "gradle deploy": "./gradlew deploy",
-        "gradle build": "./gradlew deploy",
-        "activate": "act",
+        "gradle": i("./gradlew "),
+        "gradle deploy": i("./gradlew deploy"),
+        "gradle build": i("./gradlew deploy"),
+        "activate": i("act"),
         "grab": grab_thing,
         "follow": grab_change_directory,
         "jump [<dgndictation>]": ["zz ", text, "\n"],
