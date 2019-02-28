@@ -33,11 +33,11 @@ def tKey(key):
 ctx = Context("firefox", func=is_tridactyl)
 ctx.keymap(
     {
-        "follow": "f",
-        "background": "F",
+        "(follow | go link)": "f",
+        "go background": "F",
         "go back": "H",
         "go forward": "L",
-        "close tab": "d",
+        "clear tab": "d",
         "go next tab": "gt",
         "go last tab": "gT",
         "search": "/",
@@ -46,5 +46,6 @@ ctx.keymap(
         "copy URL": "yy",
         "go next page": "]]",
         "go last page": "[[",
+        "go edit": Key("ctrl-i"),
     }
 )

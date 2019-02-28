@@ -9,6 +9,7 @@ from talon.voice import Context, Key
 
 from ..misc.basic_keys import alphabet
 from .. import utils
+from ..text.homophones import raise_homophones
 
 try:
     from ..text.homophones import all_homophones
@@ -268,14 +269,15 @@ ctx.keymap(
         "go implementation": idea("action GotoImplementation"),
         "go usage": idea("action FindUsages"),
         "go type": idea("action GotoTypeDeclaration"),
+        "go test": idea("action GotoTest"),
         "go next result": idea("action FindNext"),
         "go last result": idea("action FindPrevious"),
-        "go last <dgndictation>": [
+        "go last <dgndictation> [over]": [
             idea_find("prev"),
             Key("right"),
             set_extend(extendCommands + ["action EditorRight"]),
         ],
-        "go next <dgndictation>": [
+        "go next <dgndictation> [over]": [
             idea_find("next"),
             Key("left"),
             set_extend(extendCommands + ["action EditorLeft"]),
@@ -283,8 +285,8 @@ ctx.keymap(
         "go last bounded {jetbrains.alphabet}+": [idea_bounded("prev"), Key("right")],
         "go next bounded {jetbrains.alphabet}+": [idea_bounded("next"), Key("left")],
         "go back": idea("action Back"),
-        "go [to] here": [lambda m: delayed_click(m, from_end=True)],
         "go forward": idea("action Forward"),
+        "go [to] here": [lambda m: delayed_click(m, from_end=True)],
         f"go line start {utils.numerals}": idea_num("goto {} 0", drop=3),
         f"go line end {utils.numerals}": idea_num("goto {} 9999", drop=3),
         # This will put the cursor past the indentation
@@ -305,8 +307,8 @@ ctx.keymap(
             lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
         ),
         "(correct | select phrase)": utils.select_last_insert,  # Nothing fancy for now.
-        "select last <dgndictation>": [idea_find("prev")],
-        "select next <dgndictation>": [idea_find("next")],
+        "select last <dgndictation> [over]": [idea_find("prev")],
+        "select next <dgndictation> [over]": [idea_find("next")],
         "select last bounded {jetbrains.alphabet}+": [idea_bounded("prev")],
         "select next bounded {jetbrains.alphabet}+": [idea_bounded("next")],
         "select less": idea("action EditorUnSelectWord"),
@@ -371,6 +373,7 @@ ctx.keymap(
         ],
         "create template": idea("action SaveAsTemplate"),
         # Lines / Selections
+        "clear phrase": [utils.select_last_insert, idea("action EditorDelete")],
         "clear line": [idea("action EditorLineEnd", "action EditorDeleteToLineStart")],
         f"clear line {utils.numerals}": [
             idea_num("goto {} 0", drop=2),
@@ -396,12 +399,12 @@ ctx.keymap(
             )
         ],
         "clear this": [idea("action EditorSelectWord"), idea("action EditorDelete")],
-        "clear last <dgndictation>": [
+        "clear last <dgndictation> [over]": [
             idea_find("prev"),
             idea("action EditorDelete"),
             set_extend(extendCommands + ["action EditorDelete"]),
         ],
-        "clear next <dgndictation>": [
+        "clear next <dgndictation> [over]": [
             idea_find("next"),
             idea("action EditorDelete"),
             set_extend(extendCommands + ["action EditorDelete"]),
@@ -427,6 +430,10 @@ ctx.keymap(
             idea("action EditorDelete"),
         ],
         # Commenting
+        "comment phrase": [
+            utils.select_last_insert,
+            idea("action CommentByLineComment"),
+        ],
         "comment line": idea("action CommentByLineComment"),
         "comment here": [
             lambda m: delayed_click(m, from_end=True),
@@ -447,12 +454,12 @@ ctx.keymap(
             idea("action EditorLineEnd"),
             idea("action CommentByLineComment"),
         ],
-        "comment last <dgndictation>": [
+        "comment last <dgndictation> [over]": [
             idea_find("prev"),
             idea("action EditorLineStart"),
             idea("action CommentByLineComment"),
         ],
-        "comment next <dgndictation>": [
+        "comment next <dgndictation> [over]": [
             idea_find("next"),
             idea("action EditorLineStart"),
             idea("action CommentByLineComment"),
@@ -481,9 +488,9 @@ ctx.keymap(
         ],
         # Recording
         "toggle recording": idea("action StartStopMacroRecording"),
-        "edit (recording | recordings)": idea("action EditMacros"),
+        "change (recording | recordings)": idea("action EditMacros"),
         "play recording": idea("action PlaybackLastMacro"),
-        "play recording <dgndictation>": [
+        "play recording <dgndictation> [over]": [
             idea("action PlaySavedMacrosAction"),
             utils.text,
             Key("enter"),
@@ -565,13 +572,61 @@ ctx.keymap(
         "toggle floating": idea("action ToggleFloatingMode"),
         "toggle windowed": idea("action ToggleWindowedMode"),
         "toggle split": idea("action ToggleSideMode"),
+        # Settings, not windows
+        "toggle power save": idea("action TogglePowerSave"),
+        "toggle whitespace": idea("action EditorToggleShowWhitespaces"),
+        "toggle indents": idea("action EditorToggleShowIndentLines"),
+        "toggle line numbers": idea("action EditorToggleShowLineNumbers"),
+        "toggle bread crumbs": idea("action EditorToggleShowBreadcrumbs"),
+        "toggle gutter icons": idea("action EditorToggleShowGutterIcons"),
+        "toggle wrap": idea("action EditorToggleUseSoftWraps"),
+        "toggle parameters": idea("action ToggleInlineHintsAction"),
+        # Quick popups
+        "change scheme": idea("action QuickChangeScheme"),
+        "toggle (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc
+        "toggle definition": idea("action QuickImplementations"),
+        # Breakpoints / debugging
+        "go breakpoints": idea("action ViewBreakpoints"),
+        "toggle breakpoint line": idea("action ToggleLineBreakpoint"),
+        "toggle breakpoint method": idea("action ToggleMethodBreakpoint"),
+        "step over": idea("action StepOver"),
+        "step into": idea("action StepInto"),
+        "step smart": idea("action SmartStepInto"),
+        "step to line": idea("action RunToCursor"),
         # Grow / Shrink
         "(grow | shrink) window right": idea("action ResizeToolWindowRight"),
         "(grow | shrink) window left": idea("action ResizeToolWindowLeft"),
         "(grow | shrink) window up": idea("action ResizeToolWindowUp"),
         "(grow | shrink) window down": idea("action ResizeToolWindowDown"),
         # Matching generic editor interface as well.
+        # Homophones
+        "phones phrase": [
+            utils.select_last_insert,
+            lambda m: raise_homophones(m, is_selection=True),
+            set_extend([]),
+        ],
+        "phones last <dgndictation> [over]": [
+            idea_find("prev"),
+            lambda m: raise_homophones(m, is_selection=True),
+            set_extend([]),
+        ],
+        "phones next <dgndictation> [over]": [
+            idea_find("next"),
+            lambda m: raise_homophones(m, is_selection=True),
+            set_extend([]),
+        ],
+        "phones last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+            lambda m: raise_homophones(m, is_selection=True),
+            set_extend([]),
+        ],
+        "phones next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+            lambda m: raise_homophones(m, is_selection=True),
+            set_extend([]),
+        ],
         # moving
+        "go phrase left": [utils.select_last_insert, idea("action EditorLeft")],
         "go word left": idea("action EditorPreviousWord"),
         "go word right": idea("action EditorNextWord"),
         "go camel left": idea("action EditorPreviousWordInDifferentHumpsMode"),

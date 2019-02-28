@@ -42,6 +42,7 @@ ctx = Context("python", func=extension_context(".py"))
 # ctx.vocab_remove = ['']
 ctx.keymap(
     {
+        "state comment": i("  # "),
         "state (def | deaf | deft)": i("def "),
         "state else if": i("elif "),
         "state if": i("if "),
@@ -60,6 +61,7 @@ ctx.keymap(
     {
         # Many of these add extra terrible spacing under the assumption that
         # gofmt/goimports will erase it.
+        "state comment": i("  // "),
         "state (funk | func | fun)": i("func "),
         "state var": i("var "),
         "state break": i("break"),

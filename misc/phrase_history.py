@@ -49,6 +49,17 @@ webview = webview.Webview()
 webview.render(template, phrases=[("command", "")])
 webview.move(0, ui.main_screen().height)
 
+webview_shown = False
+
+
+def toggle_webview(m):
+    global webview_shown
+    if webview_shown:
+        webview.hide()
+    else:
+        webview.show()
+    webview_shown = not webview_shown
+
 
 class History:
     def __init__(self):
@@ -70,9 +81,6 @@ class History:
 
 
 history = History()
-
 ctx = Context("phrase_history")
-ctx.keymap(
-    {"history show": lambda m: webview.show(), "history hide": lambda m: webview.hide()}
-)
+ctx.keymap({"toggle history": toggle_webview})
 # webview.show()

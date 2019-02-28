@@ -5,7 +5,7 @@ from talon_plugins import speech, eye_mouse, eye_zoom_mouse
 from .mouse import click_keymap
 
 
-class MouseSnapNine:
+class MouseSnapSquid:
     def __init__(self):
         self.states = []
         self.main_screen = ui.main_screen()
@@ -104,14 +104,12 @@ def narrow(m):
 
 digits = dict((str(n), n) for n in range(1, 11))
 
-mg = MouseSnapNine()
-group = ContextGroup("snapNine")
-ctx = Context("mouseSnapNine", group=group)
+mg = MouseSnapSquid()
+group = ContextGroup("squid")
+ctx = Context("mouseSnapSquid", group=group)
 keymap = {
-    "{mouseSnapNine.digits}+": narrow,
-    "(oops | back)": mg.go_back,
-    "(reset | clear | escape)": mg.reset,
-    "(done | grid | mouse grid | mousegrid)": [mg.stop, lambda _: ctx.unload(), lambda _: speech.set_enabled(True)],
+    "{mouseSnapSquid.digits}+": narrow,
+    "squid": [mg.stop, lambda _: ctx.unload(), lambda _: speech.set_enabled(True)],
 }
 keymap.update({k: [v, mg.reset] for k, v in click_keymap.items()})
 ctx.keymap(keymap)
@@ -121,7 +119,7 @@ ctx.unload()
 
 startCtx = Context("mouseSnapNineStarter")
 startCtx.keymap({
-    "(grid | mouse grid | mousegrid)": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
+    "squid": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
     # "snap done": [mg.stop, lambda _: ctx.unload()],
 })
 # mg.start()

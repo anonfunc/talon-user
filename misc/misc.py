@@ -10,8 +10,9 @@ ctx = Context("misc")
 ctx.vocab = ["Jira"]
 ctx.keymap(
     {
+        "launch": Key("cmd-space"),
+        "launch <dgndictation> [over]": [Key("cmd-space"), lambda _: time.sleep(0.4), text],
         "correct": select_last_insert,
-        "launch [<dgndictation>]": [Key("cmd-space"), lambda _: time.sleep(0.4), text],
         "go dark": lambda _: subprocess.check_call(
             ["open", "/System/Library/CoreServices/ScreenSaverEngine.app"]
         ),

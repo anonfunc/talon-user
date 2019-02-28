@@ -3,6 +3,7 @@ from talon.voice import Context, Key, press
 
 from .. import utils
 from ..apps.jetbrains import port_mapping
+from ..text.homophones import  raise_homophones
 
 try:
     from ..text.homophones import all_homophones
@@ -136,11 +137,20 @@ ctx.keymap(
         "go way right": extendable("cmd-right"),
         "go way down": extendable("cmd-down"),
         "go way up": extendable("cmd-up"),
+        "go phrase left": [utils.select_last_insert, extendable("left")],
         # selecting
         "select all": [Key("cmd-a")],
         "(correct | select phrase)": utils.select_last_insert,
-        "select last <dgndictation>": select_text_to_left_of_cursor,
-        "select next <dgndictation>": select_text_to_right_of_cursor,
+        "select last <dgndictation> [over]": select_text_to_left_of_cursor,
+        "select next <dgndictation> [over]": select_text_to_right_of_cursor,
+        "phones last <dgndictation> [over]": [
+            select_text_to_left_of_cursor,
+            lambda m: raise_homophones(m, is_selection=True),
+        ],
+        "phones next <dgndictation> [over]": [
+            select_text_to_right_of_cursor,
+            lambda m: raise_homophones(m, is_selection=True),
+        ],
         "select line": extendable("cmd-left cmd-left cmd-shift-right"),
         "select left": extendable("shift-left"),
         "select right": extendable("shift-right"),
@@ -160,6 +170,7 @@ ctx.keymap(
         "select way up": extendable("cmd-shift-up"),
         "select way down": extendable("cmd-shift-down"),
         # deleting
+        "clear phrase": [utils.select_last_insert, extendable("backspace")],
         "clear line": extendable("cmd-left cmd-left cmd-shift-right delete cmd-right"),
         "clear left": extendable("backspace"),
         "clear right": extendable("delete"),

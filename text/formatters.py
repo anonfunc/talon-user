@@ -67,6 +67,8 @@ def format_text(m):
         with clip.capture() as s:
             press("cmd-c", wait=2000)
         words = normalize(s.get()).split()
+    if not words:
+        words = [""]
 
     tmp = []
     spaces = True
