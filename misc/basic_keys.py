@@ -11,14 +11,14 @@ alpha_alt = (
 
 f_keys = {f"F {i}": f"f{i}" for i in range(1, 13)}
 # arrows are separated because 'up' has a high false positive rate
-arrows = ["left", "right", "up", "down"]
+arrows = ["left", "right", "up", "down", "pageup", "pagedown"]
 simple_keys = ["tab", "escape", "enter", "space", "home", "pageup", "pagedown", "end"]
 alternate_keys = {"delete": "backspace", "forward delete": "delete"}
 symbols = {
     "back tick": "`",
     "comma": ",",
     "dot": ".",
-    "point": ".",
+    # "point": ".",
     "period": ".",
     "semi": ";",
     "semicolon": ";",

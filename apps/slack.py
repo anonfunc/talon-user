@@ -10,6 +10,7 @@ ctx.keymap(
         "go (and read | unread)": Key("cmd-shift-a"),
         "go (threads | thread)": Key("cmd-shift-t"),
         "react [<dgndictation>]": [Key("cmd-shift-\\"), text],
+        "emote [<dgndictation>]": [":", text],
         "toggle zoom": Key("cmd-."),
         "go last unread": Key("alt-shift-up"),
         "go next unread": Key("alt-shift-down"),

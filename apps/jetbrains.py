@@ -205,6 +205,8 @@ def grab_identifier(m):
 def is_real_jetbrains_editor(app, window):
     if app.bundle not in port_mapping:
         return False
+    if window is None:
+        return False
     # XXX Expose "does editor have focus" as plugin endpoint.
     # XXX Window title empty in full screen.
     return "[" in window.title or len(window.title) == 0
@@ -223,8 +225,8 @@ ctx.keymap(
         ],  # perfect == extra complete
         "smart": [idea("action SmartTypeCompletion")],
         # Variants which take text?  Replaced mostly with "call" formatter.
-        # "complete <dgndictation>++ [over]": [idea("action CodeCompletion"), text],
-        # "smart <dgndictation>++ [over]": [idea("action SmartTypeCompletion"), text],
+        # "complete <dgndictation> [over]": [idea("action CodeCompletion"), text],
+        # "smart <dgndictation> [over]": [idea("action SmartTypeCompletion"), text],
         "finish": idea("action EditorCompleteStatement"),
         "toggle tools": idea("action HideAllWindows"),
         "drag up": idea("action MoveLineUp"),
@@ -234,12 +236,13 @@ ctx.keymap(
         f"clone line {utils.numerals}": [idea_num("clone {}", drop=2)],
         f"grab {utils.optional_numerals}": [grab_identifier, set_extend()],
         # "(synchronizing | synchronize)": idea("action Synchronize"),
-        "(action | please) [<dgndictation>++]": [idea("action GotoAction"), utils.text],
+        "(action | please)": idea("action GotoAction"),
+        "(action | please) <dgndictation>++ [over]": [idea("action GotoAction"), utils.text],
         f"extend {utils.optional_numerals}": extend_action,
         "to here": to_here,
         # Refactoring
         "refactor": idea("action Refactorings.QuickListPopupAction"),
-        "refactor <dgndictation>++ [over]": [
+        "refactor <dgndictation> [over]": [
             idea("action Refactorings.QuickListPopupAction"),
             utils.text,
         ],
@@ -251,7 +254,7 @@ ctx.keymap(
         "extract method": idea("action ExtractMethod"),
         # Quick Fix / Intentions
         "fix this": idea("action ShowIntentionActions"),
-        "fix this <dgndictation>++ [over]": [
+        "fix this <dgndictation> [over]": [
             idea("action ShowIntentionActions"),
             utils.text,
         ],
@@ -279,7 +282,7 @@ ctx.keymap(
         ],
         "go next <dgndictation> [over]": [
             idea_find("next"),
-            Key("left"),
+            Key("right"),
             set_extend(extendCommands + ["action EditorLeft"]),
         ],
         "go last bounded {jetbrains.alphabet}+": [idea_bounded("prev"), Key("right")],
@@ -341,33 +344,35 @@ ctx.keymap(
         ),
         f"select until line {utils.numerals}": idea_num("extend {}", drop=3),
         # Search
-        "search everywhere": idea("action SearchEverywhere"),
-        "search everywhere <dgndictation>++ [over]": [
+        "(jump | search everywhere)": idea("action SearchEverywhere"),
+        "(jump | search everywhere) <dgndictation> [over]": [
             idea("action SearchEverywhere"),
             utils.text,
             set_extend(),
         ],
-        "search recent": [idea("action RecentFiles"), set_extend()],
-        "search recent <dgndictation>++ [over]": [
+        "recent": [idea("action RecentFiles"), set_extend()],
+        "recent <dgndictation> [over]": [
             idea("action RecentFiles"),
             utils.text,
             set_extend(),
         ],
         "search": idea("action Find"),
-        "search <dgndictation> [over]": [idea("action Find"), utils.text],
+        "search for <dgndictation> [over]": [idea("action Find"), utils.text, set_extend("action FindNext")],
+        "go next search": idea("action FindNext"),
+        "go last search": idea("action FindPrevious"),
         "search in path": idea("action FindInPath"),
         "search in path <dgndictation> [over]": [idea("action FindInPath"), utils.text],
         "search this": idea("action FindWordAtCaret"),
         # Templates: surround, generate, template.
         "surround [this]": idea("action SurroundWith"),
-        "surround [this] <dgndictation>++ [over]": [
+        "surround [this] <dgndictation> [over]": [
             idea("action SurroundWith"),
             utils.text,
         ],
         "generate": idea("action Generate"),
-        "generate <dgndictation>++ [over]": [idea("action Generate"), utils.text],
+        "generate <dgndictation> [over]": [idea("action Generate"), utils.text],
         "template": idea("action InsertLiveTemplate"),
-        "template <dgndictation>++ [over]": [
+        "template <dgndictation> [over]": [
             idea("action InsertLiveTemplate"),
             utils.text,
         ],
@@ -518,6 +523,9 @@ ctx.keymap(
         "clear all splits": idea("action UnsplitAll"),
         "go next split": idea("action NextSplitter"),
         "go last split": idea("action LastSplitter"),
+        # miscellaneous
+        "go next (method | function)": idea("action MethodDown"),
+        "go last (method | function)": idea("action MethodUp"),
         # Clipboard
         # "clippings": idea("action PasteMultiple"),  # XXX Might be a long-lived action.  Replaced with Alfred.
         "copy path": idea("action CopyPaths"),
@@ -525,12 +533,12 @@ ctx.keymap(
         "copy pretty": idea("action CopyAsRichText"),
         # File Creation
         "create sibling": idea("action NewElementSamePlace"),
-        "create sibling <dgndictation>++ [over]": [
+        "create sibling <dgndictation> [over]": [
             idea("action NewElementSamePlace"),
             utils.text,
         ],
         "create file": idea("action NewElement"),
-        "create file <dgndictation>++ [over]": [idea("action NewElement"), utils.text],
+        "create file <dgndictation> [over]": [idea("action NewElement"), utils.text],
         # Task Management
         "go task": [idea("action tasks.goto")],
         "go browser task": [idea("action tasks.open.in.browser")],
@@ -548,7 +556,7 @@ ctx.keymap(
             "action Github.View.Pull.Request"
         ),
         "jet (annotate | blame)": idea("action Annotate"),
-        "jet": idea("action Vcs.QuickListPopupAction"),
+        "jet menu": idea("action Vcs.QuickListPopupAction"),
         # Tool windows:
         # Toggling various tool windows
         "toggle project": idea("action ActivateProjectToolWindow"),
@@ -573,6 +581,11 @@ ctx.keymap(
         "toggle windowed": idea("action ToggleWindowedMode"),
         "toggle split": idea("action ToggleSideMode"),
         # Settings, not windows
+        "toggle tool buttons": idea("action ViewToolButtons"),
+        "toggle toolbar": idea("action ViewToolBar"),
+        "toggle status [bar]": idea("action ViewStatusBar"),
+        "toggle navigation [bar]": idea("action ViewNavigationBar"),
+        # Active editor settings
         "toggle power save": idea("action TogglePowerSave"),
         "toggle whitespace": idea("action EditorToggleShowWhitespaces"),
         "toggle indents": idea("action EditorToggleShowIndentLines"),
@@ -584,11 +597,12 @@ ctx.keymap(
         # Quick popups
         "change scheme": idea("action QuickChangeScheme"),
         "toggle (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc
-        "toggle definition": idea("action QuickImplementations"),
+        "pop (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc
+        "(pop deaf | toggle definition)": idea("action QuickImplementations"),
         # Breakpoints / debugging
         "go breakpoints": idea("action ViewBreakpoints"),
-        "toggle breakpoint line": idea("action ToggleLineBreakpoint"),
-        "toggle breakpoint method": idea("action ToggleMethodBreakpoint"),
+        "toggle [line] breakpoint": idea("action ToggleLineBreakpoint"),
+        "toggle method breakpoint method": idea("action ToggleMethodBreakpoint"),
         "step over": idea("action StepOver"),
         "step into": idea("action StepInto"),
         "step smart": idea("action SmartStepInto"),

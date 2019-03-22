@@ -7,10 +7,11 @@ from talon_plugins import speech
 class MouseSnap:
     def __init__(self):
         self.main_screen = ui.main_screen()
-        self.offset_x = 0
-        self.offset_y = 0
+        self.offset_x = self.main_screen.x
+        self.offset_y = self.main_screen.y
         self.width = self.main_screen.width
         self.height = self.main_screen.height
+        self.last_state = None
         self.save_last()
         self.mcanvas = canvas.Canvas.from_screen(self.main_screen)
         self.active = False
@@ -58,8 +59,8 @@ class MouseSnap:
 
     def reset(self, _):
         self.save_last()
-        self.offset_x = 0
-        self.offset_y = 0
+        self.offset_x = self.main_screen.x
+        self.offset_y = self.main_screen.y
         self.main_screen = ui.main_screen()
         self.width = self.main_screen.width
         self.height = self.main_screen.height

@@ -1,4 +1,5 @@
 import string
+import time
 
 from talon.voice import Str, press
 
@@ -103,20 +104,20 @@ def text_to_number(words):
     result = 0
     factor = 1
     for w in reversed(words):
-        # print("{} {} {}".format(result, factor, w))
+        print("{} {} {}".format(result, factor, w))
         if w not in numerals:
             raise Exception("not a number: {}".format(words))
 
         number = numeral_map[w]
         if number is None:
             continue
-
         number = int(number)
-        if number > 10:
+        print("{} {} {} {}".format(result, factor, w, number))
+        if number > factor and number % factor == 0:
             result = result + number
         else:
             result = result + factor * number
-        factor = (10 ** len(str(number))) * factor
+        factor = (10 ** max(1, len(str(number).rstrip("0")))) * factor
     return result
 
 
@@ -126,3 +127,7 @@ def text_to_range(words, delimiter="until"):
     start = text_to_number(words[:split])
     end = text_to_number(words[split + 1 :])
     return start, end
+
+
+def delay(amount):
+    return lambda _: time.sleep(amount)

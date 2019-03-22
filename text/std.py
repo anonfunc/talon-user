@@ -1,13 +1,19 @@
 from talon import app, clip, ui
 from talon.voice import Context, Key
 
-from ..utils import text, vocab, word, i
+from ..utils import text, vocab, word, i, numerals, parse_word, text_to_number, insert
 
 
 def copy_bundle(_):
     bundle = ui.active_app().bundle
     clip.set(bundle)
     app.notify("Copied app bundle", body="{}".format(bundle))
+
+
+def type_number(m):
+    # noinspection PyProtectedMember
+    count = text_to_number([parse_word(w) for w in m._words[1:]])
+    insert(str(count))
 
 
 ctx = Context("input")
@@ -20,7 +26,10 @@ ctx.keymap(
         "period <dgndictation> [over]": [". ", text],
         # "more <dgndictation> [over]": [" ", text],
         "word <dgnwords>": word,
+        f"numeral {numerals}": type_number,
         "slap": [Key("cmd-right enter")],
+        "cape": [Key("escape")],
+        "pa": [Key("space")],
         "question [mark]": i("?"),
         "tilde": i("~"),
         "(bang | exclamation point | not)": i("!"),

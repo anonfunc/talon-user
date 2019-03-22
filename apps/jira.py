@@ -3,17 +3,13 @@ import time
 from talon.voice import Context, ContextGroup, Key
 
 from .tridactyl import tKey
-from ..utils import text
-
-
-def delay(amount):
-    return lambda _: time.sleep(amount)
-
+from ..utils import text, delay
 
 # I don't want to interleave jira navigation with other commands, like dictation.
 group = ContextGroup("jira")
 
 browsers = {"Google Chrome", "Firefox", "Safari"}
+
 
 def isJira(app, win):
     return app.name in browsers and " JIRA2" in win.title
@@ -32,7 +28,7 @@ ctx.keymap(
         "assign to me": tKey("i"),
         "comment": tKey("m"),
         "edit": tKey("e"),
-        "(action | please) <dgndictation> [over]": [tKey("."), delay(0.6), text],
+        "(action | please) [<dgndictation>] [over]": [tKey("."), delay(0.6), text],
         "submit": tKey("ctrl+return"),
         "copy link": tKey("cmd+l cmd+c"),
         "copy id": tKey("cmd+l right alt+shift+left alt+shift+left cmd+c"),

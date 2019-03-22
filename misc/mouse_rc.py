@@ -15,8 +15,8 @@ SPEED = .5
 class MouseRcCar:
     def __init__(self):
         self.main_screen = ui.main_screen()
-        self.offset_x = self.main_screen.width // 2
-        self.offset_y = self.main_screen.height // 2
+        self.offset_x = self.main_screen.x + self.main_screen.width // 2
+        self.offset_y = self.main_screen.y + self.main_screen.height // 2
         self.angle = 0
         self.speed = 0.0
         self.mcanvas = canvas.Canvas.from_screen(self.main_screen)
@@ -104,8 +104,8 @@ class MouseRcCar:
             self.speed = 0.0
 
     def reset(self, _):
-        self.offset_x = self.main_screen.width // 2
-        self.offset_y = self.main_screen.height // 2
+        self.offset_x = self.main_screen.x + self.main_screen.width // 2
+        self.offset_y = self.main_screen.y + self.main_screen.height // 2
         self.angle = 0
         self.speed = 0.0
         self.main_screen = ui.main_screen()

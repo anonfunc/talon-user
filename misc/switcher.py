@@ -30,7 +30,7 @@ def update_lists():
             continue
         words = app.name.split(" ")
         for word in words:
-            if word and word not in new:
+            if word and word not in new and len(word) > 1:
                 new[word] = app.name
         new[app.name] = app.name
     if set(new.keys()) == set(apps.keys()):

@@ -1,12 +1,5 @@
-import time
-
 from talon.ui import active_app
 from talon.voice import Context, Key
-
-
-def delay(amount):
-    return lambda _: time.sleep(amount)
-
 
 enabled = True
 
@@ -42,6 +35,7 @@ ctx.keymap(
         "go last tab": "gT",
         "search": "/",
         "toggle mark": "A",
+        "toggle ignore": Key("shift-escape"),
         "toggle reader": "gr",
         "copy URL": "yy",
         "go next page": "]]",

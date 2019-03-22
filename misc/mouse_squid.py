@@ -9,8 +9,8 @@ class MouseSnapSquid:
     def __init__(self):
         self.states = []
         self.main_screen = ui.main_screen()
-        self.offset_x = 0
-        self.offset_y = 0
+        self.offset_x = self.main_screen.x
+        self.offset_y = self.main_screen.y
         self.width = self.main_screen.width
         self.height = self.main_screen.height
         self.states.append((self.offset_x, self.offset_y, self.width, self.height))
@@ -18,17 +18,8 @@ class MouseSnapSquid:
         self.active = False
         self.moving = False
         self.count = 0
-    #     tap.register(tap.MMOVE, self.on_move)
-    #
-    # def on_move(self, typ, e):
-    #     if typ != tap.MMOVE or not self.active:
-    #         return
-    #     x, y = self.pos()
-    #     last_pos = self.states[-1]
-    #     x2, y2 = last_pos[0] + last_pos[2]//2, last_pos[1] + last_pos[3]//2
-    #     # print("moved ", e, x, y)
-    #     if (e.x, e.y) != (x, y) and (e.x, e.y) != (x2, y2):
-    #         self.stop(None)
+        self.rows = 60
+        self.cols = 55
 
     def start(self, *_):
         if self.active:
@@ -47,46 +38,42 @@ class MouseSnapSquid:
     def draw(self, canvas):
         paint = canvas.paint
         paint.color = "ff0000"
-        canvas.draw_line(self.offset_x + self.width // 3, self.offset_y, self.offset_x + self.width // 3,
-                         self.offset_y + self.height)
-        canvas.draw_line(self.offset_x + 2 * self.width // 3, self.offset_y, self.offset_x + 2 * self.width // 3,
-                         self.offset_y + self.height)
+        # for i in range(1, self.cols+1):
+        #     canvas.draw_line(self.offset_x + i * self.width // self.cols, self.offset_y, self.offset_x + i * self.width // self.cols,
+        #                      self.offset_y + self.height)
+        # for i in range(1, self.rows+1):
+        #     canvas.draw_line(self.offset_x, self.offset_y + i * self.height // self.rows, self.offset_x + self.width,
+        #                      self.offset_y + i * self.height // self.rows)
 
-        canvas.draw_line(self.offset_x, self.offset_y + self.height // 3, self.offset_x + self.width,
-                         self.offset_y + self.height // 3)
-        canvas.draw_line(self.offset_x, self.offset_y + 2 * self.height // 3, self.offset_x + self.width,
-                         self.offset_y + 2 * self.height // 3)
+        for row in range(self.rows):
+            for col in range(self.cols):
+                canvas.draw_text(f"{row:02d}{col:02d}", self.offset_x + (col) * self.width//(self.cols),
+                                 self.offset_y + (row+1) * self.height//(self.rows))
 
-        for row in range(3):
-            for col in range(3):
-                canvas.draw_text(f"{row*3+col+1}", self.offset_x + self.width/6 + col * self.width/3,
-                                 self.offset_y + self.height / 6 + row * self.height/3)
-
-    def narrow(self, which):
+    def narrow(self, digits):
         self.save_state()
-        row = int(which - 1) // 3
-        col = int(which - 1) % 3
-        self.offset_x += int(col * self.width // 3)
-        self.offset_y += int(row * self.height // 3)
-        self.width //= 3
-        self.height //= 3
-        ctrl.mouse_move(*self.pos())
+        print(digits)
+        row = int(digits[0]) * 10 + int(digits[1])
+        col = int(digits[2]) * 10 + int(digits[3])
+        print(row, col)
+        offset_x = self.offset_x + int(col * self.width // self.cols)
+        offset_y = self.offset_y + int(row * self.height // self.rows)
+        width = self.width // self.cols
+        height = self.height // self.cols
+        print(offset_x + width//2, offset_y + height//2)
+        ctrl.mouse_move(offset_x + width//2, offset_y + height//2)
         self.count += 1
-        if self.count >= 4:
+        if self.count >= 2:
             self.reset(None)
-
-    def pos(self):
-        return self.offset_x + self.width//2, self.offset_y + self.height//2
 
     def reset(self, _):
         self.save_state()
         self.count = 0
-        self.offset_x = 0
-        self.offset_y = 0
+        self.offset_x = self.main_screen.x
+        self.offset_y = self.main_screen.y
         self.main_screen = ui.main_screen()
         self.width = self.main_screen.width
         self.height = self.main_screen.height
-        # print(*self.pos())
 
     def save_state(self):
         self.states.append((self.offset_x, self.offset_y, self.width, self.height))
@@ -98,11 +85,10 @@ class MouseSnapSquid:
 
 
 def narrow(m):
-    for d in m["mouseSnapNine.digits"]:
-        mg.narrow(int(d))
+    mg.narrow(m["mouseSnapSquid.digits"])
 
 
-digits = dict((str(n), n) for n in range(1, 11))
+digits = dict((str(n), n) for n in range(0, 10))
 
 mg = MouseSnapSquid()
 group = ContextGroup("squid")
@@ -117,7 +103,7 @@ ctx.set_list("digits", digits.keys())
 group.load()
 ctx.unload()
 
-startCtx = Context("mouseSnapNineStarter")
+startCtx = Context("mouseSnapSquidStarter")
 startCtx.keymap({
     "squid": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
     # "snap done": [mg.stop, lambda _: ctx.unload()],

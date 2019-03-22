@@ -67,13 +67,13 @@ def move_to_ocr(m):
     if (int(screen.width), int(screen.height)) == RETINA_SIZE:
         factor = RETINA_FACTOR
     midpoint = None
-    bounds = [0, 0, screen.width, screen.height]
+    bounds = [screen.x, screen.y, screen.width, screen.height]
     which = int(parse_word(m._words[1]))
     row = int(which - 1) // 3
     col = int(which - 1) % 3
     bounds = [
-        int(col * screen.width // 3),
-        int(row * screen.height // 3),
+        screen.x + int(col * screen.width // 3),
+        screen.y + int(row * screen.height // 3),
         screen.width // 3,
         screen.height // 3,
     ]

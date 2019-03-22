@@ -8,13 +8,13 @@ from .mouse import click_keymap
 class MouseSnapNine:
     def __init__(self):
         self.states = []
-        self.main_screen = ui.main_screen()
-        self.offset_x = 0
-        self.offset_y = 0
-        self.width = self.main_screen.width
-        self.height = self.main_screen.height
+        self.screen = ui.screens()[0]
+        self.offset_x = self.screen.x
+        self.offset_y = self.screen.y
+        self.width = self.screen.width
+        self.height = self.screen.height
         self.states.append((self.offset_x, self.offset_y, self.width, self.height))
-        self.mcanvas = canvas.Canvas.from_screen(self.main_screen)
+        self.mcanvas = canvas.Canvas.from_screen(self.screen)
         self.active = False
         self.moving = False
         self.count = 0
@@ -37,6 +37,8 @@ class MouseSnapNine:
             return
         if eye_mouse.control_mouse.enabled:
             return
+        if self.mcanvas is not None:
+            self.mcanvas.unregister('draw', self.draw)
         self.mcanvas.register('draw', self.draw)
         self.active = True
 
@@ -78,15 +80,23 @@ class MouseSnapNine:
     def pos(self):
         return self.offset_x + self.width//2, self.offset_y + self.height//2
 
-    def reset(self, _):
-        self.save_state()
-        self.count = 0
-        self.offset_x = 0
-        self.offset_y = 0
-        self.main_screen = ui.main_screen()
-        self.width = self.main_screen.width
-        self.height = self.main_screen.height
-        # print(*self.pos())
+    def reset(self, pos):
+        def _reset(_):
+            self.save_state()
+            self.count = 0
+            screens = ui.screens()
+            print(screens)
+            self.screen = screens[pos]
+            self.offset_x = self.screen.x
+            self.offset_y = self.screen.y
+            self.width = self.screen.width
+            self.height = self.screen.height
+            if self.mcanvas is not None:
+                self.mcanvas.unregister('draw', self.draw)
+            self.mcanvas = canvas.Canvas.from_screen(self.screen)
+            print(self.offset_x, self.offset_y, self.width, self.height)
+            # print(*self.pos())
+        return _reset
 
     def save_state(self):
         self.states.append((self.offset_x, self.offset_y, self.width, self.height))
@@ -110,18 +120,21 @@ ctx = Context("mouseSnapNine", group=group)
 keymap = {
     "{mouseSnapNine.digits}+": narrow,
     "(oops | back)": mg.go_back,
-    "(reset | clear | escape)": mg.reset,
+    "(reset | clear | escape)": mg.reset(0),
+    "switch": mg.reset(1),
     "(done | grid | mouse grid | mousegrid)": [mg.stop, lambda _: ctx.unload(), lambda _: speech.set_enabled(True)],
 }
-keymap.update({k: [v, mg.reset] for k, v in click_keymap.items()})
+keymap.update({k: [v, mg.reset(0)] for k, v in click_keymap.items()})
 ctx.keymap(keymap)
 ctx.set_list("digits", digits.keys())
 group.load()
 ctx.unload()
 
-startCtx = Context("mouseSnapNineStarter")
+startCtx = Context("mouseSnapNineStarter") 
 startCtx.keymap({
-    "(grid | mouse grid | mousegrid)": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
+    "(grid | mouse grid | mousegrid)": [mg.reset(0), mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
+    "(secondary | left) (grid | mouse grid | mousegrid)": [mg.reset(1), mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
+    "(tertiary | right) (grid | mouse grid | mousegrid)": [mg.reset(2), mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
     # "snap done": [mg.stop, lambda _: ctx.unload()],
 })
 # mg.start()

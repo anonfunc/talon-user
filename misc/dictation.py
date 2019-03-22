@@ -44,4 +44,4 @@ dictation_group.load()
 dictation_group.disable()
 
 auto_format = AutoFormat()
-dictation.keymap({"<dgndictation> [over]": auto_format.phrase, "press enter": Key("enter")})
+dictation.keymap({"<dgndictation> [over]": auto_format.phrase, })  # "press enter": Key("enter")

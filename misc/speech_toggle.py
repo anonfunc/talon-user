@@ -1,3 +1,4 @@
+from talon import app
 from talon.engine import engine
 from talon.voice import Context, ContextGroup, talon
 from talon_plugins import speech
@@ -12,16 +13,19 @@ sleepy.keymap(
         "talon wake": lambda m: speech.set_enabled(True),
         "dragon mode": [
             lambda m: speech.set_enabled(False),
+            lambda _: app.notify("Dragon mode"),
             lambda m: dictation_group.disable(),
             lambda m: engine.mimic("wake up".split()),
         ],
         "dictation mode": [
-            lambda m: speech.set_enabled(False),
+            # lambda m: speech.set_enabled(False),
+            lambda _: app.notify("Dictation mode"),
             lambda m: engine.mimic("go to sleep".split()),
             lambda m: dictation_group.enable(),
         ],
         "talon mode": [
             lambda m: speech.set_enabled(True),
+            lambda _: app.notify("Talon mode"),
             lambda m: dictation_group.disable(),
             lambda m: engine.mimic("go to sleep".split()),
         ],

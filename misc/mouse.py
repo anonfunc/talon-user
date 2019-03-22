@@ -105,14 +105,14 @@ def adv_click(button, *mods, **kwargs):
 
 
 def control_mouse(m):
-    ctrl.mouse(0, 0)
+    ctrl.mouse(10, 10)
     eye_mouse.control_mouse.toggle()
     if eye_zoom_mouse.zoom_mouse.enabled:
         eye_zoom_mouse.zoom_mouse.enable()
 
 
 def control_zoom_mouse(m):
-    ctrl.mouse(0, 0)
+    ctrl.mouse(10, 10)
     if eye_zoom_mouse.zoom_mouse.enabled:
         eye_zoom_mouse.zoom_mouse.disable()
     else:
@@ -162,29 +162,29 @@ keymap = {
     "hide cursor": toggle_cursor(False),
     "show cursor": toggle_cursor(True),
     # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
-    "(gaze | control mouse)": control_mouse,
+    "(gaze | control mouse | mouse)": control_mouse,
     "zoom mouse": control_zoom_mouse,
     # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
 }
 
 click_keymap = {
     "click": delayed_click,
-    "click right": delayed_right_click,
-    "click double": delayed_dubclick,
-    "click triple": delayed_tripclick,
-    "click drag": mouse_drag,
-    "click release": mouse_release,
+    "right click": delayed_right_click,
+    "double click": delayed_dubclick,
+    "triple click": delayed_tripclick,
+    "drag click": mouse_drag,
+    "release click": mouse_release,
     "wheel down": mouse_scroll(30),
     "wheel down continuous": [mouse_scroll(30), startScrolling],
     "wheel up": mouse_scroll(-30),
     "wheel up continuous": [mouse_scroll(-30), startScrolling],
     "wheel stop": stopScrolling,
-    "click command": adv_click(0, "cmd"),
-    "click control": adv_click(0, "ctrl"),
-    "click (option | opt)": adv_click(0, "alt"),
-    "click shift": adv_click(0, "shift"),
-    "click (shift alt | alt shift)": adv_click(0, "alt", "shift"),
-    "click (shift double | double shift)": adv_click(0, "shift", times=2),
+    "command click": adv_click(0, "cmd"),
+    "control click": adv_click(0, "ctrl"),
+    "(option | opt) click": adv_click(0, "alt"),
+    "shift click": adv_click(0, "shift"),
+    "(shift alt | alt shift) click": adv_click(0, "alt", "shift"),
+    "(shift double | double shift) click": adv_click(0, "shift", times=2),
 }
 keymap.update(click_keymap)
 

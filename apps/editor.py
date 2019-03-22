@@ -47,7 +47,7 @@ supported_apps = {"com.microsoft.VSCode"}
 supported_apps.update(port_mapping.keys())
 
 
-def not_supported_editor(app, window):
+def not_supported_editor(app, _):
     if str(app.bundle) in supported_apps:
         return False
     return True
