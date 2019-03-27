@@ -43,7 +43,7 @@ def do_extension(m):
         extension(m)
 
 
-supported_apps = {"com.microsoft.VSCode"}
+supported_apps = {"com.microsoft.VSCode", "com.googlecode.iterm2"}
 supported_apps.update(port_mapping.keys())
 
 
