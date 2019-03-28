@@ -1,0 +1,15 @@
+{
+  "integer": "int",
+  "bite": "byte",
+  "bites": "bytes",
+  "constant": "const",
+  "context": "ctx",
+  "define": "def",
+  "dictation": "dgndictation",
+  "format": "fmt",
+  "funk": "func",
+  "jason": "json",
+  "no": "nil",
+  "octa": "okta",
+  "struck": "struct"
+}

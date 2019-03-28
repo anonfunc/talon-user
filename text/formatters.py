@@ -1,9 +1,17 @@
+import json
+import os.path
 import re
 
+from talon import resource
 import talon.clip as clip
 from talon.voice import Context, Word, press
 
 from ..utils import parse_word, surround, vocab, parse_words, insert
+
+jargon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "jargon.json")
+jargon_substitutions = {}
+with resource.open(jargon_path) as fh:
+    jargon_substitutions.update(json.load(fh))
 
 ACRONYM = (True, lambda i, word, _: word[0:1].upper())
 FIRST_THREE = (True, lambda i, word, _: word[0:3] if i == 0 else "")
@@ -27,10 +35,7 @@ GOLANG_PUBLIC = (
     True,
     lambda i, word, _: word if word.upper() == word else word.capitalize(),
 )
-DOT_STUB = (
-    True,
-    lambda i, word, _: "." + word.lower() if i == 0 else word,
-)
+DOT_STUB = (True, lambda i, word, _: "." + word.lower() if i == 0 else word)
 NO_SPACES = (True, lambda i, word, _: word)
 DASH_SEPARATED = (True, lambda i, word, _: word if i == 0 else "-" + word)
 DOWNSCORE_SEPARATED = (True, lambda i, word, _: word if i == 0 else "_" + word)
@@ -56,6 +61,7 @@ formatters = {
     "spine": DASH_SEPARATED,
     # Spaced
     "sentence": SENTENCE,
+    "jargon": (False, lambda i, word, _: jargon_substitutions.get(word.lower(), word)),
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),
     "lowcaps": (False, lambda i, word, _: word.lower()),
@@ -132,5 +138,5 @@ def format_text(m):
 
 
 ctx = Context("formatters")
-ctx.vocab = vocab
+ctx.vocab = vocab + list(jargon_substitutions.keys())
 ctx.keymap({f"({' | '.join(formatters)})+ [<dgndictation>] [over]": format_text})

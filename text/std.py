@@ -3,7 +3,6 @@ from talon.voice import Context, Key
 
 from ..utils import text, vocab, word, i, numerals, parse_word, text_to_number, insert
 
-
 def copy_bundle(_):
     bundle = ui.active_app().bundle
     clip.set(bundle)

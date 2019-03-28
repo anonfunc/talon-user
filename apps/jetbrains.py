@@ -612,6 +612,9 @@ ctx.keymap(
         "(grow | shrink) window left": idea("action ResizeToolWindowLeft"),
         "(grow | shrink) window up": idea("action ResizeToolWindowUp"),
         "(grow | shrink) window down": idea("action ResizeToolWindowDown"),
+        # Dash Searching https://github.com/gdelmas/IntelliJDashPlugin
+        "go [smart] dash": idea("action SmartSearchAction"),
+        "go all dash": idea("action SearchAction"),
         # Matching generic editor interface as well.
         # Homophones
         "phones phrase": [

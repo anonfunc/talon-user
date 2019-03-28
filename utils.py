@@ -1,11 +1,27 @@
+import json
+import os
+import re
 import string
 import time
 
+from talon import resource
 from talon.voice import Str, press
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
 punctuation = set(".,-!?")
-vocab = ["nonce"]
+try:
+    vocab_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vocab.json")
+    with resource.open(vocab_path) as fh:
+        vocab = json.load(fh)
+except:
+    vocab = []
+
+def add_vocab(words):
+    global vocab
+    vocab += [re.sub('[^a-zA-Z0-9]+', '', w) for w in words]
+    vocab = sorted(list(set(vocab)))
+    with open(vocab_path, "w") as f:
+        json.dump(vocab, f, indent=0)
 
 
 def parse_word(w):

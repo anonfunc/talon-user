@@ -33,14 +33,14 @@ ctx.keymap(
         "last layout": mod2("down"),  # REBIND in AMETHYST
         "focus (first | left)": mod1("w"),
         "move [to] (first | left)": mod2("w"),
-        # "send [to] first": [mod2("w"), mod1("w")],
+        "send [to] left": [mod2("w"), mod1("e")],  # Puts focus back on middle.
         "take from (first | left)": [mod1("w"), mod2("e")],
         "focus (second | middle)": mod1("e"),
-        "move [to] (second | middle)": mod2("e"),
+        "(move | send) [to] (second | middle)": mod2("e"),
         # "send [to] second": [mod2("e"), mod1("e")],
         "focus right": mod1("r"),
         "move [to] right": mod2("r"),
-        # "send [to] third": [mod2("r"), mod1("r")],
+        "send [to] right": [mod2("r"), mod1("e")],  # Puts focus back on middle.
         "take from right": [mod1("r"), mod2("e")],
 
         # "third focus": mod1("r")
@@ -67,7 +67,7 @@ ctx.keymap(
         f"move to next space": mod2("right"),
         f"move to last space": mod2("left"),
         # Needs space shortcuts
-        f"(move | send) to space {numerals}": number(mod_one=True, control=True),
+        f"(move | send) to [space] {numerals}": number(mod_one=True, control=True),
         # Not strictly Amethyst
         f"focus [space] {numerals}": number(control=True),
         "mission control": Key("ctrl-up"),

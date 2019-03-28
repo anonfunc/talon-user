@@ -76,7 +76,7 @@ class History:
         cmd = j["cmd"]
         if cmd == "p.end" and phrase:
             self.history[phrase] += 1
-        by_count = sorted(self.history.items(), reverse=True, key=lambda v: v[1])[:10]
+        by_count = sorted(self.history.items(), reverse=True, key=lambda v: v[1])[:50]
         # print(by_count)
         webview.render(template, phrases=by_count)
 

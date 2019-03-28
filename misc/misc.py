@@ -2,18 +2,28 @@ import subprocess
 import time
 
 from talon import keychain
-from talon.voice import Context, Key
+import talon.clip as clip
+from talon.voice import Context, Key, press
 
-from ..utils import text, select_last_insert, delay
+from ..utils import text, select_last_insert, delay, add_vocab
+
+
+def learn_selection(_):
+    with clip.capture() as s:
+        press("cmd-c", wait=2000)
+    words = s.get().split()
+    add_vocab(words)
+
 
 ctx = Context("misc")
 ctx.vocab = ["Jira"]
 ctx.keymap(
     {
-        "launch": Key("cmd-space"),
-        "launch <dgndictation> [over]": [Key("cmd-space"), delay(0.4), text],
+        "learn selection": learn_selection,
+        "(alfred | launch)": Key("cmd-space"),
+        "(alfred | launch) <dgndictation> [over]": [Key("cmd-space"), delay(0.4), text],
         "correct": select_last_insert,
-        "go dark": lambda _: subprocess.check_call(
+        "toggle dark": lambda _: subprocess.check_call(
             ["open", "/System/Library/CoreServices/ScreenSaverEngine.app"]
         ),
         "go toolbox": Key("cmd+shift+ctrl+f1"),
@@ -24,11 +34,8 @@ ctx.keymap(
             text,
         ],
         # Clipboard
-        "clippings [<dgndictation>]": [
-            Key("cmd+ctrl+c"),
-            delay(0.1),
-            text,
-        ],
+        "clippings [<dgndictation>]": [Key("cmd+ctrl+c"), delay(0.1), text],
+        "(kapeli | Cappelli)": Key("cmd-shift-space"),
         "cut this": Key("cmd-x"),
         "copy this": Key("cmd-c"),
         "paste": Key("cmd-v"),
@@ -36,6 +43,7 @@ ctx.keymap(
         "menubar": Key("ctrl-f2"),
         # Bartender needed for this one
         "menu icons": Key("ctrl-f8"),
+        "menu search": Key("ctrl-shift-f8"),
     }
 )
 
