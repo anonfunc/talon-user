@@ -123,6 +123,23 @@ def control_zoom_mouse(m):
         eye_mouse.control_mouse.toggle()
 
 
+clickJob = None
+
+
+def click_me():
+    ctrl.mouse_click(button=0)
+
+
+def startClicking(m):
+    global clickJob
+    clickJob = cron.interval("30ms", click_me)
+
+
+def stopClicking(m):
+    global clickJob
+    cron.cancel(clickJob)
+
+
 def scrollMe():
     global scrollAmount
     if scrollAmount:
@@ -174,6 +191,8 @@ click_keymap = {
     "triple click": delayed_tripclick,
     "drag click": mouse_drag,
     "release click": mouse_release,
+    "auto click": startClicking,
+    "stop click": stopClicking,
     "wheel down": mouse_scroll(30),
     "wheel down continuous": [mouse_scroll(30), startScrolling],
     "wheel up": mouse_scroll(-30),

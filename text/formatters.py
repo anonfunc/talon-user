@@ -101,6 +101,25 @@ def formatted_text(formatter):
 
 
 def format_text(m):
+    fmt, words = extract_formatter_and_words(m)
+    tmp = []
+    spaces = True
+    for i, word in enumerate(words):
+        word = parse_word(word)
+        for name in reversed(fmt):
+            smash, func = formatters[name]
+            word = func(i, word, i == len(words) - 1)
+            spaces = spaces and not smash
+        tmp.append(word)
+    words = tmp
+
+    sep = " "
+    if not spaces:
+        sep = ""
+    insert(sep.join(words))
+
+
+def extract_formatter_and_words(m):
     fmt = []
     # noinspection PyProtectedMember
     for w in m._words:
@@ -119,24 +138,28 @@ def format_text(m):
             words = []
     if not words:
         words = [""]
+    return fmt, words
 
-    tmp = []
-    spaces = True
-    for i, word in enumerate(words):
-        word = parse_word(word)
-        for name in reversed(fmt):
-            smash, func = formatters[name]
-            word = func(i, word, i == len(words) - 1)
-            spaces = spaces and not smash
-        tmp.append(word)
-    words = tmp
 
-    sep = " "
-    if not spaces:
-        sep = ""
-    insert(sep.join(words))
+def sponge_format(m):
+    _, words = extract_formatter_and_words(m)
+    dictation = " ".join(words)
+    result = []
+    caps = True
+    for c in dictation:
+        if c == " ":
+            result.append(c)
+            continue
+        result.append(c.upper() if caps else c.lower())
+        caps = not caps
+    insert("".join(result))
 
 
 ctx = Context("formatters")
 ctx.vocab = vocab + list(jargon_substitutions.keys())
-ctx.keymap({f"({' | '.join(formatters)})+ [<dgndictation>] [over]": format_text})
+ctx.keymap(
+    {
+        f"({' | '.join(formatters)})+ [<dgndictation>] [over]": format_text,
+        "sponge [<dgndictation>] [over]": sponge_format,
+    }
+)
