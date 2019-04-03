@@ -74,7 +74,7 @@ formatters = {
 
 def normalize(identifier):
     # https://stackoverflow.com/questions/29916065/how-to-do-camelcase-split-in-python
-    return re.sub(r"[-_]", " ", re.sub("(?!^)([A-Z0-9][a-z0-9]*)", r" \1", identifier))
+    return re.sub(r"[-_]", " ", re.sub("(?!^| )([A-Z0-9][a-z0-9]+)", r" \1", identifier))
 
 
 # TODO: Can I make this part of format_text? Or reuse extract_formatter_and_words?

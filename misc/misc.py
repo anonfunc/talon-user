@@ -41,8 +41,8 @@ ctx.keymap(
         "paste": Key("cmd-v"),
         # Menubar:
         "menubar": Key("ctrl-f2"),
-        # Bartender needed for this one
         "menu icons": Key("ctrl-f8"),
+        # Bartender needed for this one
         "menu search": Key("ctrl-shift-f8"),
     }
 )
