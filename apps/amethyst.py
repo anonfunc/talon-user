@@ -1,7 +1,7 @@
 from talon import ctrl
 from talon.voice import Context, Key
 
-from ..utils import numerals, text_to_number
+from ..utils import numerals, text_to_number, delay
 
 ctx = Context("amethyst")
 
@@ -33,16 +33,15 @@ ctx.keymap(
         "last layout": mod2("down"),  # REBIND in AMETHYST
         "focus (first | left)": mod1("w"),
         "move [to] (first | left)": mod2("w"),
-        "send [to] left": [mod2("w"), mod1("e")],  # Puts focus back on middle.
-        "take from (first | left)": [mod1("w"), mod2("e")],
+        "send [to] left": [mod2("w"), delay(0.3), mod1("e")],
+        "take from (first | left)": [mod1("w"), delay(0.3), mod2("e")],
         "focus (second | middle)": mod1("e"),
         "(move | send) [to] (second | middle)": mod2("e"),
         # "send [to] second": [mod2("e"), mod1("e")],
         "focus right": mod1("r"),
         "move [to] right": mod2("r"),
-        "send [to] right": [mod2("r"), mod1("e")],  # Puts focus back on middle.
-        "take from right": [mod1("r"), mod2("e")],
-
+        "send [to] right": [mod2("r"), delay(0.3), mod1("e")],
+        "take from right": [mod1("r"), delay(0.3), mod2("e")],
         # "third focus": mod1("r")
         # "third move": mod2("r")
         "shrink pane": mod1("h"),

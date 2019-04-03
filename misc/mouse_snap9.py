@@ -8,6 +8,7 @@ from .mouse import click_keymap
 class MouseSnapNine:
     def __init__(self):
         self.states = []
+        self.screen_index = 0
         self.screen = ui.screens()[0]
         self.offset_x = self.screen.x
         self.offset_y = self.screen.y
@@ -18,6 +19,7 @@ class MouseSnapNine:
         self.active = False
         self.moving = False
         self.count = 0
+
     #     tap.register(tap.MMOVE, self.on_move)
     #
     # def on_move(self, typ, e):
@@ -84,9 +86,11 @@ class MouseSnapNine:
         def _reset(_):
             self.save_state()
             self.count = 0
+            if pos >= 0:
+                self.screen_index = pos
             screens = ui.screens()
-            print(screens)
-            self.screen = screens[pos]
+            # print(screens)
+            self.screen = screens[self.screen_index]
             self.offset_x = self.screen.x
             self.offset_y = self.screen.y
             self.width = self.screen.width
@@ -94,6 +98,7 @@ class MouseSnapNine:
             if self.mcanvas is not None:
                 self.mcanvas.unregister('draw', self.draw)
             self.mcanvas = canvas.Canvas.from_screen(self.screen)
+            self.mcanvas.register('draw', self.draw)
             print(self.offset_x, self.offset_y, self.width, self.height)
             # print(*self.pos())
         return _reset
@@ -120,11 +125,13 @@ ctx = Context("mouseSnapNine", group=group)
 keymap = {
     "{mouseSnapNine.digits}+": narrow,
     "(oops | back)": mg.go_back,
-    "(reset | clear | escape)": mg.reset(0),
-    "switch": mg.reset(1),
+    "(reset | clear | escape)": mg.reset(mg.screen_index),
+    "left": mg.reset(1),
+    "middle": mg.reset(0),
+    "right": mg.reset(2),
     "(done | grid | mouse grid | mousegrid)": [mg.stop, lambda _: ctx.unload(), lambda _: speech.set_enabled(True)],
 }
-keymap.update({k: [v, mg.reset(0)] for k, v in click_keymap.items()})
+keymap.update({k: [v, lambda _: print(mg.screen_index), mg.reset(-1)] for k, v in click_keymap.items()})
 ctx.keymap(keymap)
 ctx.set_list("digits", digits.keys())
 group.load()

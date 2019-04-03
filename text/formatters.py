@@ -77,7 +77,7 @@ def normalize(identifier):
     return re.sub(r"[-_]", " ", re.sub("(?!^)([A-Z0-9][a-z0-9]*)", r" \1", identifier))
 
 
-# TODO: Can I make this part of format_text?
+# TODO: Can I make this part of format_text? Or reuse extract_formatter_and_words?
 def formatted_text(formatter):
     def _fmt(m):
         # noinspection PyProtectedMember

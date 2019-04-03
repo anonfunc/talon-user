@@ -519,6 +519,7 @@ ctx.keymap(
         "split vertically": idea("action SplitVertically"),
         "split horizontally": idea("action SplitHorizontally"),
         "split flip": idea("action ChangeSplitOrientation"),
+        "split window": idea("action EditSourceInNewWindow"),
         "clear split": idea("action Unsplit"),
         "clear all splits": idea("action UnsplitAll"),
         "go next split": idea("action NextSplitter"),

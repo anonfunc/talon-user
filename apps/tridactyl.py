@@ -34,6 +34,8 @@ ctx.keymap(
         "clear tab": "d",
         "restore tab": "u",
         "jump [<dgndictation>] [over]": ["B", delay(0.1), text],  # Alltabs is more useful
+        "open [<dgndictation>] [over]": ["o", delay(0.1), text],
+        "create tab [<dgndictation>] [over]": ["t", delay(0.1), text],
         "search [<dgndictation>] [over]": ["s", delay(0.1), text],
         "tab search [<dgndictation>] [over]": ["S", delay(0.1), text],
         "go next tab": "gt",
