@@ -34,8 +34,8 @@ ctx.keymap(
         "clear tab": "d",
         "restore tab": "u",
         "jump [<dgndictation>] [over]": ["B", delay(0.1), text],  # Alltabs is more useful
-        "open [<dgndictation>] [over]": ["o", delay(0.1), text],
-        "create tab [<dgndictation>] [over]": ["t", delay(0.1), text],
+        "open here [<dgndictation>] [over]": ["o", delay(0.1), text],
+        "open tab [<dgndictation>] [over]": ["t", delay(0.1), text],
         "search [<dgndictation>] [over]": ["s", delay(0.1), text],
         "tab search [<dgndictation>] [over]": ["S", delay(0.1), text],
         "go next tab": "gt",
@@ -45,6 +45,7 @@ ctx.keymap(
         "toggle ignore": Key("shift-escape"),
         "toggle reader": "gr",
         "copy URL": "yy",
+        "copy location": "yy",
         "go next page": "]]",
         "go last page": "[[",
         "zoom out": "zo",

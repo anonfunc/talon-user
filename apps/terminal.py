@@ -246,7 +246,7 @@ ctx.keymap(
         "scroll down": [Key("shift-pagedown")],
         "scroll up": [Key("shift-pageup")],
         "make [<dgndictation>]": ["make ", utils.text],
-        "mage [<dgndictation>]": ["mage ", utils.text],
+        "mage [<dgndictation>]": ["mage -v ", utils.text],
         # git
         "jet [<dgndictation>]": ["git ", utils.text],
         "jet add": [utils.i("git add ")],

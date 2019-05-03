@@ -1,7 +1,8 @@
 from talon import app, clip, ui
 from talon.voice import Context, Key
 
-from ..utils import text, vocab, word, i, numerals, parse_word, text_to_number, insert
+from ..utils import text, vocab, word, i, numerals, parse_word, text_to_number, insert, text_with_trailing_space
+
 
 def copy_bundle(_):
     bundle = ui.active_app().bundle
@@ -19,10 +20,11 @@ ctx = Context("input")
 ctx.vocab = vocab
 ctx.keymap(
     {
-        "say <dgndictation> [over]": text,
+        "insert <dgndictation>++": text,
+        "say <dgndictation> [over]": text_with_trailing_space,
         # "sentence <dgndictation> [over]": sentence_text,  # Formatters.
-        "comma <dgndictation> [over]": [", ", text],
-        "period <dgndictation> [over]": [". ", text],
+        # "comma <dgndictation> [over]": [", ", text],
+        # "period <dgndictation> [over]": [". ", text],
         # "more <dgndictation> [over]": [" ", text],
         "word <dgnwords>": word,
         f"numeral {numerals}": type_number,

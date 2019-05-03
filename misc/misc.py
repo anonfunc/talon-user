@@ -36,9 +36,6 @@ ctx.keymap(
         # Clipboard
         "clippings [<dgndictation>]": [Key("cmd+ctrl+c"), delay(0.1), text],
         "(kapeli | Cappelli)": Key("cmd-shift-space"),
-        "cut this": Key("cmd-x"),
-        "copy this": Key("cmd-c"),
-        "paste": Key("cmd-v"),
         # Menubar:
         "menubar": Key("ctrl-f2"),
         "menu icons": Key("ctrl-f8"),

@@ -48,14 +48,14 @@ formatters = {
     "tree": FIRST_THREE,
     "quad": FIRST_FOUR,
     "dunder": DUNDER,
-    "camel": CAMELCASE,
+    "camel": GOLANG_PRIVATE,
     "slashed": SLASH_SEPARATED,
     # Golang private/public conventions prefer SendHTML to SendHtml sendHtml
     # TODO: Consider making these the "camel" impl, pep8 prefers it as well.
-    "private": GOLANG_PRIVATE,
-    "public": GOLANG_PUBLIC,
+    # "private": GOLANG_PRIVATE,
+    "upper": GOLANG_PUBLIC,
     # Call method: for driving jetbrains style fuzzy Complete -> .fuzCom
-    "call": DOT_STUB,
+    # "cell": DOT_STUB,
     "snake": DOWNSCORE_SEPARATED,
     "smash": NO_SPACES,
     "spine": DASH_SEPARATED,
@@ -65,9 +65,11 @@ formatters = {
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),
     "lowcaps": (False, lambda i, word, _: word.lower()),
-    "string": (False, surround('"')),
-    "ticks": (False, surround("'")),
-    "backticks": (False, surround("`")),
+    "phrase": (False, lambda i, word, _: word),
+    "bold": (False, surround('*')),
+    "quoted": (False, surround('"')),
+    "ticked": (False, surround("'")),
+    "glitched": (False, surround("`")),
     "padded": (False, surround(" ")),
 }
 

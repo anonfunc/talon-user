@@ -27,9 +27,16 @@ try:
 except ImportError:
     print("Fallback mouse click logic")
 
-    def delayed_click(_, button=0, times=1, from_end=False, mods=None):
-        ctrl.mouse_click(button=button)
 
+    def delayed_click(m, button=0, times=1, from_end=False, mods=None):
+        if mods is None:
+            mods = []
+        for key in mods:
+            ctrl.key_press(key, down=True)
+        ctrl.mouse_click(button=button, times=times)
+        for key in mods[::-1]:
+            ctrl.key_press(key, up=True)
+        time.sleep(0.032)
 
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
@@ -214,8 +221,6 @@ def is_real_jetbrains_editor(app, window):
 
 # group = ContextGroup("jetbrains")
 ctx = Context("jetbrains", func=is_real_jetbrains_editor)  # , group=group)
-ctx.vocab = ["docker", "GitHub", "refactor"]
-ctx.vocab_remove = ["doctor", "Doctor"]
 ctx.keymap(
     {
         # Misc verbs
@@ -700,6 +705,159 @@ ctx.keymap(
         "clear way down": idea(
             "action EditorTextEndWithSelection", "action EditorBackSpace"
         ),
+        # clipboard
+        "cut this": idea("action EditorCut"),
+        "copy this": idea("action EditorCopy"),
+        "paste [here]": idea("action EditorPaste"),
+        # Copying
+        "copy all": idea("action $SelectAll", "action EditorCopy"),
+
+        "copy line": idea("action EditorLineStart", "action EditorLineEndWithSelection", "action EditorCopy"),
+        "copy here": [
+            lambda m: delayed_click(m, from_end=True),
+            idea("action EditorLineStart", "action EditorLineEndWithSelection", "action EditorCopy"),
+        ],
+        "copy to here": [
+            lambda m: delayed_click(m, from_end=True, mods=["shift"]),
+            idea("action EditorCopy"),
+        ],
+        "copy from here": lambda m: set_to_here(
+            lambda _: delayed_click(m, from_end=True),
+            lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+            lambda _: time.sleep(0.2),
+            idea("action EditorCopy"),
+        ),
+        f"copy line {utils.numerals}": [
+            idea_num("goto {} 0", drop=2),
+            idea("action EditorLineEndWithSelection"),
+            idea("action EditorCopy"),
+        ],
+        "copy last <dgndictation> [over]": [
+            idea_find("prev"),
+            idea("action EditorCopy"),
+        ],
+        "copy next <dgndictation> [over]": [
+            idea_find("next"),
+            idea("action EditorCopy"),
+        ],
+        "copy last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+            idea("action EditorCopy"),
+        ],
+        "copy next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+            idea("action EditorCopy"),
+        ],
+        "copy line end": [
+            idea("action EditorLineEndWithSelection"),
+            idea("action EditorCopy"),
+        ],
+        f"copy lines {utils.numerals} until {utils.numerals}": [
+            idea_range("range {} {}", drop=2),
+            idea("action EditorCopy"),
+        ],
+        f"copy until line {utils.numerals}": [
+            idea_num("extend {}", drop=3),
+            idea("action EditorCopy"),
+        ],
+
+        "copy word left": idea(
+            "action EditorPreviousWordWithSelection", "action EditorCopy"
+        ),
+        "copy word right": idea(
+            "action EditorNextWordWithSelection", "action EditorCopy"
+        ),
+        "copy camel left": idea(
+            "action EditorPreviousWordInDifferentHumpsModeWithSelection",
+            "action EditorCopy",
+        ),
+        "copy camel right": idea(
+            "action EditorNextWordInDifferentHumpsModeWithSelection",
+            "action EditorCopy",
+        ),
+        "copy way left": idea("action EditorLineStartWithSelection", "action EditorCopy"),
+        "copy way right": idea("action EditorLineEndWithSelection", "action EditorCopy"),
+        "copy way up": idea(
+            "action EditorTextStartWithSelection", "action EditorCopy"
+        ),
+        "copy way down": idea(
+            "action EditorTextEndWithSelection", "action EditorCopy"
+        ),
+        # Cutting
+        "cut all": idea("action $SelectAll", "action EditorCut"),
+
+        "cut line": idea("action EditorLineStart", "action EditorLineEndWithSelection", "action EditorCut"),
+        "cut here": [
+            lambda m: delayed_click(m, from_end=True),
+            idea("action EditorLineStart", "action EditorLineEndWithSelection", "action EditorCut"),
+        ],
+        "cut to here": [
+            lambda m: delayed_click(m, from_end=True, mods=["shift"]),
+            idea("action EditorCut"),
+        ],
+        "cut from here": lambda m: set_to_here(
+            lambda _: delayed_click(m, from_end=True),
+            lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
+            lambda _: time.sleep(0.2),
+            idea("action EditorCut"),
+        ),
+        f"cut line {utils.numerals}": [
+            idea_num("goto {} 0", drop=2),
+            idea("action EditorLineEndWithSelection"),
+            idea("action EditorCut"),
+        ],
+        "cut last <dgndictation> [over]": [
+            idea_find("prev"),
+            idea("action EditorCut"),
+        ],
+        "cut next <dgndictation> [over]": [
+            idea_find("next"),
+            idea("action EditorCut"),
+        ],
+        "cut last bounded {jetbrains.alphabet}+": [
+            idea_bounded("prev"),
+            idea("action EditorCut"),
+        ],
+        "cut next bounded {jetbrains.alphabet}+": [
+            idea_bounded("next"),
+            idea("action EditorCut"),
+        ],
+        "cut line end": [
+            idea("action EditorLineEndWithSelection"),
+            idea("action EditorCut"),
+        ],
+        f"cut lines {utils.numerals} until {utils.numerals}": [
+            idea_range("range {} {}", drop=2),
+            idea("action EditorCut"),
+        ],
+        f"cut until line {utils.numerals}": [
+            idea_num("extend {}", drop=3),
+            idea("action EditorCut"),
+        ],
+
+        "cut word left": idea(
+            "action EditorPreviousWordWithSelection", "action EditorCut"
+        ),
+        "cut word right": idea(
+            "action EditorNextWordWithSelection", "action EditorCut"
+        ),
+        "cut camel left": idea(
+            "action EditorPreviousWordInDifferentHumpsModeWithSelection",
+            "action EditorCut",
+        ),
+        "cut camel right": idea(
+            "action EditorNextWordInDifferentHumpsModeWithSelection",
+            "action EditorCut",
+        ),
+        "cut way left": idea("action EditorLineStartWithSelection", "action EditorCut"),
+        "cut way right": idea("action EditorLineEndWithSelection", "action EditorCut"),
+        "cut way up": idea(
+            "action EditorTextStartWithSelection", "action EditorCut"
+        ),
+        "cut way down": idea(
+            "action EditorTextEndWithSelection", "action EditorCut"
+        ),
+
     }
 )
 ctx.set_list("alphabet", alphabet.keys())

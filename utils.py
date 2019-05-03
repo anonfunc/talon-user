@@ -7,7 +7,8 @@ import time
 from talon import resource
 from talon.voice import Str, press
 
-mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n"}
+mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n", "dot": ".", "comma": ",", "question": "?",
+           "exclamation": "!", "dash": "-"}
 punctuation = set(".,-!?")
 
 try:
@@ -72,6 +73,10 @@ def select_last_insert(_):
 
 def text(m):
     insert(join_words(parse_words(m)))
+
+
+def text_with_trailing_space(m):
+    insert(join_words(parse_words(m)) + " ")
 
 
 def word(m):
@@ -143,7 +148,7 @@ def text_to_range(words, delimiter="until"):
     tmp = [str(s).lower() for s in words]
     split = tmp.index(delimiter)
     start = text_to_number(words[:split])
-    end = text_to_number(words[split + 1 :])
+    end = text_to_number(words[split + 1:])
     return start, end
 
 

@@ -128,6 +128,15 @@ def select_text_to_right_of_cursor(m):
 
 ctx.keymap(
     {
+        "phones last <dgndictation> [over]": [
+            select_text_to_left_of_cursor,
+            lambda m: raise_homophones(m, is_selection=True),
+        ],
+        "phones next <dgndictation> [over]": [
+            select_text_to_right_of_cursor,
+            lambda m: raise_homophones(m, is_selection=True),
+        ],
+        f"extend {utils.optional_numerals}": do_extension,
         # moving
         "go word left": extendable("alt-left"),
         "go word right": extendable("alt-right"),
@@ -143,14 +152,6 @@ ctx.keymap(
         "(correct | select phrase)": utils.select_last_insert,
         "select last <dgndictation> [over]": select_text_to_left_of_cursor,
         "select next <dgndictation> [over]": select_text_to_right_of_cursor,
-        "phones last <dgndictation> [over]": [
-            select_text_to_left_of_cursor,
-            lambda m: raise_homophones(m, is_selection=True),
-        ],
-        "phones next <dgndictation> [over]": [
-            select_text_to_right_of_cursor,
-            lambda m: raise_homophones(m, is_selection=True),
-        ],
         "select line": extendable("cmd-left cmd-left cmd-shift-right"),
         "select left": extendable("shift-left"),
         "select right": extendable("shift-right"),
@@ -164,7 +165,6 @@ ctx.keymap(
             Key("right shift-left right alt-right alt-left shift-alt-right"),
             set_extension(Key("shift-alt-right")),
         ],
-        f"extend {utils.optional_numerals}": do_extension,
         "select way left": extendable("cmd-shift-left"),
         "select way right": extendable("cmd-shift-right"),
         "select way up": extendable("cmd-shift-up"),
@@ -184,5 +184,29 @@ ctx.keymap(
         "clear way down": extendable("cmd-shift-down delete"),
         # searching
         "search [<dgndictation>]": [Key("cmd-f"), utils.text],
+        # clipboard
+        "cut this": Key("cmd-x"),
+        "copy this": Key("cmd-c"),
+        "paste [here]": Key("cmd-v"),
+        # Copying
+        "copy phrase": [utils.select_last_insert, Key("cmd-c")],
+        "copy all": [Key("cmd-a cmd-c")],
+        "copy line": extendable("cmd-left cmd-left cmd-shift-right cmd-c cmd-right"),
+        "copy word left": extendable("shift-alt-left cmd-c"),
+        "copy word right": extendable("shift-alt-right cmd-c"),
+        "copy way left": extendable("cmd-shift-left cmd-c"),
+        "copy way right": extendable("cmd-shift-right cmd-c"),
+        "copy way up": extendable("cmd-shift-up cmd-c"),
+        "copy way down": extendable("cmd-shift-down cmd-c"),
+        # Cutting
+        "cut phrase": [utils.select_last_insert, Key("cmd-x")],
+        "cut all": [Key("cmd-a cmd-x")],
+        "cut line": extendable("cmd-left cmd-left cmd-shift-right cmd-x cmd-right"),
+        "cut word left": extendable("shift-alt-left cmd-x"),
+        "cut word right": extendable("shift-alt-right cmd-x"),
+        "cut way left": extendable("cmd-shift-left cmd-x"),
+        "cut way right": extendable("cmd-shift-right cmd-x"),
+        "cut way up": extendable("cmd-shift-up cmd-x"),
+        "cut way down": extendable("cmd-shift-down cmd-x"),
     }
 )
