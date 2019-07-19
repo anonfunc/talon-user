@@ -14,8 +14,8 @@ with resource.open(jargon_path) as fh:
     jargon_substitutions.update(json.load(fh))
 
 ACRONYM = (True, lambda i, word, _: word[0:1].upper())
-FIRST_THREE = (True, lambda i, word, _: word[0:3] if i == 0 else "")
-FIRST_FOUR = (True, lambda i, word, _: word[0:4] if i == 0 else "")
+FIRST_THREE = (True, lambda i, word, _: word[0:3])
+FIRST_FOUR = (True, lambda i, word, _: word[0:4])
 DUNDER = (
     True,
     lambda i, word, last: ("__%s" % word if i == 0 else word) + ("__" if last else ""),
@@ -35,12 +35,14 @@ GOLANG_PUBLIC = (
     True,
     lambda i, word, _: word if word.upper() == word else word.capitalize(),
 )
-DOT_STUB = (True, lambda i, word, _: "." + word.lower() if i == 0 else word)
-NO_SPACES = (True, lambda i, word, _: word)
+DOT_STUB = (True, lambda i, word, _: "." + word if i == 0 else word.capitalize())
+SLICE = (True, lambda i, word, _: " []" + word if i == 0 else word)
+NO_SPACES = (True, lambda i, word, _: word.replace("-", ""))
 DASH_SEPARATED = (True, lambda i, word, _: word if i == 0 else "-" + word)
 DOWNSCORE_SEPARATED = (True, lambda i, word, _: word if i == 0 else "_" + word)
 LOWSMASH = (True, lambda i, word, _: word.lower())
 SENTENCE = (False, lambda i, word, _: word.capitalize() if i == 0 else word)
+JARGON = (False, lambda i, word, _: jargon_substitutions.get(word.lower(), word))
 
 formatters = {
     # Smashed
@@ -54,33 +56,41 @@ formatters = {
     # TODO: Consider making these the "camel" impl, pep8 prefers it as well.
     # "private": GOLANG_PRIVATE,
     "upper": GOLANG_PUBLIC,
+    "slice": SLICE,
     # Call method: for driving jetbrains style fuzzy Complete -> .fuzCom
-    # "cell": DOT_STUB,
+    "dot": DOT_STUB,
     "snake": DOWNSCORE_SEPARATED,
     "smash": NO_SPACES,
     "spine": DASH_SEPARATED,
     # Spaced
     "sentence": SENTENCE,
-    "jargon": (False, lambda i, word, _: jargon_substitutions.get(word.lower(), word)),
+    "jargon": JARGON,
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),
     "lowcaps": (False, lambda i, word, _: word.lower()),
     "phrase": (False, lambda i, word, _: word),
-    "bold": (False, surround('*')),
+    "bold": (False, surround("*")),
     "quoted": (False, surround('"')),
     "ticked": (False, surround("'")),
     "glitched": (False, surround("`")),
     "padded": (False, surround(" ")),
+    "parens": (
+        False,
+        lambda i, word, last: ("(%s" % word if i == 0 else word)
+        + (")" if last else ""),
+    ),
 }
 
 
 def normalize(identifier):
     # https://stackoverflow.com/questions/29916065/how-to-do-camelcase-split-in-python
-    return re.sub(r"[-_]", " ", re.sub("(?!^| )([A-Z0-9][a-z0-9]+)", r" \1", identifier))
+    return re.sub(
+        r"[-_]", " ", re.sub("(?!^| )([A-Z0-9][a-z0-9]+)", r" \1", identifier)
+    )
 
 
 # TODO: Can I make this part of format_text? Or reuse extract_formatter_and_words?
-def formatted_text(formatter):
+def formatted_text(*formatters):
     def _fmt(m):
         # noinspection PyProtectedMember
         words = parse_words(m)
@@ -88,9 +98,10 @@ def formatted_text(formatter):
         spaces = True
         for i, word in enumerate(words):
             word = parse_word(word)
-            smash, func = formatter
-            word = func(i, word, i == len(words) - 1)
-            spaces = spaces and not smash
+            for formatter in formatters:
+                smash, func = formatter
+                word = func(i, word, i == len(words) - 1)
+                spaces = spaces and not smash
             tmp.append(word)
         words = tmp
 
@@ -129,7 +140,7 @@ def extract_formatter_and_words(m):
         if isinstance(w, Word) and parse_word(w.word) != "over":
             # noinspection PyUnresolvedReferences
             fmt.append(w.word)
-    words = [normalize(w) for w in parse_words(m)]
+    words = [a for w in parse_words(m) for a in normalize(w).split()]
     print(words)
     if not words:
         with clip.capture() as s:

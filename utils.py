@@ -4,8 +4,9 @@ import re
 import string
 import time
 
-from talon import resource
+from talon import resource, ctrl
 from talon.voice import Str, press
+from talon_plugins import eye_mouse, eye_zoom_mouse
 
 mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n", "dot": ".", "comma": ",", "question": "?",
            "exclamation": "!", "dash": "-"}
@@ -57,6 +58,10 @@ last_insert = ""
 def insert(s):
     global last_insert
     last_insert = s
+    if eye_zoom_mouse.zoom_mouse.enabled:
+        eye_zoom_mouse.zoom_mouse.toggle()
+    if eye_mouse.control_mouse.enabled:
+        eye_mouse.control_mouse.toggle()
     Str(s)(None)
 
 
@@ -77,6 +82,14 @@ def text(m):
 
 def text_with_trailing_space(m):
     insert(join_words(parse_words(m)) + " ")
+
+
+def text_with_leading_space(m):
+    insert(" " + join_words(parse_words(m)))
+
+
+def text_with_leading(leading):
+    return lambda m: insert(leading + join_words(parse_words(m)))
 
 
 def word(m):

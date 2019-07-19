@@ -263,8 +263,10 @@ ctx.keymap(
             idea("action ShowIntentionActions"),
             utils.text,
         ],
-        "fix next error": [idea("action GotoNextError", "action ShowIntentionActions")],
-        "fix last error": [
+        "go next (error | air)": idea("action GotoNextError"),
+        "go last (error | air)": idea("action GotoPreviousError"),
+        "fix next (error | air)": [idea("action GotoNextError", "action ShowIntentionActions")],
+        "fix last (error | air)": [
             idea("action GotoPreviousError", "action ShowIntentionActions")
         ],
         f"fix line {utils.numerals}": [
@@ -554,6 +556,7 @@ ctx.keymap(
         # Git / Github (not using verb-noun-adjective pattern, mirroring terminal commands.)
         "jet pull": idea("action Vcs.UpdateProject"),
         "jet commit": idea("action CheckinProject"),
+        "jet push": idea("action CheckinProject"),
         "jet log": idea("action Vcs.ShowTabbedFileHistory"),
         "jet browse": idea("action Github.Open.In.Browser"),
         "jet (gets | gist)": idea("action Github.Create.Gist"),

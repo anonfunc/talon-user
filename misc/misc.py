@@ -33,11 +33,13 @@ ctx.keymap(
             delay(0.1),
             text,
         ],
+        "under": delay(0.2),
         # Clipboard
         "clippings [<dgndictation>]": [Key("cmd+ctrl+c"), delay(0.1), text],
         "(kapeli | Cappelli)": Key("cmd-shift-space"),
         # Menubar:
         "menubar": Key("ctrl-f2"),
+        "menubar <dgndictation> [over]": [Key("cmd+shift+/"), delay(0.1), text],
         "menu icons": Key("ctrl-f8"),
         # Bartender needed for this one
         "menu search": Key("ctrl-shift-f8"),

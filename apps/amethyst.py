@@ -34,6 +34,7 @@ ctx.keymap(
         "focus (first | left)": mod1("w"),
         "move [to] (first | left)": mod2("w"),
         "send [to] left": [mod2("w"), delay(0.3), mod1("e")],
+        "swap [with] left": [mod2("w"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
         "take from (first | left)": [mod1("w"), delay(0.3), mod2("e")],
         "focus (second | middle)": mod1("e"),
         "(move | send) [to] (second | middle)": mod2("e"),
@@ -42,6 +43,7 @@ ctx.keymap(
         "move [to] right": mod2("r"),
         "send [to] right": [mod2("r"), delay(0.3), mod1("e")],
         "take from right": [mod1("r"), delay(0.3), mod2("e")],
+        "swap [with] right": [mod2("r"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
         # "third focus": mod1("r")
         # "third move": mod2("r")
         "shrink pane": mod1("h"),
@@ -60,13 +62,15 @@ ctx.keymap(
         "show (layouts | layout)": mod1("i"),
         "tall layout": mod1("a"),
         "wide layout": mod1("s"),
+        "fix layout": mod1("z"),
         "(full | full screen) layout": mod1("d"),
         "(call on | column) layout": mod1("f"),
         # "binary layout": mod1("g"),
         f"move to next space": mod2("right"),
         f"move to last space": mod2("left"),
         # Needs space shortcuts
-        f"(move | send) to [space] {numerals}": number(mod_one=True, control=True),
+        f"move to [space] {numerals}": [number(mod_one=True, control=True), number(control=True)],
+        f"send to [space] {numerals}": number(mod_one=True, control=True),
         # Not strictly Amethyst
         f"focus [space] {numerals}": number(control=True),
         "mission control": Key("ctrl-up"),

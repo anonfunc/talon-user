@@ -38,6 +38,8 @@ def is_vscode_terminal():
     global _lastEditorSelection
     global _lastTerminalLsof
     global _inTerminal
+    if not ENABLED:
+        return False
     port, username, password = get_rest_api_settings()
     if port:
         response = requests.get(

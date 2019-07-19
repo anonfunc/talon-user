@@ -17,8 +17,8 @@ alternate_keys = {"delete": "backspace", "forward delete": "delete"}
 symbols = {
     "back tick": "`",
     "comma": ",",
-    "dot": ".",
-    # "point": ".",
+    # "dot": ".",
+    "point": ".",
     "period": ".",
     "semi": ";",
     "semicolon": ";",
