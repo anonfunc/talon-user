@@ -78,13 +78,13 @@ def move_to_ocr(m):
         screen.height // 3,
     ]
     midpoint = (bounds[0] + bounds[2] // 2, bounds[1] + bounds[3] // 2)
-    print(which, row, col, bounds, midpoint)
+    # print(which, row, col, bounds, midpoint)
     # noinspection PyProtectedMember
     search = join_words(list(map(parse_word, m.dgnwords[0]._words))).lower().strip()
     ctrl.mouse_move(*midpoint)
-    print(f"Starting teleport {which} to {search}")
+    # print(f"Starting teleport {which} to {search}")
     hocr = ocr_screen(*bounds, factor=factor)
-    print(f"... OCR'd screen: {time.time() - start} seconds.")
+    # print(f"... OCR'd screen: {time.time() - start} seconds.")
     tree = ElementTree.XML(hocr)  # type: list[ElementTree.Element]
     # print(list(tree[1]))
     best_pos = None

@@ -140,7 +140,7 @@ def text_to_number(words):
     result = 0
     factor = 1
     for w in reversed(words):
-        print("{} {} {}".format(result, factor, w))
+        # print("{} {} {}".format(result, factor, w))
         if w not in numerals:
             raise Exception("not a number: {}".format(words))
 
@@ -148,7 +148,7 @@ def text_to_number(words):
         if number is None:
             continue
         number = int(number)
-        print("{} {} {} {}".format(result, factor, w, number))
+        # print("{} {} {} {}".format(result, factor, w, number))
         if number > factor and number % factor == 0:
             result = result + number
         else:

@@ -1,7 +1,7 @@
 import subprocess
 import time
 
-from talon import keychain
+from talon import keychain, ui
 import talon.clip as clip
 from talon.voice import Context, Key, press
 
@@ -13,6 +13,7 @@ def learn_selection(_):
         press("cmd-c", wait=2000)
     words = s.get().split()
     add_vocab(words)
+    print("Learned " + words)
 
 
 ctx = Context("misc")
@@ -26,6 +27,9 @@ ctx.keymap(
         "toggle dark": lambda _: subprocess.check_call(
             ["open", "/System/Library/CoreServices/ScreenSaverEngine.app"]
         ),
+        "terminal": lambda _: [ui.launch(bundle="com.googlecode.iterm2")],
+        "GoLand": lambda _: [ui.launch(bundle="com.jetbrains.goland")],
+        "PyCharm": lambda _: [ui.launch(bundle="com.jetbrains.pycharm")],
         "go toolbox": Key("cmd+shift+ctrl+f1"),
         "password amigo": keychain.find("login", "user"),
         "snippet [<dgndictation>]": [  # XXX Doesn't really go here

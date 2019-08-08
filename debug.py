@@ -23,7 +23,7 @@ def listener(topic, m):
 
 
 # Uncomment to enable.
-#engine.register('', listener)
+# engine.register('', listener)
 def unload():
     engine.unregister("", listener)
 

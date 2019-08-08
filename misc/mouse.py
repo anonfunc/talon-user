@@ -1,6 +1,6 @@
 import time
 
-from talon import cron, ctrl, tap
+from talon import cron, ctrl, tap, ui
 from talon.voice import Context
 from talon_plugins import eye_mouse, eye_zoom_mouse
 
@@ -108,7 +108,7 @@ def control_mouse(m):
     ctrl.mouse(10, 10)
     eye_mouse.control_mouse.toggle()
     if eye_zoom_mouse.zoom_mouse.enabled:
-        eye_zoom_mouse.zoom_mouse.enable()
+        eye_zoom_mouse.zoom_mouse.disable()
 
 
 def control_zoom_mouse(m):
@@ -152,15 +152,39 @@ def startScrolling(m):
 
 
 def stopScrolling(m):
-    global scrollAmount, scrollJob
+    global scrollAmount, scrollJob, gazeJob
     scrollAmount = 0
     cron.cancel(scrollJob)
+    cron.cancel(gazeJob)
+
+
+def gazeScroll():
+    windows = ui.windows()
+    window = None
+    x, y = ctrl.mouse_pos()
+    for w in windows:
+        if w.rect.contains(x, y):
+            window = w.rect
+            break
+    if window is None:
+        return
+    midpoint = window.y + window.height / 2
+    amount = ((y - midpoint) / (window.height / 10)) ** 3
+    ctrl.mouse_scroll(by_lines=False, y=amount)
+    # print(f"gazeScroll: {midpoint} {window.height} {amount}")
+
+
+def startCursorScrolling(m):
+    global gazeJob
+    stopScrolling(m)
+    gazeJob = cron.interval("60ms", gazeScroll)
 
 
 scrollAmount = 0
 scrollJob = None
 
 hideJob = None
+gazeJob = None
 
 
 def toggle_cursor(show):
@@ -191,18 +215,21 @@ click_keymap = {
     "triple click": delayed_tripclick,
     "drag click": mouse_drag,
     "release click": mouse_release,
-    "auto click": startClicking,
-    "stop click": stopClicking,
+    # "auto click": startClicking,
+    # "stop click": stopClicking,
     "wheel down": mouse_scroll(30),
     "wheel down continuous": [mouse_scroll(30), startScrolling],
     "wheel up": mouse_scroll(-30),
     "wheel up continuous": [mouse_scroll(-30), startScrolling],
     "wheel stop": stopScrolling,
+    "wheel scroll": startCursorScrolling,
     "command click": adv_click(0, "cmd"),
     "control click": adv_click(0, "ctrl"),
-    "(option | opt) click": adv_click(0, "alt"),
+    "(option | opt | alt) click": adv_click(0, "alt"),
     "shift click": adv_click(0, "shift"),
-    "(shift alt | alt shift) click": adv_click(0, "alt", "shift"),
+    "(shift alt | alt shift | shift option | option shift) click": adv_click(
+        0, "alt", "shift"
+    ),
     "(shift double | double shift) click": adv_click(0, "shift", times=2),
 }
 keymap.update(click_keymap)

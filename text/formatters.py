@@ -141,7 +141,7 @@ def extract_formatter_and_words(m):
             # noinspection PyUnresolvedReferences
             fmt.append(w.word)
     words = [a for w in parse_words(m) for a in normalize(w).split()]
-    print(words)
+    # print(words)
     if not words:
         with clip.capture() as s:
             press("cmd-c", wait=2000)

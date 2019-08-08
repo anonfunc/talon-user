@@ -52,15 +52,15 @@ class MouseSnapSquid:
 
     def narrow(self, digits):
         self.save_state()
-        print(digits)
+        # print(digits)
         row = int(digits[0]) * 10 + int(digits[1])
         col = int(digits[2]) * 10 + int(digits[3])
-        print(row, col)
+        # print(row, col)
         offset_x = self.offset_x + int(col * self.width // self.cols)
         offset_y = self.offset_y + int(row * self.height // self.rows)
         width = self.width // self.cols
         height = self.height // self.cols
-        print(offset_x + width//2, offset_y + height//2)
+        # print(offset_x + width//2, offset_y + height//2)
         ctrl.mouse_move(offset_x + width//2, offset_y + height//2)
         self.count += 1
         if self.count >= 2:

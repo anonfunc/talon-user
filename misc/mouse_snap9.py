@@ -99,7 +99,7 @@ class MouseSnapNine:
                 self.mcanvas.unregister('draw', self.draw)
             self.mcanvas = canvas.Canvas.from_screen(self.screen)
             self.mcanvas.register('draw', self.draw)
-            print(self.offset_x, self.offset_y, self.width, self.height)
+            # print(self.offset_x, self.offset_y, self.width, self.height)
             # print(*self.pos())
         return _reset
 
