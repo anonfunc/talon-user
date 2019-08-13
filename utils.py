@@ -8,8 +8,33 @@ from talon import resource, ctrl
 from talon.voice import Str, press
 from talon_plugins import eye_mouse, eye_zoom_mouse
 
-mapping = {"semicolon": ";", "new-line": "\n", "new-paragraph": "\n\n", "dot": ".", "comma": ",", "question": "?",
-           "exclamation": "!", "dash": "-"}
+ordinal_indexes = {
+    "first": 0,
+    "second": 1,
+    "third": 2,
+    "fourth": 3,
+    "fifth": 4,
+    "sixth": 5,
+    "seventh": 6,
+    "eighth": 7,
+    "ninth": 8,
+    "tenth": 9,
+    "final": -1,
+    "next": "next",  # Yeah, yeah, not a number.
+    "last": "last",
+    "this": "this",
+}
+
+mapping = {
+    "semicolon": ";",
+    "new-line": "\n",
+    "new-paragraph": "\n\n",
+    "dot": ".",
+    "comma": ",",
+    "question": "?",
+    "exclamation": "!",
+    "dash": "-",
+}
 punctuation = set(".,-!?")
 
 try:
@@ -161,7 +186,7 @@ def text_to_range(words, delimiter="until"):
     tmp = [str(s).lower() for s in words]
     split = tmp.index(delimiter)
     start = text_to_number(words[:split])
-    end = text_to_number(words[split + 1:])
+    end = text_to_number(words[split + 1 :])
     return start, end
 
 
