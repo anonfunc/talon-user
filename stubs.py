@@ -115,4 +115,4 @@ def dump_all_stubs():
 
 # if time.time() - os.path.getmtime(os.path.join(STUBS_DIR, "talon", "__init__.pyi")) > 3600:
 #     dump_all_stubs()
-dump_all_stubs()
+# dump_all_stubs()

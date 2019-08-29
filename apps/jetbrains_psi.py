@@ -18,9 +18,10 @@ PSI_PATHS = {
     # },
     "parameter": {
         "_": 0, # You probably want the first parameter of the current function
+        "+": [", space", None],
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,PARAMETERS,PARAMETER_DECLARATION",
         "java": "METHOD|FUNCTION,^PARAMETER_LIST,PARAMETER",
-        "py": "Py:FUNCTION_DECLARATION,PARAMETER",
+        "py": "FUNCTION_DECLARATION,PARAMETER",
         "php": "Class method|function|Function,Parameter list,Parameter",
         "default": "DECLARATION,PARAMETER",
     },
@@ -36,6 +37,7 @@ PSI_PATHS = {
     },
     "import": {
         "_": 0, # You probably want the first import of the current file
+        "+": ["enter", None],
         "go": "FILE,IMPORT_LIST,IMPORT_SPEC",
         "java": "FILE,IMPORT_LIST,IMPORT_STATEMENT",
         "py": "FILE,IMPORT_STATEMENT",
@@ -44,11 +46,13 @@ PSI_PATHS = {
     },
     "comment": {
         "_": "next",  # You probably want the next comment
+        # "+": ["\n", None],
         "php": "FILE,Comment",
         "default": "FILE,COMMENT",
     },
     "method": {
         "_": "this",  # You probably want the method containing the cursor
+        "+": ["enter shift-tab", "method"],
         "go": "FILE,METHOD_DECLARATION|FUNCTION_DECLARATION",
         "java": "java.FILE,METHOD",
         "py": "FILE,Py:FUNCTION_DECLARATION",
@@ -82,6 +86,7 @@ PSI_PATHS = {
     },
     "function": {
         "_": "this",  # You probably want the function containing the cursor
+        "+": ["enter shift-tab", "function"],
         "go": "FILE,METHOD_DECLARATION|FUNCTION_DECLARATION",
         "py": "FILE,Py:FUNCTION_DECLARATION",
         "php": "FILE,Function",
@@ -96,6 +101,7 @@ PSI_PATHS = {
     },
     "class": {
         "_": "this",  # You probably want the class containing the cursor
+        "+": ["enter shift-tab", "class"],
         "py": "FILE,Py:CLASS_DECLARATION",
         "java": "FILE,CLASS",
         "php": "FILE,Class",
@@ -110,6 +116,7 @@ PSI_PATHS = {
     },
     "type": {
         "_": "this",  # You probably want the type containing the cursor
+        "+": ["\n", "type"],
         "go": "FILE,TYPE_DECLARATION",
     },
     "type name": {
@@ -118,6 +125,7 @@ PSI_PATHS = {
     },
     "struct": {
         "_": "this",  # You probably want the struct containing the cursor.
+        "+": ["enter shift-tab", "struct"],
         "go": "FILE,STRUCT_TYPE",
     },
     "if statement": {

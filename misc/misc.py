@@ -28,8 +28,8 @@ ctx.keymap(
             ["open", "/System/Library/CoreServices/ScreenSaverEngine.app"]
         ),
         "terminal": lambda _: [ui.launch(bundle="com.googlecode.iterm2")],
-        "GoLand": lambda _: [ui.launch(bundle="com.jetbrains.goland")],
-        "PyCharm": lambda _: [ui.launch(bundle="com.jetbrains.pycharm")],
+        "focus GoLand": lambda _: [ui.launch(bundle="com.jetbrains.goland")],
+        "focus PyCharm": lambda _: [ui.launch(bundle="com.jetbrains.pycharm")],
         "go toolbox": Key("cmd+shift+ctrl+f1"),
         "password amigo": keychain.find("login", "user"),
         "snippet [<dgndictation>]": [  # XXX Doesn't really go here

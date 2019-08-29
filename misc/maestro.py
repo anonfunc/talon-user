@@ -1,5 +1,5 @@
 from talon import applescript
-from talon.voice import Context
+# from talon.voice import Context
 
 
 def kmaestro(script_id):
@@ -17,7 +17,7 @@ def kmaestro(script_id):
         )
 
     return _kmaestro
-
-
-ctx = Context("maestro")
-ctx.keymap({"switcher": kmaestro("Switcher"), "window max": kmaestro("Windy Max")})
+#
+#
+# ctx = Context("maestro")
+# ctx.keymap({"switcher": kmaestro("Switcher"), "window max": kmaestro("Windy Max")})

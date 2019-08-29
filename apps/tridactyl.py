@@ -2,7 +2,7 @@ from talon.ui import active_app
 from talon.voice import Context, Key
 
 from ..utils import delay, text
-enabled = True
+enabled = False
 
 
 def is_tridactyl(app, _):
@@ -24,7 +24,7 @@ def tKey(key):
     return tKeyM
 
 
-ctx = Context("firefox", func=is_tridactyl)
+ctx = Context("tridactyl", func=is_tridactyl)
 ctx.keymap(
     {
         "(follow | go link)": "f",

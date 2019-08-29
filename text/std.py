@@ -34,7 +34,7 @@ ctx.keymap(
         "pa": [Key("space")],
         "question [mark]": i("?"),
         "tilde": i("~"),
-        "(bang | exclamation point | not)": i("!"),
+        "(bang | exclamation point)": i("!"),
         "dollar [sign]": i("$"),
         "downscore": i("_"),
         "colon": i(":"),

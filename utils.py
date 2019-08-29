@@ -4,7 +4,7 @@ import re
 import string
 import time
 
-from talon import resource, ctrl
+from talon import resource, cron, ctrl
 from talon.voice import Str, press
 from talon_plugins import eye_mouse, eye_zoom_mouse
 
@@ -78,15 +78,34 @@ def join_words(words, sep=" "):
 
 
 last_insert = ""
+reenable_job = None
+
+
+def debounce_enable_job():
+    global reenable_job
+    if reenable_job is not None:
+        cron.cancel(reenable_job)
+        reenable_job = cron.after("3s", enable_tracking)
+
+
+def enable_tracking():
+    if not eye_mouse.control_mouse.enabled:
+        eye_mouse.control_mouse.toggle()
 
 
 def insert(s):
-    global last_insert
+    global last_insert, reenable_job
+
     last_insert = s
     if eye_zoom_mouse.zoom_mouse.enabled:
         eye_zoom_mouse.zoom_mouse.toggle()
     if eye_mouse.control_mouse.enabled:
         eye_mouse.control_mouse.toggle()
+        ctrl.cursor_visible(True)
+        if reenable_job is None:
+            reenable_job = cron.after("3s", enable_tracking)
+    if reenable_job is not None:
+        debounce_enable_job()
     Str(s)(None)
 
 

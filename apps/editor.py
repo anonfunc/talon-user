@@ -46,7 +46,7 @@ def do_extension(m):
         extension(m)
 
 
-supported_apps = {"com.microsoft.VSCode", "com.googlecode.iterm2"}
+supported_apps = {"com.googlecode.iterm2"}
 supported_apps.update(port_mapping.keys())
 
 
@@ -73,15 +73,16 @@ def select_text_from_cursor(direction):
             back = "left"
         key = utils.join_words(words).lower()
         keys = homophone_lookup.get(key, [key])
-        text = _get_line(direction, back, more)
+        text = _get_line(direction, back, more).lower()
         result = -1 if direction == "left" else len(text) + 1
-        for needle in keys:
-            find = text.find(needle)
+        for needle_up in keys:
+            needle = needle_up.lower()
+            find = text.find(needle.lower())
             if direction == "left" and find > result:
                 result = find
                 key = needle
                 # There could be a closer one...
-                find = text.find(needle, result+1)
+                find = text.find(needle, result + 1)
                 while find > result:
                     result = find
                     find = text.find(needle, result + 1)
@@ -92,11 +93,13 @@ def select_text_from_cursor(direction):
                 result = find
                 key = needle
                 break
+        # print(direction, key, result, text)
         if result == (-1 if direction == "left" else len(text) + 1):
             return
         _select_in_text(direction, key, result, text)
         global extension
         extension = lambda _: fn(m)
+
     return fn
 
 
@@ -110,9 +113,7 @@ def select_bounded_from_cursor(direction):
             more = "end"
             back = "left"
         keys = [alphabet[k] for k in m["editor.alphabet"]]
-        regex = r"\b" + r"[^-_ .()]*?".join(
-            keys
-        )
+        regex = r"\b" + r"[^-_ .()]*?".join(keys)
         text = _get_line(direction, back, more)
         print(regex, text, direction)
         result = -1 if direction == "left" else len(text) + 1
@@ -132,11 +133,10 @@ def select_bounded_from_cursor(direction):
             print(key, result, match)
         if result == -1:
             return
-        print(direction, regex, key, result, text)
+        # print(direction, regex, key, result, text)
         _select_in_text(direction, key, result, text)
         global extension
         extension = lambda _: fn(m)
-
 
     return fn
 
@@ -158,14 +158,13 @@ def _select_in_text(direction, key, result, text):
         count = len(text) - result
     else:
         count = result
-    # print(direction, text, keys, result, len(text), count)
+    # print(direction, text, key, result, len(text), count)
     # cursor over to the found key text
     for i in range(0, count):
         press(direction, wait=0)
     # now select the matching key text
     for i in range(0, len(key)):
         press("shift-right")
-
 
 
 ctx.keymap(

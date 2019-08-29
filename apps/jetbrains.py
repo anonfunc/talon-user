@@ -6,13 +6,15 @@ import requests
 import talon.clip as clip
 from talon import ctrl
 from talon.ui import active_app
-from talon.voice import Context, Key
+from talon.voice import Context, Key, Str
 
 from .jetbrains_psi import PSI_PATHS
 
 from ..misc.basic_keys import alphabet
 from .. import utils
 from ..text.homophones import raise_homophones
+
+from ..text.formatters import CAMELCASE, formatted_text
 
 try:
     from ..text.homophones import all_homophones
@@ -64,6 +66,7 @@ port_mapping = {
 extendCommands = []
 toHereCommands = []
 old_line, old_col = 0, 0
+location_stack = []
 
 
 def set_extend(*commands):
@@ -147,6 +150,30 @@ def idea_num(cmd, drop=1, zero_okay=False):
     return handler
 
 
+# XXX Placeholder until I add an RPC template command to the backend
+def start_template(key):
+    send_idea_command("action InsertLiveTemplate")
+    time.sleep(0.3)
+    Str(key + "\n")(None)
+    time.sleep(0.2)
+    Key("enter")
+
+
+def send_psi(path, cmd, index):
+    if path not in PSI_PATHS:
+        return
+    path = PSI_PATHS[path].get(extension, PSI_PATHS[path].get("default", None))
+    if path is None:
+        return
+    cmd_string = f"psi {cmd} {path}"
+    if "##" in cmd_string:
+        cmd_string = cmd_string.replace("##", f"%23{index}")
+    else:
+        cmd_string = f"{cmd_string}%23{index}"
+
+    send_idea_command(cmd_string)
+
+
 def idea_psi(cmd):
     def handler(m):
         generic_path = m["jetbrains.path"][0]
@@ -156,18 +183,49 @@ def idea_psi(cmd):
         except KeyError:
             pass
         # print(cmd.format(line))
-        if generic_path not in PSI_PATHS:
-            return
-        path = PSI_PATHS[generic_path].get(extension, PSI_PATHS[generic_path].get("default", None))
-        if path is None:
-            return
-        cmd_string = f"psi {cmd} {path}"
-        if "##" in cmd_string:
-            cmd_string = cmd_string.replace("##", f"%23{index}")
-        else:
-            cmd_string = f"{cmd_string}%23{index}"
+        send_psi(generic_path, cmd, index)
+        global extendCommands
+        extendCommands = []
 
-        send_idea_command(cmd_string)
+    return handler
+
+
+def idea_psi_and_snippet():
+    def handler(m):
+        path = m["jetbrains.path"][0]
+        default_index = PSI_PATHS[path]["_"]
+        how_to_add = PSI_PATHS[path].get("+", None)
+        if how_to_add is None:
+            return
+        if PSI_PATHS[path].get(extension, None) is None:
+            # Probably won't do the right thing with fallback path.
+            return
+        prefix, template = how_to_add
+        try:
+            default_index = utils.ordinal_indexes[m["jetbrains.ordinal"][0]]
+        except KeyError:
+            pass
+        # print(cmd.format(line))
+        index = default_index
+        cmd = "end"
+        if index == 0:
+            index = -1
+        if index != "next":
+            # The "next" motion generally means we should add at point.
+            send_psi(path, cmd, index)
+        if prefix:
+            Key(prefix)(None)
+            time.sleep(0.1)
+        if template:
+            start_template(template)
+        try:
+            # noinspection PyProtectedMember
+            if m.dgndictation[0]._words:
+                time.sleep(0.1)
+                formatted_text(CAMELCASE)(m)
+        except AttributeError:
+            pass
+
         global extendCommands
         extendCommands = []
 
@@ -255,6 +313,30 @@ def is_real_jetbrains_editor(app, window):
     return "[" in window.title or len(window.title) == 0
 
 
+def push_loc(m):
+    line, col = get_idea_location()
+    global location_stack
+    location_stack.append((line, col))
+
+
+def pop_loc(m):
+    global location_stack
+    if not location_stack:
+        return
+    line, col = location_stack.pop()
+    send_idea_command("goto {} {}".format(line, col))
+
+
+def swap_loc(m):
+    global location_stack
+    if not location_stack:
+        return
+    line1, col1 = get_idea_location()
+    line2, col2 = location_stack.pop()
+    send_idea_command("goto {} {}".format(line2, col2))
+    location_stack.append((line1, col1))
+
+
 # group = ContextGroup("jetbrains")
 ctx = Context("jetbrains", func=is_real_jetbrains_editor)  # , group=group)
 keymap = {
@@ -317,8 +399,6 @@ keymap = {
     "go usage": idea("action FindUsages"),
     "go type": idea("action GotoTypeDeclaration"),
     "go test": idea("action GotoTest"),
-    "go next result": idea("action FindNext"),
-    "go last result": idea("action FindPrevious"),
     "go last <dgndictation> [over]": [
         idea_find("prev"),
         Key("right"),
@@ -406,8 +486,10 @@ keymap = {
         utils.text,
         set_extend("action FindNext"),
     ],
-    "go next search": idea("action FindNext"),
-    "go last search": idea("action FindPrevious"),
+    # "go next search": idea("action FindNext"),
+    # "go last search": idea("action FindPrevious"),
+    "go next result": idea("action FindNext"),
+    "go last result": idea("action FindPrevious"),
     "search in path": idea("action FindInPath"),
     "search in path <dgndictation> [over]": [idea("action FindInPath"), utils.text],
     "search this": idea("action FindWordAtCaret"),
@@ -539,6 +621,10 @@ keymap = {
         utils.text,
         Key("enter"),
     ],
+    # Talon Marks
+    "pushed": push_loc,
+    "popped": pop_loc,
+    "swapped": swap_loc,
     # Marks
     "go mark": idea("action ShowBookmarks"),
     "toggle mark": idea("action ToggleBookmark"),
@@ -643,7 +729,7 @@ keymap = {
     # Breakpoints / debugging
     "go breakpoints": idea("action ViewBreakpoints"),
     "toggle [line] breakpoint": idea("action ToggleLineBreakpoint"),
-    "toggle method breakpoint method": idea("action ToggleMethodBreakpoint"),
+    "toggle method breakpoint": idea("action ToggleMethodBreakpoint"),
     "step over": idea("action StepOver"),
     "step into": idea("action StepInto"),
     "step smart": idea("action SmartStepInto"),
@@ -876,27 +962,32 @@ keymap = {
     "cut way up": idea("action EditorTextStartWithSelection", "action EditorCut"),
     "cut way down": idea("action EditorTextEndWithSelection", "action EditorCut"),
     # Structure
-    "go [end] [{jetbrains.ordinal}] {jetbrains.path}": idea_psi("end"),
-    "go start [{jetbrains.ordinal}] {jetbrains.path}": idea_psi("start"),
+    "go [end] [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("end")],
+    "go start [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("start")],
     "fix [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
         idea_psi("start"),
         idea("action ShowIntentionActions"),
     ],
     "refactor [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
         idea_psi("select"),
         utils.delay(0.2),
         idea("action Refactorings.QuickListPopupAction"),
     ],
     "rename [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
         idea_psi("select"),
         utils.delay(0.2),
         idea("action RenameElement"),
     ],
-    "select [{jetbrains.ordinal}] {jetbrains.path}": idea_psi("select"),
+    "select [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select")],
     "clear [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
         idea_psi("select"),
         idea("action EditorDelete"),
     ],
+    "add {jetbrains.path} [<dgndictation>] [over]": [push_loc, idea_psi_and_snippet()],
 }
 
 ctx.keymap(keymap)

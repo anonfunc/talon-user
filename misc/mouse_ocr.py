@@ -111,6 +111,6 @@ def move_to_ocr(m):
     ctrl.mouse_move(*old_pos)
 
 
-ctx = Context("ocr")
+# ctx = Context("ocr")
 
-ctx.keymap({"teleport (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9) <dgnwords>++": [move_to_ocr]})
+# ctx.keymap({"teleport (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9) <dgnwords>++": [move_to_ocr]})

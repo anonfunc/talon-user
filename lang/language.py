@@ -85,6 +85,8 @@ ctx.keymap(
         ],
         "state else if": i("elif "),
         "state if": i("if "),
+        "is not none": i(" is not None"),
+        "is none": i(" is None"),
         "if <dgndictation> [over]": [i("if "), formatted_text(DOWNSCORE_SEPARATED)],
         "state while": i("while "),
         "while <dgndictation> [over]": [
@@ -104,6 +106,7 @@ ctx.keymap(
         "state (past | pass)": i("pass"),
         "state true": i("True"),
         "state false": i("False"),
+        "state none": i("None"),
         "item <dgndictation> [over]": [i(", "), formatted_text(DOWNSCORE_SEPARATED)],
     }
 )
