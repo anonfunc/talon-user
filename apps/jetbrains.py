@@ -468,8 +468,8 @@ keymap = {
     ),
     f"select until line {utils.numerals}": idea_num("extend {}", drop=3),
     # Search
-    "(jump | search everywhere)": idea("action SearchEverywhere"),
-    "(jump | search everywhere) <dgndictation> [over]": [
+    "search (everywhere | all)": idea("action SearchEverywhere"),
+    "search (everywhere | all) <dgndictation> [over]": [
         idea("action SearchEverywhere"),
         utils.text,
         set_extend(),

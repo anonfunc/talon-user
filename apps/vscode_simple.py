@@ -220,8 +220,8 @@ context.keymap(
         # ),
         # f"select until line {utils.numerals}": eKey_num("extend {}", drop=3),
         # Search
-        "(jump | search everywhere)": eKey(QUICK_OPEN_KEY),
-        "(jump | search everywhere) <dgndictation> [over]": [
+        "search (everywhere | all)": eKey(QUICK_OPEN_KEY),
+        "search (everywhere | all) <dgndictation> [over]": [
             eKey(QUICK_OPEN_KEY),
             utils.text,
             set_extend(),
@@ -402,11 +402,11 @@ context.keymap(
             "Configure User Snippets\n",
             set_extend(),
         ],
-        "toggle explore": eKey(EXPLORE_TAB_KEY),
-        "toggle search": eKey(SEARCH_TAB_KEY),
-        "toggle debug": eKey(DEBUG_TAB_KEY),
-        "toggle jet": eKey(VCS_TAB_KEY),
-        "toggle extensions": eKey(EXTENSIONS_TAB_KEY),
+        "focus explore": eKey(EXPLORE_TAB_KEY),
+        "focus search": eKey(SEARCH_TAB_KEY),
+        "focus debug": eKey(DEBUG_TAB_KEY),
+        "focus jet": eKey(VCS_TAB_KEY),
+        "focus extensions": eKey(EXTENSIONS_TAB_KEY),
         "toggle (tools | sidebar)": eKey("cmd-b"),
         # XXX These need to go to generic editor interface
         # tabbing
