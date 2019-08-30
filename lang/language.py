@@ -2,6 +2,8 @@
 # Programming specific dictation, mostly that which could vary by language.
 # Mostly keyword commands of the form "state <something>" so that the keywords in the syntax
 # can be expressed with no ambiguity.  (Consider `state else` -> "else" vs `word else` -> "elves".)
+import os
+
 from talon.voice import Context, Key
 
 from ..text.formatters import (
@@ -16,6 +18,38 @@ from ..text.formatters import (
     formatted_text,
 )
 from ..utils import i, delay, text_with_leading
+
+def not_extension_context(*exts):
+    def language_match(app, win):
+        if win is None:
+            return True
+        title = win.title
+        filename = ""
+        # print("Window title:" + title)
+        if app.bundle == "com.microsoft.VSCode":
+            if u"\u2014" in title:
+                filename = title.split(u" \u2014 ", 1)[0]  # Unicode em dash!
+            elif "-" in title:
+                filename = title.split(u" - ", 1)[0]
+        elif app.bundle == "com.apple.Terminal":
+            parts = title.split(" \u2014 ")
+            if len(parts) >= 2 and parts[1].startswith(("vi ", "vim ")):
+                filename = parts[1].split(" ", 1)[1]
+            else:
+                return True
+        elif str(app.bundle).startswith("com.jetbrains."):
+            filename = title.split(" - ")[-1]
+            filename = filename.split(" [")[0]
+        elif win.doc:
+            filename = win.doc
+        else:
+            return True
+        filename = filename.strip()
+        _, ext = os.path.splitext(filename)
+        # print(ext, exts, ext not in exts)
+        return ext not in exts
+
+    return language_match
 
 
 def extension_context(ext):
@@ -60,16 +94,18 @@ ctx = Context("python", func=extension_context(".py"))
 # that you are operating on a locally scoped variable.
 ctx.keymap(
     {
-        "state comment": i("  # "),
-        "line comment <dgndictation> [over]": [
+        "and": i(" and "),
+        "or": i(" or "),
+        "state comment": i("# "),
+        "[line] comment <dgndictation> [over]": [
             Key("cmd-right"),
             i("  # "),
             formatted_text(SENTENCE),
         ],
-        "add comment <dgndictation> [over]": [
-            Key("cmd-right"),
-            text_with_leading(" # "),
-        ],
+        # "add comment <dgndictation> [over]": [
+        #     Key("cmd-right"),
+        #     text_with_leading(" # "),
+        # ],
         "state (def | deaf | deft)": i("def "),
         "function <dgndictation> [over]": [
             i("def "),
@@ -95,6 +131,7 @@ ctx.keymap(
         ],
         "state for": i("for "),
         "for <dgndictation> [over]": [i("for "), formatted_text(DOWNSCORE_SEPARATED)],
+        "body": [Key("cmd-right : enter")],
         "state import": i("import "),
         "import <dgndictation> [over]": [i("for "), formatted_text(DOT_SEPARATED)],
         "state class": i("class "),
@@ -116,19 +153,21 @@ ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
 ctx.keymap(
     {
+        "and": i(" && "),
+        "or": i(" || "),
         # Many of these add extra terrible spacing under the assumption that
         # gofmt/goimports will erase it.
-        "state comment": i("  // "),
-        "line comment <dgndictation>": [
+        "state comment": i("// "),
+        "[line] comment <dgndictation>": [
             Key("cmd-right"),
-            i("  // "),
+            i(" // "),
             formatted_text(SENTENCE),
         ],
-        "add comment <dgndictation> [over]": [
-            Key("cmd-right"),
-            text_with_leading(" // "),
-        ],
-        "state context": i("ctx"),
+        # "add comment <dgndictation> [over]": [
+        #     Key("cmd-right"),
+        #     text_with_leading(" // "),
+        # ],
+        "[state] context": i("ctx"),
         "state (funk | func | fun)": i("func "),
         "function (Annette | init) [over]": [
             i("func init() {\n"),
@@ -236,9 +275,20 @@ ctx.keymap(
         "length <dgndictation> [over]": [i("len("), formatted_text(GOLANG_PRIVATE)],
         "append <dgndictation> [over]": [i("append("), formatted_text(GOLANG_PRIVATE)],
         "state (air | err)": i("err"),
+        "error": i(" err "),
         "loop over <dgndictation> [over]": [formatted_text(GOLANG_PRIVATE), i(".forr ")],
         "item <dgndictation> [over]": [i(", "), formatted_text(GOLANG_PRIVATE)],
         "value <dgndictation> [over]": [i(": "), formatted_text(GOLANG_PRIVATE)],
+    }
+)
+
+ctx = Context("generic", func=not_extension_context(".go", ".py"))
+ctx.vocab = ["nil", "context", "lambda", "init"]
+ctx.vocab_remove = ["Linda", "Doctor", "annette"]
+ctx.keymap(
+    {
+        "and": i(" && "),
+        "or": i(" || "),
     }
 )
 

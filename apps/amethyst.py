@@ -29,45 +29,9 @@ def number(control=False, mod_one=False):
 
 ctx.keymap(
     {
-        "next layout": mod1("space"),
-        "last layout": mod2("down"),  # REBIND in AMETHYST
-        "focus [the] (first | left | bottom)": mod1("w"),
-        "send [to] (first | left | bottom)": [mod2("w"), delay(0.3), mod1("e")],
-        "move [to] (first | left | bottom)": mod2("w"),
-        "swap [with] (first | left | bottom)": [mod2("w"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
-        "swap [with] (second | middle | top)": [mod2("e"), delay(0.3), mod1("j"), delay(0.3), mod2("ws")],
-        "take from (first | left | bottom)": [mod1("w"), delay(0.3), mod2("e")],
-        "take from (second | middle | top)": [mod1("e"), delay(0.3), mod2("w")],
-        "focus [the] (second | middle | top)": mod1("e"),
-        "(move | send) [to] (second | middle | top)": mod2("e"),
-        # "send [to] second": [mod2("e"), mod1("e")],
-        # "focus right": mod1("r"),
-        # "move [to] right": mod2("r"),
-        # "send [to] right": [mod2("r"), delay(0.3), mod1("e")],
-        # "take from right": [mod1("r"), delay(0.3), mod2("e")],
-        # "swap [with] right": [mod2("r"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
-        # "third focus": mod1("r")
-        # "third move": mod2("r")
-        "shrink pane": mod1("h"),
-        "grow pane": mod1("l"),
-        "more windows": mod1(","),
-        "fewer windows": mod1("."),
-        "focus (last slot | counter clockwise)": mod1("j"),
-        "move (last slot |  counter clockwise)": mod2("j"),
-        "focus (next slot | clockwise)": mod1("k"),
-        "move (next slot | clockwise)": mod2("k"),
-        # "move (next | clockwise) space": mod2("h"),
-        # "move (last | previous | counter clockwise) space": mod2("l"),
-        "move [to] main": mod1("return"),
-        "toggle (float | floating)": mod1("t"),
-        "toggle (amethyst | tiling)": mod2("t"),
-        "show (layouts | layout)": mod1("i"),
-        "tall layout": mod1("a"),
-        "wide layout": mod1("s"),
-        "fix layout": mod1("z"),
-        "(full | full screen) layout": mod1("d"),
-        "(call on | column) layout": mod1("f"),
-        # "binary layout": mod1("g"),
+        ###
+        # Spaces!
+        ###
         f"move to next space": mod2("right"),
         f"move to last space": mod2("left"),
         # Needs space shortcuts
@@ -79,5 +43,74 @@ ctx.keymap(
         "(app | application) windows": Key("ctrl-down"),
         f"focus next space": Key("ctrl-right"),
         f"focus last space": Key("ctrl-left"),
+
+        ###
+        # Top / Bottom Screens, Bottom Main
+        ###
+        "focus [the] (first | bottom)": mod1("w"),
+        "send [to] (first | bottom)": [mod2("w"), delay(0.3), mod1("e")],
+        "move [to] (first | bottom)": mod2("w"),
+        "swap [with] (first | bottom)": [mod2("w"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        "take [from] (first | bottom)": [mod1("w"), delay(0.3), mod2("e")],
+        
+        "focus [the] (second | top)": mod1("e"),
+        "send [to] (second | top)": [mod2("e"), delay(0.3), mod1("w")],
+        "move [to] (second | top)": mod2("e"),
+        "swap [with] (second | top)": [mod2("e"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        "take [from] (second | top)": [mod1("e"), delay(0.3), mod2("w")],
+        
+        ###
+        # Left / Middle / Right, Middle Main
+        ###
+        # "focus [the] (first | left)": mod1("w"),
+        # "send [to] (first | left)": [mod2("w"), delay(0.3), mod1("e")],
+        # "move [to] (first | left)": mod2("w"),
+        # "swap [with] (first | left)": [mod2("w"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        # "take [from] (first | left)": [mod1("w"), delay(0.3), mod2("e")],
+        
+        # "focus [the] (second | middle)": mod1("e"),
+        # "send [to] (second | middle)": [mod2("e"), delay(0.3), mod1("w")],
+        # "move [to] (second | middle)": mod2("e"),
+        # "swap [with] (second | middle)": [mod2("e"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        # "take [from] (second | middle)": [mod1("e"), delay(0.3), mod2("w")],
+
+        # "focus [the] (third | right)": mod1("r"),
+        # "send [to] (third | right)": [mod2("r"), delay(0.3), mod1("e")],
+        # "move [to] (third | right)": mod2("r"),
+        # "swap [with] (third | right)": [mod2("r"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        # "take [from] (third | right)": [mod1("r"), delay(0.3), mod2("e")],
+        
+        ###
+        # Pane / Window Commands
+        # Calling the managed "windows" slots to distinguish from Cmd-` as "next window of app"
+        ###
+        "shrink slot": mod1("h"),
+        "grow slot": mod1("l"),
+        
+        "more slots": mod1(","),
+        "fewer slots": mod1("."),
+        "[focus] last slot": mod1("j"),
+        "move [to] last slot": mod2("j"),
+        "[focus] next slot": mod1("k"),
+        "move [to] next slot": mod2("k"),
+        # Not binding these...
+        # "move (next | clockwise) space": mod2("h"),
+        # "move (last | previous | counter clockwise) space": mod2("l"),
+        "move [to] main slot": mod1("return"),
+
+        ###
+        # Layout commands
+        ###
+        "toggle (float | floating)": mod1("t"),
+        "toggle (amethyst | tiling)": mod2("t"),
+        "next layout": mod1("space"),
+        "last layout": mod2("down"),  # REBIND in AMETHYST
+        "show (layouts | layout)": mod1("i"),
+        "tall layout": mod1("a"),
+        "wide layout": mod1("s"),
+        "fix layout": mod1("z"),
+        "(full | full screen) layout": mod1("d"),
+        "(call on | column) layout": mod1("f"),
+        # "binary layout": mod1("g"),
     }
 )

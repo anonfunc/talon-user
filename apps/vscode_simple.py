@@ -344,7 +344,7 @@ context.keymap(
         "split horizontally": eKey("cmd-k cmd-\\"),
         "split flip": eKey("cmd-alt-0"),
         "split window": eKey("cmd-k o"),
-        "go next split": eKey("cmd-k cmd-right"),  # Assumes vertical split!
+        "go next split": eKey("cmd-k cmd-right"),  # XXX Assumes vertical split!
         "go last split": eKey("cmd-k cmd-left"),
         "copy path": eKey("alt-cmd-c"),
         # Breakpoints / debugging
