@@ -1,12 +1,10 @@
-from collections import defaultdict
 import json
 import os
+from collections import defaultdict
 
-from talon import canvas, ctrl, ui, resource
-from talon.voice import Context, ContextGroup, Key
-from talon.voice import talon as talon_cg
-from talon_plugins import speech
+from talon.voice import Context
 
+from talon import app, ctrl, ui, resource
 from .. import utils
 
 warps_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "warps.json")
@@ -26,47 +24,34 @@ class MouseWarp:
         window = ui.active_window()
         bundle = window.app.bundle
         x, y = ctrl.mouse_pos()
-        corner = None
-        x_offset, y_offset = 0, 0
-        window_x_midpoint = window.rect.x + window.rect.width // 2
-        window_y_midpoint = window.rect.y + window.rect.height // 2
-        if x < window_x_midpoint:
-            x_offset = x - window.rect.x
-        else:
-            x_offset = -(window.rect.x + window.rect.width - x)
-        if y <= window_y_midpoint:
-            y_offset = y - window.rect.y
-        else:
-            y_offset = -(window.rect.y + window.rect.height - y)
-
+        rect = window.rect
+        center_x, center_y = rect.center
+        x_offset = x - (rect.left if x < center_x else rect.right)
+        y_offset = y - (rect.top if y < center_y else rect.bot)
+        app.notify(f"Marked: {name}")
         self.data[bundle][name] = [int(x_offset), int(y_offset)]
-        # print(f"Marked self.data[{bundle}][{name}] = {[x_offset, y_offset]}")
         self.dump()
 
     def warp(self, name):
         window = ui.active_window()
         bundle = window.app.bundle
-        x, y = 0, 0
         try:
             x_offset, y_offset = self.data[bundle][name]
         except KeyError:
             return
-        if x_offset > 0:
-            x = window.rect.x + x_offset
-        else:
-            x = window.rect.x + window.rect.width + x_offset
-
-        if y_offset > 0:
-            y = window.rect.y + y_offset
-        else:
-            y = window.rect.y + window.rect.height + y_offset
-        # print(f"Warp to self.data[{bundle}][{name}] = {[x_offset, y_offset]} ({[x, y]})")
+        rect = window.rect
+        x = rect.left + (x_offset % rect.width)
+        y = rect.top + (y_offset % rect.height)
         ctrl.mouse(x, y)
 
     def warps(self):
-        window = ui.active_window()
-        bundle = window.app.bundle
-        return self.data[bundle].keys()
+        try:
+            window = ui.active_window()
+            bundle = window.app.bundle
+            return self.data[bundle].keys()
+        except Exception as e:
+            print(e)
+            return []
 
     def dump(self):
         with open(warps_file, "w") as f:
@@ -81,10 +66,9 @@ ctx.keymap(
             lambda m: mj.mark(utils.join_words(utils.parse_words(m))),
             lambda _: ctx.set_list("warps", mj.warps()),
         ],
-        "warp {warp.warps}": [
-            lambda m: mj.warp(m["warp.warps"][0]),
-        ],
-         "click {warp.warps}": [
+        "warp {warp.warps}": [lambda m: mj.warp(m["warp.warps"][0])],
+        "list warps": [lambda _: app.notify("Warps:\n" + "\n".join(mj.warps()))],
+        "click {warp.warps}": [
             lambda m: mj.warp(m["warp.warps"][0]),
             lambda _: ctrl.mouse_click(button=0),
         ],
