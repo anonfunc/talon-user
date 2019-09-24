@@ -6,19 +6,20 @@
 
 import os
 import re
+import string
+import subprocess
 
 import talon.clip as clip
 from talon import applescript
 from talon.voice import Context, Key, Str, press
 
 from .. import utils
-from ..misc.basic_keys import alphabet
+from ..misc.basic_keys import alphabet, alpha_alt
 from ..misc.mouse import delayed_click
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
 ctx.vocab_remove = ["doctor", "Doctor"]
-
 
 try:
     from ..text.homophones import all_homophones
@@ -33,6 +34,7 @@ except ImportError:
 
 
 subdirs = {}
+files = {}
 
 extension = None
 
@@ -131,37 +133,74 @@ def select_text_to_right_of_cursor(m):
     set_extension(lambda _: select_text_to_right_of_cursor(m))
 
 
+to_alphabet_map = dict(zip(string.ascii_lowercase, alpha_alt))
+
+
 def slugify(value):
     """
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
-    value = re.sub("[^\w\s-]", "", value).strip().lower()
-    value = re.sub("[-\s]+", " ", value)
-    return value
+    value = re.sub(r"[.]", " ", value).strip().lower()
+    value = re.sub(r"[^\w\s-]", "", value)
+    value = re.sub(r"[-\s]+", " ", value)
+    words = []
+    for word in value.split():
+        vowels = 0
+        for c in "aeiou":
+            vowels += word.count(c)
+        if vowels == 0:
+            word = " ".join([to_alphabet_map.get(c, c) for c in word])
+        words.append(word)
+    return " ".join(words)
 
 
 def update_ctx(_=None, newdir=None):
-    global ctx, subdirs
+    global ctx, subdirs, files
     cwd = current_dir()
     if newdir:
         cwd = os.path.join(cwd, newdir)
     subdirs = {
         slugify(c): c for c in os.listdir(cwd) if os.path.isdir(os.path.join(cwd, c))
     }
+    files = {
+        slugify(c): c
+        for c in os.listdir(cwd)
+        if not os.path.isdir(os.path.join(cwd, c))
+    }
     subdirs[""] = ""
     ctx.set_list("subdirs", subdirs.keys())
-    print(cwd, newdir)
+    ctx.set_list("files", files.keys())
+    print(cwd, newdir, files, subdirs)
+    if os.path.isdir(os.path.join(cwd, ".git")):
+        branches = subprocess.check_output(
+            ["git", "branch", "-l", "--format=%(refname:short)"], cwd=cwd
+        )
+        ctx.set_list("git-branches", branches)
+
+
+def filename(m):
+    # print("{}".format(" ".join([str(w) for w in m._words])))
+    if len(m["terminal.files"]) >= 1:
+        name = m["terminal.files"][0]
+        utils.insert(f'"{files.get(name, "")}"')
+
+
+def dirname(m):
+    # print("{}".format(" ".join([str(w) for w in m._words])))
+    if len(m["terminal.subdirs"]) >= 1:
+        name = m["terminal.subdirs"][0]
+        utils.insert(f'"{subdirs.get(name, "")}"')
 
 
 def change_dir(m):
     # print("{}".format(" ".join([str(w) for w in m._words])))
-    name = None
-    if len(m._words) > 1:
-        name = utils.parse_word(m._words[1])
-    if name in subdirs:
-        utils.insert("cd {}; ls\n".format(subdirs[name]))
-        update_ctx(newdir=subdirs[name])
+    name = ""
+    if len(m["terminal.subdirs"]) >= 1:
+        name = m["terminal.subdirs"][0]
+        if name in subdirs:
+            utils.insert(f"cd {subdirs[name]}; ls\n")
+            update_ctx(newdir=subdirs[name])
     else:
         utils.insert("cd ")
 
@@ -235,8 +274,11 @@ mapping = {"semicolon": ";", r"new-line": "\n", r"new-paragraph": "\n\n"}
 
 ctx.keymap(
     {
-        "(cd {terminal.subdirs} | cd)": change_dir,
+        "cd {terminal.subdirs}": change_dir,
+        "file {terminal.files}": filename,
+        "dir {terminal.subdirs}": dirname,
         "list": list_dir,
+        "refresh": update_ctx,
         "clear terminal": Key("ctrl-l"),
         "go parent": parent,
         "go home": ["cd \n", update_ctx],
@@ -254,11 +296,19 @@ ctx.keymap(
         "jet branch": "git br\n",
         "jet clone": [utils.i("git clone ")],
         "jet checkout master": "git checkout master\n",
-        "jet checkout [<dgndictation>]": ["git checkout ", utils.text],
+        # "jet checkout [<dgndictation>]": ["git checkout ", utils.text],
+        "jet checkout {terminal.git-branches}": [
+            "git checkout ",
+            utils.list_value("terminal.git-branches"),
+        ],
         "jet commit [<dgndictation>]": ["git commit ", utils.text],
-        "jet commit all [<dgndictation>]": ['git commit -a -m ""', Key("left"), utils.text],
-        "jet amend all head": [utils.i('git commit --amend -a -C HEAD')],
-        "jet amend": [utils.i('git commit --amend ')],
+        "jet commit all [<dgndictation>]": [
+            'git commit -a -m ""',
+            Key("left"),
+            utils.text,
+        ],
+        "jet amend all head": [utils.i("git commit --amend -a -C HEAD")],
+        "jet amend": [utils.i("git commit --amend ")],
         "jet diff": "git diff\n",
         "jet history": "git hist\n",
         "jet merge [<dgndictation>]": ["git merge ", utils.text],
@@ -287,7 +337,6 @@ ctx.keymap(
         "dash {terminal.alphabet}": ["-", letter],
         "dash dash <dgnwords>": ["--", utils.word],
         "dash <dgnwords>": ["-", utils.word],
-
         # Editor commands
         # moving
         "go word left": extendable("alt-left"),
@@ -320,7 +369,7 @@ ctx.keymap(
         "select way right": extendable("shift-end"),
         # deleting
         "clear phrase": [utils.select_last_insert, extendable("backspace")],
-        "clear line": extendable("home shift-end backspace"),
+        "clear line": [Key("end"), Key("shift-home"), extendable("backspace")],
         "clear left": extendable("backspace"),
         "clear right": extendable("delete"),
         "clear word left": extendable("alt-backspace"),
