@@ -28,11 +28,11 @@ class MouseSnapSquid:
             return
         if eye_mouse.control_mouse.enabled:
             return
-        self.mcanvas.register('draw', self.draw)
+        self.mcanvas.register("draw", self.draw)
         self.active = True
 
     def stop(self, *_):
-        self.mcanvas.unregister('draw', self.draw)
+        self.mcanvas.unregister("draw", self.draw)
         self.active = False
 
     def draw(self, canvas):
@@ -47,21 +47,24 @@ class MouseSnapSquid:
 
         for row in range(self.rows):
             for col in range(self.cols):
-                canvas.draw_text(f"{row:02d}{col:02d}", self.offset_x + (col) * self.width//(self.cols),
-                                 self.offset_y + (row+1) * self.height//(self.rows))
+                canvas.draw_text(
+                    f"{col:02d}{row:02d}",
+                    self.offset_x + (col) * self.width // (self.cols),
+                    self.offset_y + (row + 1) * self.height // (self.rows),
+                )
 
     def narrow(self, digits):
         self.save_state()
         # print(digits)
-        row = int(digits[0]) * 10 + int(digits[1])
-        col = int(digits[2]) * 10 + int(digits[3])
+        col = int(digits[0]) * 10 + int(digits[1])
+        row = int(digits[2]) * 10 + int(digits[3])
         # print(row, col)
         offset_x = self.offset_x + int(col * self.width // self.cols)
         offset_y = self.offset_y + int(row * self.height // self.rows)
         width = self.width // self.cols
         height = self.height // self.cols
         # print(offset_x + width//2, offset_y + height//2)
-        ctrl.mouse_move(offset_x + width//2, offset_y + height//2)
+        ctrl.mouse_move(offset_x + width // 2, offset_y + height // 2)
         self.count += 1
         if self.count >= 2:
             self.reset(None)
@@ -104,10 +107,24 @@ group.load()
 ctx.unload()
 
 startCtx = Context("mouseSnapSquidStarter")
-startCtx.keymap({
-    "squid": [mg.reset, mg.start, lambda _: ctx.load(), lambda _: speech.set_enabled(False)],
-    # "snap done": [mg.stop, lambda _: ctx.unload()],
-})
+startCtx.keymap(
+    {
+        "squid": [
+            mg.reset,
+            mg.start,
+            lambda _: ctx.load(),
+            lambda _: speech.set_enabled(False),
+        ],
+        "squid {mouseSnapSquidStarter.digits}+": [
+            mg.reset,
+            mg.start,
+            lambda m: mg.narrow("".join(m["mouseSnapSquidStarter.digits"])),
+            mg.stop,
+        ]
+        # "snap done": [mg.stop, lambda _: ctx.unload()],
+    }
+)
+startCtx.set_list("digits", digits.keys())
 # mg.start()
 # Hot reload while grid is active is very confusing without this.
 speech.set_enabled(True)

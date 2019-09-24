@@ -47,17 +47,17 @@ ctx.keymap(
         ###
         # Top / Bottom Screens, Bottom Main
         ###
-        "focus [the] (first | bottom)": mod1("w"),
-        "send [to] (first | bottom)": [mod2("w"), delay(0.3), mod1("e")],
-        "move [to] (first | bottom)": mod2("w"),
-        "swap [with] (first | bottom)": [mod2("w"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
-        "take [from] (first | bottom)": [mod1("w"), delay(0.3), mod2("e")],
+        "focus [the] (first | bottom) screen": mod1("w"),
+        "send [to] (first | bottom) screen": [mod2("w"), delay(0.3), mod1("e")],
+        "move [to] (first | bottom) screen": mod2("w"),
+        "swap [with] (first | bottom) screen": [mod2("w"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        "take [from] (first | bottom) screen": [mod1("w"), delay(0.3), mod2("e")],
         
-        "focus [the] (second | top)": mod1("e"),
-        "send [to] (second | top)": [mod2("e"), delay(0.3), mod1("w")],
-        "move [to] (second | top)": mod2("e"),
-        "swap [with] (second | top)": [mod2("e"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
-        "take [from] (second | top)": [mod1("e"), delay(0.3), mod2("w")],
+        "focus [the] (second | top) screen": mod1("e"),
+        "send [to] (second | top) screen": [mod2("e"), delay(0.3), mod1("w")],
+        "move [to] (second | top) screen": mod2("e"),
+        "swap [with] (second | top) screen": [mod2("e"), delay(0.3), mod1("j"), delay(0.3), mod2("e")],
+        "take [from] (second | top) screen": [mod1("e"), delay(0.3), mod2("w")],
         
         ###
         # Left / Middle / Right, Middle Main

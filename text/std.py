@@ -92,8 +92,8 @@ ctx.keymap(
         "is less [than] or equal [to] ": i(" <= "),
         "to the power of": i(" ** "),
         ## Language specific, moved to language.py.
-        # "and": i(" && "),
-        # "or": i(" || "),
+        # "logical and": i(" && "),
+        # "logical or": i(" || "),
         "bitwise and": i(" & "),
         "bitwise or": i(" | "),
         "(piped | alternate)": i(" | "),

@@ -94,8 +94,8 @@ ctx = Context("python", func=extension_context(".py"))
 # that you are operating on a locally scoped variable.
 ctx.keymap(
     {
-        "and": i(" and "),
-        "or": i(" or "),
+        "[logical] and": i(" and "),
+        "logical or": i(" or "),
         "state comment": i("# "),
         "[line] comment <dgndictation> [over]": [
             Key("cmd-right"),
@@ -153,8 +153,8 @@ ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
 ctx.keymap(
     {
-        "and": i(" && "),
-        "or": i(" || "),
+        "[logical] and": i(" && "),
+        "logical or": i(" || "),
         # Many of these add extra terrible spacing under the assumption that
         # gofmt/goimports will erase it.
         "state comment": i("// "),
@@ -287,8 +287,8 @@ ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
 ctx.keymap(
     {
-        "and": i(" && "),
-        "or": i(" || "),
+        "[logical] and": i(" && "),
+        "logical or": i(" || "),
     }
 )
 
