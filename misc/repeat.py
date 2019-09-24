@@ -2,7 +2,6 @@ from talon.voice import Context, Rep, talon
 
 from ..utils import optional_numerals, text_to_number
 
-
 def repeat(m):
 
     # noinspection PyProtectedMember

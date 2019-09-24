@@ -37,7 +37,7 @@ ctx.keymap(
             delay(0.1),
             text,
         ],
-        "under": delay(0.2),
+        # "under": delay(0.2),
         # Clipboard
         "clippings [<dgndictation>]": [Key("cmd+ctrl+c"), delay(0.1), text],
         "(kapeli | Cappelli)": Key("cmd-shift-space"),

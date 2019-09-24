@@ -5,6 +5,7 @@ from talon.audio import noise
 from talon.track.geom import Point2d
 from talon_plugins import eye_mouse, eye_zoom_mouse
 
+
 class NoiseModel:
     def __init__(self):
         self.hiss_start = 0
@@ -65,4 +66,4 @@ class NoiseModel:
         #     self.hiss_start = 0
 
 
-#model = NoiseModel()
+model = NoiseModel()

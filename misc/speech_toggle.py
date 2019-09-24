@@ -1,4 +1,4 @@
-from talon import app
+from talon import app, tap
 from talon.engine import engine
 from talon.voice import Context, ContextGroup, talon
 from talon_plugins import speech
@@ -37,3 +37,14 @@ sleepy.keymap(
     }
 )
 sleep_group.load()
+
+
+def sleep_hotkey(typ, e):
+    # print(e)
+    if e == 'cmd-alt-ctrl-f12' and e.down:
+        speech.set_enabled(not speech.talon.enabled)
+        e.block()
+    return True
+
+
+tap.register(tap.HOOK | tap.KEY, sleep_hotkey)

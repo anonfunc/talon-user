@@ -58,7 +58,7 @@ formatters = {
     "upper": GOLANG_PUBLIC,
     "slice": SLICE,
     # Call method: for driving jetbrains style fuzzy Complete -> .fuzCom
-    "dot": DOT_STUB,
+    "invoke": DOT_STUB,
     "snake": DOWNSCORE_SEPARATED,
     "smash": NO_SPACES,
     "spine": DASH_SEPARATED,

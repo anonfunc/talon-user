@@ -8,11 +8,14 @@ from talon import app, ctrl, ui, resource
 from .. import utils
 
 warps_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "warps.json")
+with resource.open(warps_file) as fh:
+    resource_data = json.load(fh)
 
 
 class MouseWarp:
     def __init__(self):
         self.data = defaultdict(dict)
+        self.data.update(resource_data)
 
     def mark(self, name):
         window = ui.active_window()
@@ -23,12 +26,12 @@ class MouseWarp:
         x_offset = x - (rect.left if x < center_x else rect.right)
         y_offset = y - (rect.top if y < center_y else rect.bot)
         app.notify(f"Marked: {name}")
-        self.load()
+        # self.load()
         self.data[bundle][name] = [int(x_offset), int(y_offset)]
         self.dump()
 
     def warp(self, name):
-        self.load()
+        # self.load()
         window = ui.active_window()
         bundle = window.app.bundle
         # print(f"{window}{bundle}{self.data[bundle]}")
@@ -42,21 +45,15 @@ class MouseWarp:
         ctrl.mouse(x, y)
 
     def warps(self):
-        self.load()
         try:
+            # self.load()
             window = ui.active_window()
             bundle = window.app.bundle
-            return self.data[bundle].keys()
+            keys = self.data[bundle].keys()
+            return keys
         except Exception as e:
             # print(e)
             return []
-
-    def load(self):
-        try:
-            with resource.open(warps_file) as fh:
-                self.data = json.load(fh)
-        except FileNotFoundError:
-            self.data = defaultdict(dict)
 
     def dump(self):
         with open(warps_file, "w") as f:
@@ -79,14 +76,12 @@ ctx.keymap(
         ],
     }
 )
-ctx.set_list("warps", mj.warps())
 
 
 def ui_event(event, arg):
     if event in ("win_open", "win_closed") and arg.app.name == "Amethyst":
         return
     if event in ("app_activate", "app_launch", "app_close", "win_open", "win_close"):
-        mj.load()
         ctx.set_list("warps", mj.warps())
 
 

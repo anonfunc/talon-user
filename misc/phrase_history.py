@@ -71,7 +71,7 @@ class History:
 
     def on_phrase_post(self, j):
         phrase = self.parse_phrase(j.get("phrase", []))
-        if phrase in ("history show", "history hide"):
+        if phrase in ("toggle history"):
             return
         cmd = j["cmd"]
         if cmd == "p.end" and phrase:

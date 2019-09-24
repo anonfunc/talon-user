@@ -52,7 +52,7 @@ ctx.keymap(
         "(pound | hash [sign] | octo | thorpe | number sign)": i("#"),
         "(percent [sign] | modulo)": i("%"),
         "caret": i("^"),
-        "at [sign]": i("@"),
+        "(at sign | arobase)": i("@"),
         "ampersand": i("&"),
         "pipe": i("|"),
         "(dubquote | double quote)": i('"'),

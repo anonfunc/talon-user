@@ -183,18 +183,12 @@ def startCursorScrolling(m):
 scrollAmount = 0
 scrollJob = None
 
-hideJob = None
 gazeJob = None
 
 
 def toggle_cursor(show):
     def _toggle(_):
-        global hideJob
         ctrl.cursor_visible(show)
-        if show:
-            cron.cancel(hideJob)
-        else:
-            hideJob = cron.interval("500ms", lambda: ctrl.cursor_visible(show))
 
     return _toggle
 
@@ -203,7 +197,7 @@ keymap = {
     "hide cursor": toggle_cursor(False),
     "show cursor": toggle_cursor(True),
     # "debug overlay": lambda m: eye.on_menu("Eye Tracking >> Show Debug Overlay"),
-    "(gaze | control mouse | mouse)": control_mouse,
+    "(gaze | control mouse)": control_mouse,
     "zoom mouse": control_zoom_mouse,
     # "camera overlay": lambda m: eye.on_menu("Eye Tracking >> Show Camera Overlay"),
 }

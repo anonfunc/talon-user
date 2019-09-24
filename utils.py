@@ -30,6 +30,7 @@ mapping = {
     "new-line": "\n",
     "new-paragraph": "\n\n",
     "dot": ".",
+    "…": "...",
     "comma": ",",
     "question": "?",
     "exclamation": "!",
@@ -104,7 +105,7 @@ def insert(s):
         ctrl.cursor_visible(True)
         if reenable_job is None:
             reenable_job = cron.after("3s", enable_tracking)
-    if reenable_job is not None:
+    elif reenable_job is not None:
         debounce_enable_job()
     Str(s)(None)
 
@@ -122,6 +123,12 @@ def select_last_insert(_):
 
 def text(m):
     insert(join_words(parse_words(m)))
+
+
+def list_value(l, index=0):
+    def _val(m):
+        insert(m[l][index])
+    return _val
 
 
 def text_with_trailing_space(m):
