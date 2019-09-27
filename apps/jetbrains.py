@@ -42,7 +42,6 @@ except ImportError:
             ctrl.key_press(key, up=True)
         time.sleep(0.032)
 
-
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
 # Note that MPS and IntelliJ ultimate will conflict...
@@ -124,11 +123,11 @@ def get_idea_location():
     return send_idea_command("location").split()
 
 
-def idea(*cmds):
-    def inner(m):
+def idea(*commands):
+    def inner(_):
         global extendCommands
-        extendCommands = cmds
-        for cmd in cmds:
+        extendCommands = commands
+        for cmd in commands:
             send_idea_command(cmd)
 
     return inner
@@ -286,15 +285,18 @@ def grab_identifier(m):
     if not times:
         times = 1
     try:
-        old_line, old_col = get_idea_location()
+        original_line, original_column = get_idea_location()
         delayed_click(m, button=0, times=2)
         for _ in range(times - 1):
             send_idea_command("action EditorSelectWord")
         send_idea_command("action EditorCopy")
-        send_idea_command("goto {} {}".format(old_line, old_col))
+        send_idea_command("goto {} {}".format(original_line, original_column))
         send_idea_command("action EditorPaste")
     finally:
         clip.set(old_clip)
+
+
+extension = None
 
 
 def is_real_jetbrains_editor(app, window):
@@ -313,13 +315,13 @@ def is_real_jetbrains_editor(app, window):
     return "[" in window.title or len(window.title) == 0
 
 
-def push_loc(m):
+def push_loc(_):
     line, col = get_idea_location()
     global location_stack
     location_stack.append((line, col))
 
 
-def pop_loc(m):
+def pop_loc(_):
     global location_stack
     if not location_stack:
         return
@@ -327,7 +329,7 @@ def pop_loc(m):
     send_idea_command("goto {} {}".format(line, col))
 
 
-def swap_loc(m):
+def swap_loc(_):
     global location_stack
     if not location_stack:
         return
@@ -612,6 +614,9 @@ keymap = {
         idea_num("extend {}", drop=3),
         idea("action CommentByLineComment"),
     ],
+    # Run!
+    "run menu": idea("action ChooseRunConfiguration"),
+    "run again": idea("action Run"),
     # Recording
     "toggle recording": idea("action StartStopMacroRecording"),
     "change (recording | recordings)": idea("action EditMacros"),
@@ -721,6 +726,10 @@ keymap = {
     "toggle gutter icons": idea("action EditorToggleShowGutterIcons"),
     "toggle wrap": idea("action EditorToggleUseSoftWraps"),
     "toggle parameters": idea("action ToggleInlineHintsAction"),
+    # Toggleable views
+    "toggle fullscreen": idea("action ToggleFullScreen"),
+    "toggle distraction [free mode]": idea("action ToggleDistractionFreeMode"),
+    "toggle presentation [mode]": idea("action TogglePresentationMode"),
     # Quick popups
     "change scheme": idea("action QuickChangeScheme"),
     "toggle (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc

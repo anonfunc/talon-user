@@ -11,5 +11,11 @@
   "jason": "json",
   "no": "nil",
   "octa": "okta",
-  "struck": "struct"
+  "struck": "struct",
+  "command": "cmd",
+  "temp": "tmp",
+  "module": "mod",
+  "initialized": "init",
+  "initialize": "init",
+  "Annette": "init"
 }

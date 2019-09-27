@@ -44,6 +44,14 @@ PSI_PATHS = {
         "php": "FILE,Use list",
         "default": "FILE,IMPORT_STATEMENT",
     },
+    "package": {
+        "_": 0, # Only one package in a file
+        "go": "FILE,PACKAGE_CLAUSE",
+    },
+    "package name": {
+        "_": 0, # Only one package in a file
+        "go": "FILE,PACKAGE_CLAUSE,identifier",
+    },
     "comment": {
         "_": "next",  # You probably want the next comment
         # "+": ["\n", None],

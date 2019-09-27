@@ -10,16 +10,17 @@ import string
 import subprocess
 
 import talon.clip as clip
-from talon import applescript
+from talon import applescript, ui, tap, cron
 from talon.voice import Context, Key, Str, press
 
 from .. import utils
 from ..misc.basic_keys import alphabet, alpha_alt
 from ..misc.mouse import delayed_click
+from ..text.formatters import LOWSMASH, formatted_text
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
-ctx.vocab_remove = ["doctor", "Doctor"]
+ctx.vocab_remove = ["doctor", "Doctor", "talent", "talented"]
 
 try:
     from ..text.homophones import all_homophones
@@ -171,7 +172,7 @@ def update_ctx(_=None, newdir=None):
     subdirs[""] = ""
     ctx.set_list("subdirs", subdirs.keys())
     ctx.set_list("files", files.keys())
-    print(cwd, newdir, files, subdirs)
+    print(cwd, newdir, sorted(files.keys()), sorted(subdirs.keys()))
     if os.path.isdir(os.path.join(cwd, ".git")):
         branches = subprocess.check_output(
             ["git", "branch", "-l", "--format=%(refname:short)"], cwd=cwd
@@ -188,20 +189,22 @@ def filename(m):
 
 def dirname(m):
     # print("{}".format(" ".join([str(w) for w in m._words])))
-    if len(m["terminal.subdirs"]) >= 1:
-        name = m["terminal.subdirs"][0]
-        utils.insert(f'"{subdirs.get(name, "")}"')
+    try:
+        if len(m["terminal.subdirs"]) >= 1:
+            name = m["terminal.subdirs"][0]
+            utils.insert(f'"{subdirs.get(name, "")}"')
+    except KeyError:
+        pass
 
 
 def change_dir(m):
     # print("{}".format(" ".join([str(w) for w in m._words])))
-    name = ""
-    if len(m["terminal.subdirs"]) >= 1:
+    try:
         name = m["terminal.subdirs"][0]
         if name in subdirs:
             utils.insert(f"cd {subdirs[name]}; ls\n")
             update_ctx(newdir=subdirs[name])
-    else:
+    except KeyError:
         utils.insert("cd ")
 
 
@@ -276,19 +279,26 @@ ctx.keymap(
     {
         "cd {terminal.subdirs}": change_dir,
         "file {terminal.files}": filename,
-        "dir {terminal.subdirs}": dirname,
+        "(directory | folder) {terminal.subdirs}": dirname,
         "list": list_dir,
         "refresh": update_ctx,
         "clear terminal": Key("ctrl-l"),
         "go parent": parent,
         "go home": ["cd \n", update_ctx],
-        "make dir": utils.i("mkdir -p "),
+        "make (directory | folder) [<dgndictation>] [over]": [
+            utils.i("mkdir -p "),
+            formatted_text(LOWSMASH),
+            update_ctx,
+        ],
         "remove ": utils.i("rm "),
-        "remove directory": utils.i("rm -rf "),
+        "remove (directory | folder) [{terminal.subdirs}]": [
+            utils.i("rm -rf "),
+            dirname,
+        ],
         "scroll down": [Key("shift-pagedown")],
         "scroll up": [Key("shift-pageup")],
-        "make [<dgndictation>]": ["make ", utils.text],
-        "mage [<dgndictation>]": ["mage -v ", utils.text],
+        # "make [<dgndictation>]": ["make ", utils.text],
+        # "mage [<dgndictation>]": ["mage -v ", utils.text],
         # git
         "jet [<dgndictation>]": ["git ", utils.text],
         "jet add": [utils.i("git add ")],
@@ -378,7 +388,50 @@ ctx.keymap(
         "clear way right": extendable("shift-end delete"),
         # searching
         "search [<dgndictation>]": [Key("cmd-f"), utils.text],
+        # clipboard
+        "cut this": Key("cmd-x"),
+        "copy this": Key("cmd-c"),
+        "paste [here]": Key("cmd-v"),
+        # Copying
+        "copy path": lambda _: clip.set(current_dir()),
+        "copy phrase": [utils.select_last_insert, Key("cmd-c")],
+        "copy all": [Key("cmd-a cmd-c")],
+        "copy line": extendable("cmd-left cmd-left cmd-shift-right cmd-c cmd-right"),
+        "copy word left": extendable("shift-alt-left cmd-c"),
+        "copy word right": extendable("shift-alt-right cmd-c"),
+        "copy way left": extendable("cmd-shift-left cmd-c"),
+        "copy way right": extendable("cmd-shift-right cmd-c"),
+        "copy way up": extendable("cmd-shift-up cmd-c"),
+        "copy way down": extendable("cmd-shift-down cmd-c"),
+        # Cutting
+        "cut phrase": [utils.select_last_insert, Key("cmd-x")],
+        "cut all": [Key("cmd-a cmd-x")],
+        "cut line": extendable("cmd-left cmd-left cmd-shift-right cmd-x cmd-right"),
+        "cut word left": extendable("shift-alt-left cmd-x"),
+        "cut word right": extendable("shift-alt-right cmd-x"),
+        "cut way left": extendable("cmd-shift-left cmd-x"),
+        "cut way right": extendable("cmd-shift-right cmd-x"),
+        "cut way up": extendable("cmd-shift-up cmd-x"),
+        "cut way down": extendable("cmd-shift-down cmd-x"),
     }
 )
+
+
+def terminal_hotkey(_, e):
+    """Adds an alt-w to pick up zle selection as well."""
+    window = ui.active_window()
+    bundle = window.app.bundle
+    if bundle != "com.googlecode.iterm2":
+        return
+    if e == "cmd-c" and e.up:
+        print("intercept " + str(e))
+        Key("alt-w")(None)
+    elif e == "enter" and e.up:
+        print("intercept " + str(e))
+        cron.after("500ms", lambda: update_ctx(None))
+    return True
+
+
+tap.register(tap.HOOK | tap.KEY, terminal_hotkey)
 
 ctx.set_list("alphabet", alphabet.keys())

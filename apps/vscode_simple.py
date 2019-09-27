@@ -246,7 +246,7 @@ context.keymap(
         "search in path <dgndictation> [over]": [eKey(SEARCH_ALL_KEY), utils.text],
         # Lines / Selections
         "clear phrase": [utils.select_last_insert, eKey("delete")],
-        "clear line": [eKey("end shift-home delete")],
+        "clear line": [eKey("end shift-home backspace")],
         f"clear line {utils.numerals}": [
             jump_to_line,
             eKey("end"),

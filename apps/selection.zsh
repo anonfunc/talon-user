@@ -89,8 +89,8 @@ r-copy() {
     zle copy-region-as-kill
     echo -n "${CUTBUFFER}" | pbcopy
     zle $*
-  else
-    echo -n '' | pbcopy
+#  else
+#    echo -n '' | pbcopy
   fi
 }
 

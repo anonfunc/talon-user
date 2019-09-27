@@ -2,7 +2,7 @@ import json
 import os.path
 import re
 
-from talon import resource
+from talon import resource, app
 import talon.clip as clip
 from talon.voice import Context, Word, press
 
@@ -21,7 +21,7 @@ DUNDER = (
     lambda i, word, last: ("__%s" % word if i == 0 else word) + ("__" if last else ""),
 )
 CAMELCASE = (True, lambda i, word, _: word if i == 0 else word.capitalize())
-SLASH_SEPARATED = (True, lambda i, word, _: word if i == 0 else "/" + word)
+SLASH_SEPARATED = (True, lambda i, word, _: "/" + word)
 DOT_SEPARATED = (True, lambda i, word, _: word if i == 0 else "." + word)
 GOLANG_PRIVATE = (
     True,
@@ -35,7 +35,7 @@ GOLANG_PUBLIC = (
     True,
     lambda i, word, _: word if word.upper() == word else word.capitalize(),
 )
-DOT_STUB = (True, lambda i, word, _: "." + word if i == 0 else word.capitalize())
+DOT_STUB = (True, lambda i, word, _: "." + word[:2] if i == 0 else word.capitalize()[:2])
 SLICE = (True, lambda i, word, _: " []" + word if i == 0 else word)
 NO_SPACES = (True, lambda i, word, _: word.replace("-", ""))
 DASH_SEPARATED = (True, lambda i, word, _: word if i == 0 else "-" + word)
@@ -74,6 +74,7 @@ formatters = {
     "ticked": (False, surround("'")),
     "glitched": (False, surround("`")),
     "padded": (False, surround(" ")),
+    "pad": (False, lambda i, word, _: " " + word if i == 0 else word),
     "parens": (
         False,
         lambda i, word, last: ("(%s" % word if i == 0 else word)
@@ -168,11 +169,32 @@ def sponge_format(m):
     insert("".join(result))
 
 
+def add_jargon(key, meaning):
+    global jargon_substitutions, ctx
+    jargon_substitutions[key] = meaning
+    resource.write(jargon_path, json.dumps(jargon_substitutions, indent=2))
+    v = list(ctx.vocab)
+    v.append(key)
+    ctx.vocab = v
+
+
+def learn_jargon(m):
+    with clip.capture() as s:
+        press("cmd-c", wait=2000)
+    meaning = s.get() # type: str
+    if meaning:
+        meaning = meaning.strip()
+        key = " ".join(parse_words(m))
+        app.notify(f"learned {key}={meaning}")
+        add_jargon(key, meaning)
+
+
 ctx = Context("formatters")
 ctx.vocab = vocab + list(jargon_substitutions.keys())
 ctx.keymap(
     {
         f"({' | '.join(formatters)})+ [<dgndictation>] [over]": format_text,
         "sponge [<dgndictation>] [over]": sponge_format,
+        "create jargon <dgndictation> [over]": learn_jargon,
     }
 )

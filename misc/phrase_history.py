@@ -46,7 +46,7 @@ td {
 """
 
 webview = webview.Webview()
-webview.render(template, phrases=[("command", "")])
+webview.render(template, phrases=[(" ", "")])
 webview.move(0, ui.main_screen().height)
 
 webview_shown = False
@@ -66,6 +66,9 @@ class History:
         self.history = []
         engine.register("post:phrase", self.on_phrase_post)
 
+    def clear(self, _):
+        self.history = []
+
     def parse_phrase(self, phrase):
         return " ".join(word.split("\\")[0] for word in phrase)
 
@@ -75,12 +78,15 @@ class History:
             return
         cmd = j["cmd"]
         if cmd == "p.end" and phrase:
-            self.history.append((phrase, ""))
+            if phrase != "clear history":
+                self.history.append((phrase, ""))
             self.history = self.history[-hist_len:]
             webview.render(template, phrases=self.history)
+            with open("last_phrase.txt", "w") as fh:
+                fh.write(phrase)
 
 
 history = History()
 ctx = Context("phrase_history")
-ctx.keymap({"toggle history": toggle_webview})
+ctx.keymap({"toggle history": toggle_webview, "clear history": history.clear})
 # webview.show()

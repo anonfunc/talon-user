@@ -35,6 +35,7 @@ def update_lists():
         new[app.name] = app.name
     if set(new.keys()) == set(apps.keys()):
         return
+    # print(new)
     ctx.set_list("apps", new.keys())
     apps = new
 

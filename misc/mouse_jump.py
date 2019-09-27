@@ -30,6 +30,13 @@ class MouseWarp:
         self.data[bundle][name] = [int(x_offset), int(y_offset)]
         self.dump()
 
+    def delete(self, name):
+        window = ui.active_window()
+        bundle = window.app.bundle
+        print("deleting " + name)
+        del self.data[bundle][name]
+        self.dump()
+
     def warp(self, name):
         # self.load()
         window = ui.active_window()
@@ -56,8 +63,7 @@ class MouseWarp:
             return []
 
     def dump(self):
-        with open(warps_file, "w") as f:
-            json.dump(self.data, f, indent=2)
+        resource.write(warps_file, json.dumps(self.data, indent=2))
 
 
 mj = MouseWarp()
@@ -69,6 +75,7 @@ ctx.keymap(
             lambda _: ctx.set_list("warps", mj.warps()),
         ],
         "warp {warp.warps}": [lambda m: mj.warp(m["warp.warps"][0])],
+        "clear warp {warp.warps} [over]": [lambda m: mj.delete(m["warp.warps"][0])],
         "list warps": [lambda _: app.notify("Warps:", ", ".join(mj.warps()))],
         "click {warp.warps}": [
             lambda m: mj.warp(m["warp.warps"][0]),

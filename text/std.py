@@ -20,7 +20,7 @@ ctx = Context("input")
 ctx.vocab = vocab
 ctx.keymap(
     {
-        "over": delay(0.3),
+        # "over": delay(0.3),
         "literal <dgndictation>++": text,
         "say <dgndictation> [over]": text,
         # "sentence <dgndictation> [over]": sentence_text,  # Formatters.
@@ -78,7 +78,7 @@ ctx.keymap(
         "add": i(" + "),
         "(times | multiply)": i(" * "),
         "(divide | divided by)": i(" / "),
-        "(mod | modulo)": i(" % "),
+        "modulo": i(" % "),
         "(minus | subtract) equals": i(" -= "),
         "(plus | add) equals": i(" += "),
         "(times | multiply) equals": i(" *= "),
