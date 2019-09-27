@@ -16,7 +16,7 @@ from talon.voice import Context, Key, Str, press
 from .. import utils
 from ..misc.basic_keys import alphabet, alpha_alt
 from ..misc.mouse import delayed_click
-from ..text.formatters import LOWSMASH, formatted_text
+from ..text.formatters import LOWSMASH, DASH_SEPARATED, formatted_text
 
 ctx = Context("terminal", bundle="com.googlecode.iterm2")
 ctx.vocab = ["docker", "talon"]
@@ -172,7 +172,7 @@ def update_ctx(_=None, newdir=None):
     subdirs[""] = ""
     ctx.set_list("subdirs", subdirs.keys())
     ctx.set_list("files", files.keys())
-    print(cwd, newdir, sorted(files.keys()), sorted(subdirs.keys()))
+    # print(cwd, newdir, sorted(files.keys()), sorted(subdirs.keys()))
     if os.path.isdir(os.path.join(cwd, ".git")):
         branches = subprocess.check_output(
             ["git", "branch", "-l", "--format=%(refname:short)"], cwd=cwd
@@ -344,9 +344,9 @@ ctx.keymap(
         "follow": grab_change_directory,
         "jump [<dgndictation>]": ["zz ", utils.text, "\n"],
         # Options
-        "dash {terminal.alphabet}": ["-", letter],
-        "dash dash <dgnwords>": ["--", utils.word],
-        "dash <dgnwords>": ["-", utils.word],
+        "dash {terminal.alphabet}": [" -", letter, " "],
+        "dash dash <dgndictation> [over]": [" --", formatted_text(DASH_SEPARATED), " "],
+        "dash <dgndictation> [over]": [" -", formatted_text(DASH_SEPARATED), " "],
         # Editor commands
         # moving
         "go word left": extendable("alt-left"),
@@ -424,10 +424,10 @@ def terminal_hotkey(_, e):
     if bundle != "com.googlecode.iterm2":
         return
     if e == "cmd-c" and e.up:
-        print("intercept " + str(e))
+        # print("intercept " + str(e))
         Key("alt-w")(None)
     elif e == "enter" and e.up:
-        print("intercept " + str(e))
+        # print("intercept " + str(e))
         cron.after("500ms", lambda: update_ctx(None))
     return True
 

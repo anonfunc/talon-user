@@ -19,12 +19,16 @@ from ..text.formatters import (
 )
 from ..utils import i, delay, text_with_leading
 
+last_filename = ""
+
+
 def not_extension_context(*exts):
     def language_match(app, win):
+        global last_filename
         if win is None:
             return True
         title = win.title
-        filename = ""
+        filename = last_filename
         # print("Window title:" + title)
         if app.bundle == "com.microsoft.VSCode":
             if u"\u2014" in title:
@@ -45,6 +49,10 @@ def not_extension_context(*exts):
         else:
             return True
         filename = filename.strip()
+        if "." in filename:
+            last_filename = filename
+        else:
+            filename = last_filename
         _, ext = os.path.splitext(filename)
         # print(ext, exts, ext not in exts)
         return ext not in exts
@@ -54,10 +62,11 @@ def not_extension_context(*exts):
 
 def extension_context(ext):
     def language_match(app, win):
+        global last_filename
         if win is None:
-            return False
+            return True
         title = win.title
-        filename = ""
+        filename = last_filename
         # print("Window title:" + title)
         if app.bundle == "com.microsoft.VSCode":
             if u"\u2014" in title:
@@ -78,7 +87,10 @@ def extension_context(ext):
         else:
             return False
         filename = filename.strip()
-        return filename.endswith(ext)
+        if "." in filename:
+            last_filename = filename
+            return filename.endswith(ext)
+        return last_filename.endswith(ext)
 
     return language_match
 
@@ -169,9 +181,7 @@ ctx.keymap(
         # ],
         "[state] context": i("ctx"),
         "state (funk | func | fun)": i("func "),
-        "function (Annette | init) [over]": [
-            i("func init() {\n"),
-        ],
+        "function (Annette | init) [over]": [i("func init() {\n")],
         "function <dgndictation> [over]": [
             i("func "),
             formatted_text(GOLANG_PRIVATE),
@@ -253,11 +263,11 @@ ctx.keymap(
         "[state] (no | nil)": i("nil"),
         "state (int | integer | ant) 64": i(" int64 "),
         "state tag": [i(" ``"), Key("left")],
-        "tag <dgndictation> [over]": [
+        "field tag <dgndictation> [over]": [
             i(" `"),
             delay(0.1),
             formatted_text(LOWSMASH, JARGON),
-            i(' '),
+            i(" "),
             delay(0.1),
         ],
         "state return": i(" return "),
@@ -271,12 +281,18 @@ ctx.keymap(
         ],
         "receive": i(" <- "),
         "make": i("make("),
-        "loggers [<dgndictation>] [over]": [i("logrus."), formatted_text(GOLANG_PUBLIC)],
+        "loggers [<dgndictation>] [over]": [
+            i("logrus."),
+            formatted_text(GOLANG_PUBLIC),
+        ],
         "length <dgndictation> [over]": [i("len("), formatted_text(GOLANG_PRIVATE)],
         "append <dgndictation> [over]": [i("append("), formatted_text(GOLANG_PRIVATE)],
         "state (air | err)": i("err"),
         "error": i(" err "),
-        "loop over <dgndictation> [over]": [formatted_text(GOLANG_PRIVATE), i(".forr ")],
+        "loop over <dgndictation> [over]": [
+            formatted_text(GOLANG_PRIVATE),
+            i(".forr "),
+        ],
         "item <dgndictation> [over]": [i(", "), formatted_text(GOLANG_PRIVATE)],
         "value <dgndictation> [over]": [i(": "), formatted_text(GOLANG_PRIVATE)],
     }
@@ -285,12 +301,7 @@ ctx.keymap(
 ctx = Context("generic", func=not_extension_context(".go", ".py"))
 ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
-ctx.keymap(
-    {
-        "logical and": i(" && "),
-        "logical or": i(" || "),
-    }
-)
+ctx.keymap({"logical and": i(" && "), "logical or": i(" || ")})
 
 ctx = Context("jargon")
 ctx.keymap(

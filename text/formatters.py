@@ -130,6 +130,7 @@ def format_text(m):
     sep = " "
     if not spaces:
         sep = ""
+
     insert(sep.join(words))
 
 

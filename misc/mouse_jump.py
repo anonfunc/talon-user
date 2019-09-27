@@ -18,6 +18,7 @@ class MouseWarp:
         self.data.update(resource_data)
 
     def mark(self, name):
+        name = name.lower()
         window = ui.active_window()
         bundle = window.app.bundle
         x, y = ctrl.mouse_pos()
@@ -57,6 +58,7 @@ class MouseWarp:
             window = ui.active_window()
             bundle = window.app.bundle
             keys = self.data[bundle].keys()
+            print(keys)
             return keys
         except Exception as e:
             # print(e)
@@ -76,7 +78,10 @@ ctx.keymap(
         ],
         "warp {warp.warps}": [lambda m: mj.warp(m["warp.warps"][0])],
         "clear warp {warp.warps} [over]": [lambda m: mj.delete(m["warp.warps"][0])],
-        "list warps": [lambda _: app.notify("Warps:", ", ".join(mj.warps()))],
+        "list warps": [
+            lambda _: app.notify("Warps:", ", ".join(mj.warps())),
+            lambda _: ctx.set_list("warps", mj.warps()),
+        ],
         "click {warp.warps}": [
             lambda m: mj.warp(m["warp.warps"][0]),
             lambda _: ctrl.mouse_click(button=0),

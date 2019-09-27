@@ -161,7 +161,8 @@ PSI_PATHS = {
         "default": "METHOD_DECLARATION|FUNCTION_DECLARATION,FOR_STATEMENT",
     },
     "statement": {
-        "_": "next",  # You probably want the next statement of the method
+        "_": "this",  # You probably want the current statement of the method
+        "+": ["enter", None],
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,STATEMENT",
         "java": "METHOD|FUNCTION,STATEMENT",
         "py": "Py:FUNCTION_DECLARATION|FILE,STATEMENT",
@@ -169,8 +170,25 @@ PSI_PATHS = {
         "php": "FILE,Statement",
         "default": "METHOD_DECLARATION|FUNCTION_DECLARATION|FILE,STATEMENT",
     },
+    "literal": {
+        "_": "next",  # You probably want the next literal
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,LITERAL_VALUE",
+    },
+    "complex literal": {
+        "_": "this",  # You probably want the current composite literal
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,COMPOSITE_LIT",
+    },
+    "complex literal type": {
+        "_": "this",  # You probably want the current composite literal
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,COMPOSITE_LIT,TYPE",
+    },
+    "complex literal value": {
+        "_": "this",  # You probably want the current composite literal
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,COMPOSITE_LIT,LITERAL_VALUE",
+    },
     "argument": {
-        "_": "next",  # You probably want the next argument of the current statement
+        "_": 0,  # You probably want the first / ordinal argument of the current statement
+        "+": [", space", None],
         "go": "STATEMENT,ARGUMENT_LIST,_EXPR|LITERAL|_EXPRESSION",
         "java": "STATEMENT,EXPRESSION_LIST,_EXPRESSION",
         "py": "STATEMENT,ARGUMENT_LIST,EXPRESSION",
@@ -179,11 +197,17 @@ PSI_PATHS = {
     },
     "return": {
         "_": "next",  # You probably want the next return statement of the method
+        "+": ["enter r e t u r n space", None],
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,RETURN_STATEMENT",
         "java": "METHOD|FUNCTION,RETURN_STATEMENT",
         "py": "Py:FUNCTION_DECLARATION,Py:RETURN_STATEMENT",
         "php": "FILE,Return",
         "default": "METHOD_DECLARATION|FUNCTION_DECLARATION,RETURN_STATEMENT",
+    },
+    "new return": {
+        "_": -1,  # You probably want to add a return statement
+        "+": ["enter r e t u r n space", None],
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,STATEMENT",
     },
     # "value": {
     #     "_": 0, # First value of the literal?

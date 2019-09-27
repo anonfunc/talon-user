@@ -63,6 +63,7 @@ ctx.keymap(
         "go last tab": Key("cmd-shift-["),
         "toggle mark": Key("cmd-d"),
         "toggle reader": Key("cmd-alt-r"),
+        "mark pin board": Key("alt-p"),
         "copy (URL | location)": [Key("cmd-l cmd-c")],
         # "go next page": Key("]]"),
         # "go last page": Key("[["),

@@ -735,6 +735,8 @@ keymap = {
     "toggle (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc
     "pop (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc
     "(pop deaf | toggle definition)": idea("action QuickImplementations"),
+    "pop type": idea("action ExpressionTypeInfo"),
+    "pop parameters": idea("action ParameterInfo"),
     # Breakpoints / debugging
     "go breakpoints": idea("action ViewBreakpoints"),
     "toggle [line] breakpoint": idea("action ToggleLineBreakpoint"),
@@ -991,6 +993,8 @@ keymap = {
         idea("action RenameElement"),
     ],
     "select [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select")],
+    "copy [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select"), idea("action EditorCopy")],
+    "cut [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select"), idea("action EditorCopy")],
     "clear [{jetbrains.ordinal}] {jetbrains.path}": [
         push_loc,
         idea_psi("select"),

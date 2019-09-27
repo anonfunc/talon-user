@@ -17,5 +17,7 @@
   "module": "mod",
   "initialized": "init",
   "initialize": "init",
-  "Annette": "init"
+  "Annette": "init",
+  "cloud": "cfn",
+  "llama": "yaml"
 }
