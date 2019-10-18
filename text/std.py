@@ -58,7 +58,8 @@ ctx.keymap(
         "(dubquote | double quote)": i('"'),
         "triple tick": i("'''"),
         "triple quote": i('"""'),
-        "swipe": [Key("right"), i(", ")],
+        # Swipe moved to language.py
+        #"swipe": [Key("right"), i(", ")],
         "item": i(", "),
         "value": i(": "),
         # "space": " ",  # basic_keys.py

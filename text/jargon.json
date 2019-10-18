@@ -6,6 +6,7 @@
   "context": "ctx",
   "define": "def",
   "dictation": "dgndictation",
+  "error": "err",
   "format": "fmt",
   "funk": "func",
   "jason": "json",
@@ -19,5 +20,7 @@
   "initialize": "init",
   "Annette": "init",
   "cloud": "cfn",
-  "llama": "yaml"
+  "llama": "yaml",
+  "unsigned": "u",
+  "weight": "wait"
 }

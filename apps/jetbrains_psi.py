@@ -128,8 +128,8 @@ PSI_PATHS = {
         "go": "FILE,TYPE_DECLARATION",
     },
     "type name": {
-        "_": 0,  # You probably want the name of the current type
-        "go": "FILE,TYPE_DECLARATION,identifier",
+        "_": "this",  # You probably want the name of the current type
+        "go": "FILE,TYPE_DECLARATION##,identifier",
     },
     "struct": {
         "_": "this",  # You probably want the struct containing the cursor.
@@ -185,6 +185,18 @@ PSI_PATHS = {
     "complex literal value": {
         "_": "this",  # You probably want the current composite literal
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,COMPOSITE_LIT,LITERAL_VALUE",
+    },
+    "field": {
+        "_": "this",
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,ELEMENT",
+    },
+    "field value": {
+        "_": "this",
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,ELEMENT##,VALUE",
+    },
+    "field name": {
+        "_": "this",
+        "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,ELEMENT##,KEY",
     },
     "argument": {
         "_": 0,  # You probably want the first / ordinal argument of the current statement

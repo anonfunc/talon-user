@@ -42,6 +42,7 @@ except ImportError:
             ctrl.key_press(key, up=True)
         time.sleep(0.032)
 
+
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
 # Note that MPS and IntelliJ ultimate will conflict...
@@ -496,28 +497,37 @@ keymap = {
     "search in path <dgndictation> [over]": [idea("action FindInPath"), utils.text],
     "search this": idea("action FindWordAtCaret"),
     # Templates: surround, generate, template.
-    "surround [this]": idea("action SurroundWith"),
-    "surround [this] <dgndictation> [over]": [idea("action SurroundWith"), utils.text],
-    "generate": idea("action Generate"),
-    "generate <dgndictation> [over]": [idea("action Generate"), utils.text],
-    "template": idea("action InsertLiveTemplate"),
-    "template <dgndictation> [over]": [idea("action InsertLiveTemplate"), utils.text],
+    # "surround [this] with": idea("action SurroundWith"),
+    "surround [this] with <dgndictation> [over]": [
+        idea("action SurroundWith"),
+        utils.text,
+    ],
+    # Making these longer to reduce collisions with real code dictation.
+    "insert generated <dgndictation> [over]": [idea("action Generate"), utils.text],
+    "insert template <dgndictation> [over]": [
+        idea("action InsertLiveTemplate"),
+        utils.text,
+    ],
     "create template": idea("action SaveAsTemplate"),
     # Lines / Selections
-    "clear phrase": [utils.select_last_insert, idea("action EditorDelete")],
-    "clear line": [idea("action EditorLineEnd", "action EditorDeleteToLineStart")],
+    "clear phrase": [utils.select_last_insert, idea("action EditorBackSpace")],
+    "clear line": [
+        idea("action EditorLineEnd", "action EditorDeleteToLineStart"),
+        set_extend("action EditorBackSpace"),
+    ],
     f"clear line {utils.numerals}": [
         idea_num("goto {} 0", drop=2),
         idea("action EditorLineEnd"),
         idea("action EditorDeleteToLineStart"),
+        set_extend("action EditorBackSpace"),
     ],
     "clear here": [
         lambda m: delayed_click(m, from_end=True),
-        idea("action EditorLineStart", "action EditorDelete"),
+        idea("action EditorLineStart", "action EditorBackSpace"),
     ],
     "clear to here": [
         lambda m: delayed_click(m, from_end=True, mods=["shift"]),
-        idea("action EditorDelete"),
+        idea("action EditorBackSpace"),
     ],
     "clear from here": [
         (
@@ -525,40 +535,40 @@ keymap = {
                 lambda _: delayed_click(m, from_end=True),
                 lambda m2: delayed_click(m2, from_end=True, mods=["shift"]),
                 lambda _: time.sleep(0.2),
-                idea("action EditorDelete"),
+                idea("action EditorBackSpace"),
             )
         )
     ],
-    "clear this": [idea("action EditorSelectWord"), idea("action EditorDelete")],
+    "clear this": [idea("action EditorSelectWord"), idea("action EditorBackSpace")],
     "clear last <dgndictation> [over]": [
         idea_find("prev"),
-        idea("action EditorDelete"),
-        set_extend(extendCommands + ["action EditorDelete"]),
+        idea("action EditorBackSpace"),
+        set_extend(extendCommands + ["action EditorBackSpace"]),
     ],
     "clear next <dgndictation> [over]": [
         idea_find("next"),
-        idea("action EditorDelete"),
-        set_extend(extendCommands + ["action EditorDelete"]),
+        idea("action EditorBackSpace"),
+        set_extend(extendCommands + ["action EditorBackSpace"]),
     ],
     "clear last bounded {jetbrains.alphabet}+": [
         idea_bounded("prev"),
-        idea("action EditorDelete"),
-        set_extend(extendCommands + ["action EditorDelete"]),
+        idea("action EditorBackSpace"),
+        set_extend(extendCommands + ["action EditorBackSpace"]),
     ],
     "clear next bounded {jetbrains.alphabet}+": [
         idea_bounded("next"),
-        idea("action EditorDelete"),
-        set_extend(extendCommands + ["action EditorDelete"]),
+        idea("action EditorBackSpace"),
+        set_extend(extendCommands + ["action EditorBackSpace"]),
     ],
     "clear line end": idea("action EditorDeleteToLineEnd"),
     "clear line start": idea("action EditorDeleteToLineStart"),
     f"clear lines {utils.numerals} until {utils.numerals}": [
         idea_range("range {} {}", drop=2),
-        idea("action EditorDelete"),
+        idea("action EditorBackSpace"),
     ],
     f"clear until line {utils.numerals}": [
         idea_num("extend {}", drop=3),
-        idea("action EditorDelete"),
+        idea("action EditorBackSpace"),
     ],
     # Commenting
     "comment phrase": [utils.select_last_insert, idea("action CommentByLineComment")],
@@ -993,14 +1003,25 @@ keymap = {
         idea("action RenameElement"),
     ],
     "select [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select")],
-    "copy [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select"), idea("action EditorCopy")],
-    "cut [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("select"), idea("action EditorCopy")],
+    "copy [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
+        idea_psi("select"),
+        idea("action EditorCopy"),
+    ],
+    "cut [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
+        idea_psi("select"),
+        idea("action EditorCopy"),
+    ],
     "clear [{jetbrains.ordinal}] {jetbrains.path}": [
         push_loc,
         idea_psi("select"),
-        idea("action EditorDelete"),
+        idea("action EditorBackSpace"),
     ],
-    "add {jetbrains.path} [<dgndictation>] [over]": [push_loc, idea_psi_and_snippet()],
+    "create {jetbrains.path} [<dgndictation>] [over]": [
+        push_loc,
+        idea_psi_and_snippet(),
+    ],
 }
 
 ctx.keymap(keymap)

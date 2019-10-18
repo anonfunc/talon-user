@@ -39,13 +39,14 @@ ctx.keymap(
         "set low priority": Key("cmd-ctrl-1"),
         "set medium priority": Key("cmd-ctrl-2"),
         "set high priority": Key("cmd-ctrl-3"),
+        # Conflict with Alfred clipboard
+        "go calendar": Key("shift-ctrl-cmd-c"),
 
         # Back to defaults
-        "go today": Key("ctrl-cmd-t"),
+        "go today": Key("alt-cmd-t"),
         "go tomorrow": Key("ctrl-cmd-t"),
         "go next seven days": Key("alt-cmd-n"),
         "go all": Key("alt-cmd-a"),
-        "go calendar": Key("ctrl-cmd-c"),
         "go assigned": Key("ctrl-cmd-a"),
         "go complete": Key("alt-cmd-c"),
     }

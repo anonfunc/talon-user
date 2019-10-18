@@ -12,7 +12,6 @@ from ..text.formatters import (
     DOWNSCORE_SEPARATED,
     SENTENCE,
     GOLANG_PUBLIC,
-    SLICE,
     LOWSMASH,
     JARGON,
     formatted_text,
@@ -121,13 +120,13 @@ ctx.keymap(
         "state (def | deaf | deft)": i("def "),
         "function <dgndictation> [over]": [
             i("def "),
-            formatted_text(DOWNSCORE_SEPARATED),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
             i("():"),
             Key("left left"),
         ],
         "method <dgndictation> [over]": [
             i("def "),
-            formatted_text(DOWNSCORE_SEPARATED),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
             i("(self, ):"),
             Key("left left"),
         ],
@@ -135,17 +134,26 @@ ctx.keymap(
         "state if": i("if "),
         "is not none": i(" is not None"),
         "is none": i(" is None"),
-        "if <dgndictation> [over]": [i("if "), formatted_text(DOWNSCORE_SEPARATED)],
+        "if <dgndictation> [over]": [
+            i("if "),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
+        ],
         "state while": i("while "),
         "while <dgndictation> [over]": [
             i("while "),
-            formatted_text(DOWNSCORE_SEPARATED),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
         ],
         "state for": i("for "),
-        "for <dgndictation> [over]": [i("for "), formatted_text(DOWNSCORE_SEPARATED)],
+        "for <dgndictation> [over]": [
+            i("for "),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
+        ],
         "body": [Key("cmd-right : enter")],
         "state import": i("import "),
-        "import <dgndictation> [over]": [i("for "), formatted_text(DOT_SEPARATED)],
+        "import <dgndictation> [over]": [
+            i("for "),
+            formatted_text(DOT_SEPARATED, JARGON),
+        ],
         "state class": i("class "),
         "class <dgndictation> [over]": [
             i("class "),
@@ -156,7 +164,15 @@ ctx.keymap(
         "state true": i("True"),
         "state false": i("False"),
         "state none": i("None"),
-        "item <dgndictation> [over]": [i(", "), formatted_text(DOWNSCORE_SEPARATED)],
+        "item <dgndictation> [over]": [
+            i(", "),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
+        ],
+        "swipe [<dgndictation>] [over]": [
+            Key("right"),
+            i(", "),
+            formatted_text(DOWNSCORE_SEPARATED, JARGON),
+        ],
     }
 )
 
@@ -165,6 +181,7 @@ ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
 ctx.keymap(
     {
+        "variadic": i("..."),
         "logical and": i(" && "),
         "logical or": i(" || "),
         # Many of these add extra terrible spacing under the assumption that
@@ -179,29 +196,33 @@ ctx.keymap(
         #     Key("cmd-right"),
         #     text_with_leading(" // "),
         # ],
-        "[state] context": i("ctx"),
+        # "[state] context": i("ctx"),
         "state (funk | func | fun)": i("func "),
         "function (Annette | init) [over]": [i("func init() {\n")],
         "function <dgndictation> [over]": [
             i("func "),
-            formatted_text(GOLANG_PRIVATE),
+            formatted_text(GOLANG_PRIVATE, JARGON),
             i("("),
             delay(0.1),
         ],
         "method <dgndictation> [over]": [
             i("meth "),
-            formatted_text(GOLANG_PRIVATE),
+            formatted_text(GOLANG_PRIVATE, JARGON),
             delay(0.1),
         ],
         "state var": i("var "),
-        "variable <dgndictation> [over]": [
+        "variable [<dgndictation>] [over]": [
             i("var "),
-            formatted_text(GOLANG_PRIVATE),
-            i(" "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+            # i(" "),
             delay(0.1),
         ],
+        "of type [<dgndictation>] [over]": [
+            i(" "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         # "set <dgndictation> [over]": [
-        #     formatted_text(GOLANG_PRIVATE),
+        #     formatted_text(GOLANG_PRIVATE, JARGON),
         #     i(" := "),
         #     delay(0.1),
         # ],
@@ -209,57 +230,83 @@ ctx.keymap(
         "state (chan | channel)": i(" chan "),
         "state go": i("go "),
         "state if": i("if "),
-        "if <dgndictation> [over]": [i("if "), formatted_text(GOLANG_PRIVATE)],
+        "if <dgndictation> [over]": [i("if "), formatted_text(GOLANG_PRIVATE, JARGON)],
+        "spawn <dgndictation> [over]": [i("go "), formatted_text(GOLANG_PRIVATE, JARGON)],
         "state else if": i(" else if "),
         "else if <dgndictation> [over]": [
             i(" else if "),
-            formatted_text(GOLANG_PRIVATE),
+            formatted_text(GOLANG_PRIVATE, JARGON),
         ],
         "state else": i(" else "),
         "else <dgndictation> [over]": [
             i(" else {"),
             Key("enter"),
-            formatted_text(GOLANG_PRIVATE),
+            formatted_text(GOLANG_PRIVATE, JARGON),
         ],
         "state while": i(
             "while "
         ),  # actually a live template for "for" with a single condition
-        "while <dgndictation> [over]": [i("while "), formatted_text(GOLANG_PRIVATE)],
+        "while <dgndictation> [over]": [
+            i("while "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state for": i("for "),
-        "for <dgndictation> [over]": [i("for "), formatted_text(GOLANG_PRIVATE)],
+        "for <dgndictation> [over]": [
+            i("for "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state for range": i("forr "),
-        "range <dgndictation> [over]": [i("forr "), formatted_text(GOLANG_PRIVATE)],
+        "range <dgndictation> [over]": [
+            i("forr "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state format": i("fmt"),
-        "format <dgndictation> [over]": [i("fmt."), formatted_text(GOLANG_PUBLIC)],
+        "format <dgndictation> [over]": [
+            i("fmt."),
+            formatted_text(GOLANG_PUBLIC, JARGON),
+        ],
         "state switch": i("switch "),
-        "switch <dgndictation> [over]": [i("switch "), formatted_text(GOLANG_PRIVATE)],
+        "switch <dgndictation> [over]": [
+            i("switch "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state select": i("select "),
-        # "select <dgndictation>": [i("select "), formatted_text(GOLANG_PRIVATE)],
+        # "select <dgndictation>": [i("select "), formatted_text(GOLANG_PRIVATE, JARGON)],
         "state (const | constant)": i(" const "),
-        "constant <dgndictation> [over]": [i("const "), formatted_text(GOLANG_PUBLIC)],
+        "constant <dgndictation> [over]": [
+            i("const "),
+            formatted_text(GOLANG_PUBLIC, JARGON),
+        ],
         "state case": i(" case "),
         "state default": i(" default:"),
-        "case <dgndictation> [over]": [i("case "), formatted_text(GOLANG_PRIVATE)],
+        "case <dgndictation> [over]": [
+            i("case "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state type": i(" type "),
-        "type <dgndictation> [over]": [i("type "), formatted_text(GOLANG_PUBLIC)],
+        "type <dgndictation> [over]": [
+            i("type "),
+            formatted_text(GOLANG_PUBLIC, JARGON),
+        ],
         "state true": i(" true "),
         "state false": i(" false "),
         "state (start | struct | struck)": [i(" struct {"), Key("enter")],
         "(struct | struck) <dgndictation> [over]": [
             i(" struct {"),
             Key("enter"),
-            formatted_text(GOLANG_PUBLIC),
+            formatted_text(GOLANG_PUBLIC, JARGON),
         ],
         "[state] empty interface": i(" interface{} "),
         "state interface": [i(" interface {"), Key("enter")],
         "interface <dgndictation> [over]": [
             i(" interface {"),
             Key("enter"),
-            formatted_text(GOLANG_PUBLIC),
+            formatted_text(GOLANG_PUBLIC, JARGON),
         ],
         "state string": i(" string "),
-        "[state] (int | integer | ant)": i(" int "),
+        "[state] (int | integer | ant)": i("int"),
         "state slice": i(" []"),
+        "slice of": i("[]"),
         "[state] (no | nil)": i("nil"),
         "state (int | integer | ant) 64": i(" int64 "),
         "state tag": [i(" ``"), Key("left")],
@@ -271,11 +318,14 @@ ctx.keymap(
             delay(0.1),
         ],
         "state return": i(" return "),
-        "return  <dgndictation> [over]": [i("return "), formatted_text(GOLANG_PRIVATE)],
+        "return  <dgndictation> [over]": [
+            i("return "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "map of string to string": i(" map[string]string "),
         "map of <dgndictation> [over]": [
             i("map["),
-            formatted_text(GOLANG_PRIVATE),
+            formatted_text(GOLANG_PRIVATE, JARGON),
             Key("right"),
             delay(0.1),
         ],
@@ -283,25 +333,60 @@ ctx.keymap(
         "make": i("make("),
         "loggers [<dgndictation>] [over]": [
             i("logrus."),
-            formatted_text(GOLANG_PUBLIC),
+            formatted_text(GOLANG_PUBLIC, JARGON),
         ],
-        "length <dgndictation> [over]": [i("len("), formatted_text(GOLANG_PRIVATE)],
-        "append <dgndictation> [over]": [i("append("), formatted_text(GOLANG_PRIVATE)],
+        "length <dgndictation> [over]": [
+            i("len("),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
+        "append <dgndictation> [over]": [
+            i("append("),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state (air | err)": i("err"),
         "error": i(" err "),
-        "loop over <dgndictation> [over]": [
-            formatted_text(GOLANG_PRIVATE),
-            i(".forr "),
+        "loop over [<dgndictation>] [over]": [
+            i("forr "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
         ],
-        "item <dgndictation> [over]": [i(", "), formatted_text(GOLANG_PRIVATE)],
-        "value <dgndictation> [over]": [i(": "), formatted_text(GOLANG_PRIVATE)],
+        "item <dgndictation> [over]": [i(", "), formatted_text(GOLANG_PRIVATE, JARGON)],
+        "value <dgndictation> [over]": [
+            i(": "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
+        "address of [<dgndictation>] [over]": [
+            i("&"),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
+        "pointer to [<dgndictation>] [over]": [
+            i("*"),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
+        "swipe [<dgndictation>] [over]": [
+            Key("right"),
+            i(", "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
     }
 )
+
+
+def forget_last_language(_):
+    global last_filename
+    last_filename = ""
+
 
 ctx = Context("generic", func=not_extension_context(".go", ".py"))
 ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
-ctx.keymap({"logical and": i(" && "), "logical or": i(" || ")})
+ctx.keymap(
+    {
+        "logical and": i(" && "),
+        "logical or": i(" || "),
+        "swipe": [Key("right"), i(", ")],
+        "clear language context": forget_last_language,
+    }
+)
 
 ctx = Context("jargon")
 ctx.keymap(

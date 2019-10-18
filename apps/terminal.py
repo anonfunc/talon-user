@@ -342,7 +342,12 @@ ctx.keymap(
         "activate": utils.i("act"),
         "grab": grab_thing,
         "follow": grab_change_directory,
-        "jump [<dgndictation>]": ["zz ", utils.text, "\n"],
+        "go back": utils.i("cd -"),
+        # fzf alias
+        # "jump [<dgndictation>]": ["zz ", utils.text, "\n"],
+        # fzf shortcuts
+        "jump [<dgndictation>]": [Key("alt-c"), utils.delay(0.2), utils.text],
+        "fuzzy [<dgndictation>]": [Key("ctrl-t"), utils.delay(0.2), utils.text],
         # Options
         "dash {terminal.alphabet}": [" -", letter, " "],
         "dash dash <dgndictation> [over]": [" --", formatted_text(DASH_SEPARATED), " "],

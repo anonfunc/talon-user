@@ -98,15 +98,15 @@ def insert(s):
     global last_insert, reenable_job
 
     last_insert = s
-    if eye_zoom_mouse.zoom_mouse.enabled:
-        eye_zoom_mouse.zoom_mouse.toggle()
-    if eye_mouse.control_mouse.enabled:
-        eye_mouse.control_mouse.toggle()
-        ctrl.cursor_visible(True)
-        if reenable_job is None:
-            reenable_job = cron.after("3s", enable_tracking)
-    elif reenable_job is not None:
-        debounce_enable_job()
+    # if eye_zoom_mouse.zoom_mouse.enabled:
+    #     eye_zoom_mouse.zoom_mouse.toggle()
+    # if eye_mouse.control_mouse.enabled:
+    #     eye_mouse.control_mouse.toggle()
+    #     ctrl.cursor_visible(True)
+    #     if reenable_job is None:
+    #         reenable_job = cron.after("3s", enable_tracking)
+    # elif reenable_job is not None:
+    #     debounce_enable_job()
     Str(s)(None)
 
 
@@ -123,11 +123,14 @@ def select_last_insert(_):
 
 def text(m):
     insert(join_words(parse_words(m)))
+    # Add a universal fudge factor.
+    time.sleep(0.2)
 
 
 def list_value(l, index=0):
     def _val(m):
         insert(m[l][index])
+
     return _val
 
 
@@ -147,6 +150,8 @@ def word(m):
     try:
         # noinspection PyProtectedMember
         insert(join_words(list(map(parse_word, m.dgnwords[0]._words))))
+        # Universal fudge factor.
+        time.sleep(0.2)
     except AttributeError:
         pass
 
@@ -190,8 +195,8 @@ def text_to_number(words):
 
     result = 0
     factor = 1
-    for w in reversed(words):
-        # print("{} {} {}".format(result, factor, w))
+    for i, w in enumerate(reversed(words)):
+        print(f"{i} {result} {factor} {w}")
         if w not in numerals:
             raise Exception("not a number: {}".format(words))
 
@@ -199,12 +204,15 @@ def text_to_number(words):
         if number is None:
             continue
         number = int(number)
-        # print("{} {} {} {}".format(result, factor, w, number))
+        print(f"{i} {result} {factor} {w} {number}")
         if number > factor and number % factor == 0:
             result = result + number
         else:
             result = result + factor * number
-        factor = (10 ** max(1, len(str(number).rstrip("0")))) * factor
+        if i != 0:
+            factor = (10 ** max(1, len(str(number).rstrip("0")))) * factor
+        else:
+            factor = (10 ** max(1, len(str(number)))) * factor
     return result
 
 
@@ -212,7 +220,7 @@ def text_to_range(words, delimiter="until"):
     tmp = [str(s).lower() for s in words]
     split = tmp.index(delimiter)
     start = text_to_number(words[:split])
-    end = text_to_number(words[split + 1 :])
+    end = text_to_number(words[split + 1:])
     return start, end
 
 
