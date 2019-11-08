@@ -64,7 +64,7 @@ ctx.keymap(
         "value": i(": "),
         # "space": " ",  # basic_keys.py
         "(args | arguments)": ["()", Key("left")],
-        "index": ["[]", Key("left")],
+        # "index": ["[]", Key("left")],
         "block": [" {}", Key("left enter")],
         "empty array": i("[]"),
         "(empty dict | empty dictionary)": i("{}"),

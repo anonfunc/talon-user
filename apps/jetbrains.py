@@ -353,6 +353,7 @@ keymap = {
     # "complete <dgndictation> [over]": [idea("action CodeCompletion"), text],
     # "smart <dgndictation> [over]": [idea("action SmartTypeCompletion"), text],
     "finish": idea("action EditorCompleteStatement"),
+    "done": idea("action EditorCompleteStatement"),
     "toggle tools": idea("action HideAllWindows"),
     "drag up": idea("action MoveLineUp"),
     "drag down": idea("action MoveLineDown"),
@@ -383,15 +384,18 @@ keymap = {
     # Quick Fix / Intentions
     "fix this": idea("action ShowIntentionActions"),
     "fix this <dgndictation> [over]": [idea("action ShowIntentionActions"), utils.text],
-    "go next (error | air)": idea("action GotoNextError"),
-    "go last (error | air)": idea("action GotoPreviousError"),
+    "go next (error | air)": [push_loc, idea("action GotoNextError")],
+    "go last (error | air)": [push_loc, idea("action GotoPreviousError")],
     "fix next (error | air)": [
-        idea("action GotoNextError", "action ShowIntentionActions")
+        push_loc,
+        idea("action GotoNextError", "action ShowIntentionActions"),
     ],
     "fix last (error | air)": [
-        idea("action GotoPreviousError", "action ShowIntentionActions")
+        push_loc,
+        idea("action GotoPreviousError", "action ShowIntentionActions"),
     ],
     f"fix line {utils.numerals}": [
+        push_loc,
         idea_num("goto {} 0", drop=2),
         idea("action GotoNextError", "action ShowIntentionActions"),
     ],
@@ -403,17 +407,27 @@ keymap = {
     "go type": idea("action GotoTypeDeclaration"),
     "go test": idea("action GotoTest"),
     "go last <dgndictation> [over]": [
+        push_loc,
         idea_find("prev"),
         Key("right"),
         set_extend(extendCommands + ["action EditorRight"]),
     ],
     "go next <dgndictation> [over]": [
+        push_loc,
         idea_find("next"),
         Key("right"),
         set_extend(extendCommands + ["action EditorLeft"]),
     ],
-    "go last bounded {jetbrains.alphabet}+": [idea_bounded("prev"), Key("right")],
-    "go next bounded {jetbrains.alphabet}+": [idea_bounded("next"), Key("left")],
+    "go last bounded {jetbrains.alphabet}+": [
+        push_loc,
+        idea_bounded("prev"),
+        Key("right"),
+    ],
+    "go next bounded {jetbrains.alphabet}+": [
+        push_loc,
+        idea_bounded("next"),
+        Key("left"),
+    ],
     "go back": idea("action Back"),
     "go forward": idea("action Forward"),
     "go [to] here": [lambda m: delayed_click(m, from_end=True)],
@@ -511,19 +525,14 @@ keymap = {
     "create template": idea("action SaveAsTemplate"),
     # Lines / Selections
     "clear phrase": [utils.select_last_insert, idea("action EditorBackSpace")],
-    "clear line": [
-        idea("action EditorLineEnd", "action EditorDeleteToLineStart"),
-        set_extend("action EditorBackSpace"),
-    ],
+    "clear line": [idea("action EditorDeleteLine")],
     f"clear line {utils.numerals}": [
         idea_num("goto {} 0", drop=2),
-        idea("action EditorLineEnd"),
-        idea("action EditorDeleteToLineStart"),
-        set_extend("action EditorBackSpace"),
+        idea("action EditorDeleteLine"),
     ],
     "clear here": [
         lambda m: delayed_click(m, from_end=True),
-        idea("action EditorLineStart", "action EditorBackSpace"),
+        idea("action EditorDeleteLine"),
     ],
     "clear to here": [
         lambda m: delayed_click(m, from_end=True, mods=["shift"]),
@@ -560,6 +569,9 @@ keymap = {
         idea("action EditorBackSpace"),
         set_extend(extendCommands + ["action EditorBackSpace"]),
     ],
+    "clear line contents": idea(
+        "action EditorLineEnd", "action EditorDeleteToLineStart"
+    ),
     "clear line end": idea("action EditorDeleteToLineEnd"),
     "clear line start": idea("action EditorDeleteToLineStart"),
     f"clear lines {utils.numerals} until {utils.numerals}": [
@@ -655,6 +667,13 @@ keymap = {
     f"go mark (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
         "action GotoBookmark{}", drop=2, zero_okay=True
     ),
+    # Folding
+    "expand region": idea("action ExpandRegion"),
+    "expand deep": idea("action ExpandRegionRecursively"),
+    "expand all": idea("action ExpandAllRegions"),
+    "collapse region": idea("action CollapseRegion"),
+    "collapse deep": idea("action CollapseRegionRecursively"),
+    "collapse all": idea("action CollapseAllRegions"),
     # Splits
     "split vertically": idea("action SplitVertically"),
     "split horizontally": idea("action SplitHorizontally"),
@@ -1017,6 +1036,21 @@ keymap = {
         push_loc,
         idea_psi("select"),
         idea("action EditorBackSpace"),
+    ],
+    "comment [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
+        idea_psi("select"),
+        idea("action CommentByLineComment"),
+    ],
+    "expand [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
+        idea_psi("start"),
+        idea("action ExpandRegion"),
+    ],
+    "collapse [{jetbrains.ordinal}] {jetbrains.path}": [
+        push_loc,
+        idea_psi("start"),
+        idea("action CollapseRegion"),
     ],
     "create {jetbrains.path} [<dgndictation>] [over]": [
         push_loc,

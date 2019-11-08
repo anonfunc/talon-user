@@ -35,7 +35,7 @@ GOLANG_PUBLIC = (
     True,
     lambda i, word, _: word if word.upper() == word else word.capitalize(),
 )
-DOT_STUB = (True, lambda i, word, _: "." + word[:2] if i == 0 else word.capitalize()[:2])
+DOT_STUB = (True, lambda i, word, _: "." + word[:1] if i == 0 else word.capitalize()[:1])
 SLICE = (True, lambda i, word, _: " []" + word if i == 0 else word)
 NO_SPACES = (True, lambda i, word, _: word.replace("-", ""))
 DASH_SEPARATED = (True, lambda i, word, _: word if i == 0 else "-" + word)
@@ -56,7 +56,7 @@ formatters = {
     # TODO: Consider making these the "camel" impl, pep8 prefers it as well.
     # "private": GOLANG_PRIVATE,
     "upper": GOLANG_PUBLIC,
-    "slice": SLICE,
+    # "slice": SLICE,
     # Call method: for driving jetbrains style fuzzy Complete -> .fuzCom
     "invoke": DOT_STUB,
     "snake": DOWNSCORE_SEPARATED,

@@ -45,9 +45,10 @@ modifiers = {
 }
 
 alphabet = dict(zip(alpha_alt, string.ascii_lowercase))
+alphabet["kush"] = "k"
+alphabet["nor"] = "n"
 alphabet["oil"] = "o"
 alphabet["yes"] = "y"
-alphabet["nor"] = "n"
 digits = {str(i): str(i) for i in range(10)}
 simple_keys = {k: k for k in simple_keys}
 arrows = {k: k for k in arrows}

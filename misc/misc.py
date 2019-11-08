@@ -65,6 +65,7 @@ ctx.keymap(
 
 ctx = Context("login", bundle="com.apple.loginwindow")
 ctx.keymap({"amigo": [keychain.find("login", "user"), Key("enter")]})
+# keychain.remove("login", "user"); keychain.add("login", "user", "pass")
 
 
 def screensaver_hotkey(_, e):

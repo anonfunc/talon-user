@@ -59,6 +59,16 @@ def not_supported_editor(app, _):
 ctx = Context("editor", func=not_supported_editor)
 
 
+def fix_format(m):
+    press("cmd-right")
+    press("shift-cmd-left")
+    s = ""
+    with clip.capture() as _s:
+        press("cmd-c", wait=2000)
+    s = str(_s.get())
+    utils.insert(re.sub(r' +', ' ', s))
+
+
 def select_text_from_cursor(direction):
     # jcooper-korg from talon slack
     def fn(m):
@@ -251,6 +261,7 @@ ctx.keymap(
         "cut way right": extendable("cmd-shift-right cmd-x"),
         "cut way up": extendable("cmd-shift-up cmd-x"),
         "cut way down": extendable("cmd-shift-down cmd-x"),
+        "fix format": fix_format,
     }
 )
 ctx.set_list("alphabet", alphabet.keys())

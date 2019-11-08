@@ -181,6 +181,8 @@ ctx.vocab = ["nil", "context", "lambda", "init"]
 ctx.vocab_remove = ["Linda", "Doctor", "annette"]
 ctx.keymap(
     {
+        "empty string": i('""'),
+        "is not empty": i('.len  != 0'),
         "variadic": i("..."),
         "logical and": i(" && "),
         "logical or": i(" || "),
@@ -197,6 +199,7 @@ ctx.keymap(
         #     text_with_leading(" // "),
         # ],
         # "[state] context": i("ctx"),
+        "CTX": i("ctx"),
         "state (funk | func | fun)": i("func "),
         "function (Annette | init) [over]": [i("func init() {\n")],
         "function <dgndictation> [over]": [
@@ -231,7 +234,10 @@ ctx.keymap(
         "state go": i("go "),
         "state if": i("if "),
         "if <dgndictation> [over]": [i("if "), formatted_text(GOLANG_PRIVATE, JARGON)],
-        "spawn <dgndictation> [over]": [i("go "), formatted_text(GOLANG_PRIVATE, JARGON)],
+        "spawn <dgndictation> [over]": [
+            i("go "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
         "state else if": i(" else if "),
         "else if <dgndictation> [over]": [
             i(" else if "),
@@ -306,7 +312,11 @@ ctx.keymap(
         "state string": i(" string "),
         "[state] (int | integer | ant)": i("int"),
         "state slice": i(" []"),
-        "slice of": i("[]"),
+        "slice [of] <dgndictation>": [
+            i("[]"),
+            delay(0.1),
+            formatted_text(LOWSMASH, JARGON),
+        ],
         "[state] (no | nil)": i("nil"),
         "state (int | integer | ant) 64": i(" int64 "),
         "state tag": [i(" ``"), Key("left")],
@@ -344,7 +354,7 @@ ctx.keymap(
             formatted_text(GOLANG_PRIVATE, JARGON),
         ],
         "state (air | err)": i("err"),
-        "error": i(" err "),
+        # "error": i(" err "),
         "loop over [<dgndictation>] [over]": [
             i("forr "),
             formatted_text(GOLANG_PRIVATE, JARGON),
@@ -365,6 +375,11 @@ ctx.keymap(
         "swipe [<dgndictation>] [over]": [
             Key("right"),
             i(", "),
+            formatted_text(GOLANG_PRIVATE, JARGON),
+        ],
+        "index <dgndictation> [over]": [
+            i("[]"),
+            Key("left"),
             formatted_text(GOLANG_PRIVATE, JARGON),
         ],
     }
