@@ -347,7 +347,7 @@ def phones_selection(m):
 select_verbs = {
     "select": [],
     "copy": [idea("action EditorCopy")],
-    "cut": [idea("action EditorCopy")],
+    "cut": [idea("action EditorCut")],
     "clear": [idea("action EditorBackSpace")],
     "comment": [idea("action CommentByLineComment")],
     "expand": [idea("action ExpandRegion")],
