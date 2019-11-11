@@ -173,7 +173,7 @@ def raise_homophones(m, force_raise=False, is_selection=False):
 
 
 help_data = {
-    "phones this": "look up homophones for selected text",
+    "phones": "look up homophones for selected text",
     "phones [word]": "look up homophones for a given word",
     "pick [number]": "make a selection from the homophone list",
     "ship [number]": "make a selection and capitalize it",
@@ -197,7 +197,7 @@ context.keymap(
     {
         "(phones | homophones) help": homophones_help,
         "phones {homophones.canonical}": raise_homophones,
-        "phones this": lambda m: raise_homophones(m, is_selection=True),
+        "phones": lambda m: raise_homophones(m, is_selection=True),
         "force phones {homophones.canonical}": lambda m: raise_homophones(
             m, force_raise=True
         ),

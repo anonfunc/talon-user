@@ -618,6 +618,8 @@ keymap.update(
         "collapse all": idea("action CollapseAllRegions"),
 
         # Splits
+        "split right": idea("action MoveTabRight"),
+        "split down": idea("action MoveTabDown"),
         "split vertically": idea("action SplitVertically"),
         "split horizontally": idea("action SplitHorizontally"),
         "split flip": idea("action ChangeSplitOrientation"),
@@ -709,6 +711,22 @@ keymap.update(
         "toggle fullscreen": idea("action ToggleFullScreen"),
         "toggle distraction [free mode]": idea("action ToggleDistractionFreeMode"),
         "toggle presentation [mode]": idea("action TogglePresentationMode"),
+
+        # Tabs
+        "go first tab": idea("action GoToTab1"),
+        "go second tab": idea("action GoToTab2"),
+        "go third tab": idea("action GoToTab3"),
+        "go fourth tab": idea("action GoToTab4"),
+        "go fifth tab": idea("action GoToTab5"),
+        "go sixth tab": idea("action GoToTab6"),
+        "go seventh tab": idea("action GoToTab7"),
+        "go eighth tab": idea("action GoToTab8"),
+        "go ninth tab": idea("action GoToTab9"),
+        "go next tab": idea("action NextTab"),
+        "go last tab": idea("action PreviousTab"),
+        "go final tab": idea("action GoToLastTab"),
+        "clear tab": idea("action CloseActiveTab"),
+
 
         # Quick popups
         "change scheme": idea("action QuickChangeScheme"),
