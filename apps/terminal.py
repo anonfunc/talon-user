@@ -176,7 +176,7 @@ def update_ctx(_=None, newdir=None):
     if os.path.isdir(os.path.join(cwd, ".git")):
         branches = subprocess.check_output(
             ["git", "branch", "-l", "--format=%(refname:short)"], cwd=cwd
-        )
+        ).decode("utf-8").split()
         ctx.set_list("git-branches", branches)
 
 
@@ -303,7 +303,7 @@ ctx.keymap(
         "jet [<dgndictation>]": ["git ", utils.text],
         "jet add": [utils.i("git add ")],
         "jet add all": [utils.i("git add .\n")],
-        "jet branch": "git br\n",
+        "jet branch": "git branch\n",
         "jet clone": [utils.i("git clone ")],
         "jet checkout master": "git checkout master\n",
         # "jet checkout [<dgndictation>]": ["git checkout ", utils.text],

@@ -170,7 +170,7 @@ def _select_in_text(direction, key, result, text):
         count = result
     # print(direction, text, key, result, len(text), count)
     # cursor over to the found key text
-    for i in range(0, count):
+    for i in range(0, count+1):
         press(direction, wait=0)
     # now select the matching key text
     for i in range(0, len(key)):
