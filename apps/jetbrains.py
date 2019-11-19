@@ -4,7 +4,7 @@ import time
 
 import requests
 import talon.clip as clip
-from talon import ctrl
+from talon import ctrl, ui
 from talon.ui import active_app
 from talon.voice import Context, Key, Str
 
@@ -301,6 +301,7 @@ extension = None
 
 
 def is_real_jetbrains_editor(app, window):
+    # print("Context check")
     global extension
     if app.bundle not in port_mapping:
         return False
@@ -309,10 +310,13 @@ def is_real_jetbrains_editor(app, window):
     # XXX Expose "does editor have focus" as plugin endpoint.
     # XXX Window title empty in full screen.
     title = window.title
+    if not title:
+        print(f"Window is Jetbrains product but not an editor: {window}")
+        return False
     filename = title.split(" - ")[-1]
     filename = filename.split(" [")[0]
     extension = os.path.splitext(filename)[1][1:]
-
+    # print(f"{window} {app}")
     return "[" in window.title or len(window.title) == 0
 
 
@@ -389,9 +393,7 @@ select_objects = {
             "action EditorLineEndWithSelection",
         ),
     ],
-    "whole line": [
-        idea("action EditorSelectLine"),
-    ],
+    "whole line": [idea("action EditorSelectLine")],
     f"whole line {utils.numerals}": [
         idea_num("goto {} 0", drop=3),  # broken with go start
         idea("action EditorSelectLine"),
@@ -647,13 +649,11 @@ keymap.update(
         f"go mark (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)": idea_num(
             "action GotoBookmark{}", drop=2, zero_okay=True
         ),
-
         # Folding
         "expand deep": idea("action ExpandRegionRecursively"),
         "expand all": idea("action ExpandAllRegions"),
         "collapse deep": idea("action CollapseRegionRecursively"),
         "collapse all": idea("action CollapseAllRegions"),
-
         # Splits
         "split right": idea("action MoveTabRight"),
         "split down": idea("action MoveTabDown"),
@@ -665,18 +665,15 @@ keymap.update(
         "clear all splits": idea("action UnsplitAll"),
         "go next split": idea("action NextSplitter"),
         "go last split": idea("action LastSplitter"),
-
         # miscellaneous
         # XXX These might be better than the structural ones, depending on language.
         # "go next (method | function)": idea("action MethodDown"),
         # "go last (method | function)": idea("action MethodUp"),
-
         # Clipboard
         # "clippings": idea("action PasteMultiple"),  # XXX Might be a long-lived action.  Replaced with Alfred.
         "copy path": idea("action CopyPaths"),
         "copy reference": idea("action CopyReference"),
         "copy pretty": idea("action CopyAsRichText"),
-
         # File Creation
         "create sibling": idea("action NewElementSamePlace"),
         "create sibling <dgndictation> [over]": [
@@ -685,14 +682,12 @@ keymap.update(
         ],
         "create file": idea("action NewElement"),
         "create file <dgndictation> [over]": [idea("action NewElement"), utils.text],
-
         # Task Management
         "go task": [idea("action tasks.goto")],
         "go browser task": [idea("action tasks.open.in.browser")],
         "switch task": [idea("action tasks.switch")],
         "clear task": [idea("action tasks.close")],
         "fix task settings": [idea("action tasks.configure.servers")],
-
         # Git / Github (not using verb-noun-adjective pattern, mirroring terminal commands.)
         "jet pull": idea("action Vcs.UpdateProject"),
         "jet commit": idea("action CheckinProject"),
@@ -706,7 +701,6 @@ keymap.update(
         ),
         "jet (annotate | blame)": idea("action Annotate"),
         "jet menu": idea("action Vcs.QuickListPopupAction"),
-
         # Tool windows:
         # Toggling various tool windows
         "toggle project": idea("action ActivateProjectToolWindow"),
@@ -748,7 +742,6 @@ keymap.update(
         "toggle fullscreen": idea("action ToggleFullScreen"),
         "toggle distraction [free mode]": idea("action ToggleDistractionFreeMode"),
         "toggle presentation [mode]": idea("action TogglePresentationMode"),
-
         # Tabs
         "go first tab": idea("action GoToTab1"),
         "go second tab": idea("action GoToTab2"),
@@ -763,8 +756,6 @@ keymap.update(
         "go last tab": idea("action PreviousTab"),
         "go final tab": idea("action GoToLastTab"),
         "clear tab": idea("action CloseActiveTab"),
-
-
         # Quick popups
         "change scheme": idea("action QuickChangeScheme"),
         "toggle (doc | documentation)": idea("action QuickJavaDoc"),  # Always javadoc
@@ -772,7 +763,6 @@ keymap.update(
         "(pop deaf | toggle definition)": idea("action QuickImplementations"),
         "pop type": idea("action ExpressionTypeInfo"),
         "pop parameters": idea("action ParameterInfo"),
-
         # Breakpoints / debugging
         "go breakpoints": idea("action ViewBreakpoints"),
         "toggle [line] breakpoint": idea("action ToggleLineBreakpoint"),
@@ -781,20 +771,16 @@ keymap.update(
         "step into": idea("action StepInto"),
         "step smart": idea("action SmartStepInto"),
         "step to line": idea("action RunToCursor"),
-
         # Grow / Shrink
         "(grow | shrink) window right": idea("action ResizeToolWindowRight"),
         "(grow | shrink) window left": idea("action ResizeToolWindowLeft"),
         "(grow | shrink) window up": idea("action ResizeToolWindowUp"),
         "(grow | shrink) window down": idea("action ResizeToolWindowDown"),
-
         # Dash Searching https://github.com/gdelmas/IntelliJDashPlugin
         "go [smart] dash": idea("action SmartSearchAction"),
         "go all dash": idea("action SearchAction"),
-
         # Most of the edition, selection, etc. commands now come
         # from build_text_action_keymap.  Any edge cases go here.
-
         # moving
         "go phrase left": [utils.select_last_insert, idea("action EditorLeft")],
         # clipboard

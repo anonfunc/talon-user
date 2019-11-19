@@ -41,7 +41,7 @@ sleep_group.load()
 
 def sleep_hotkey(typ, e):
     # print(e)
-    if e == 'cmd-alt-ctrl-f12' and e.down:
+    if e == 'cmd-alt-ctrl-shift-tab' and e.down:
         speech.set_enabled(not speech.talon.enabled)
         e.block()
     return True

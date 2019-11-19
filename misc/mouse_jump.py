@@ -58,7 +58,7 @@ class MouseWarp:
             window = ui.active_window()
             bundle = window.app.bundle
             keys = self.data[bundle].keys()
-            print(keys)
+            # print(keys)
             return keys
         except Exception as e:
             # print(e)
