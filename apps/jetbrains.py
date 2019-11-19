@@ -350,11 +350,14 @@ select_verbs = {
     "cut": [idea("action EditorCut")],
     "clear": [idea("action EditorBackSpace")],
     "comment": [idea("action CommentByLineComment")],
+    "replace": [idea("action EditorPaste")],
     "expand": [idea("action ExpandRegion")],
     "collapse": [idea("action CollapseRegion")],
     "phones": [phones_selection],
     "refactor": [idea("action Refactorings.QuickListPopupAction")],
     "rename": [idea("action RenameElement")],
+    "indent": [idea("action EditorIndentLineOrSelection")],
+    "unindent": [idea("action EditorUnindentSelection")],
 }
 
 select_objects = {
@@ -386,6 +389,13 @@ select_objects = {
             "action EditorLineEndWithSelection",
         ),
     ],
+    "whole line": [
+        idea("action EditorSelectLine"),
+    ],
+    f"whole line {utils.numerals}": [
+        idea_num("goto {} 0", drop=3),  # broken with go start
+        idea("action EditorSelectLine"),
+    ],
     f"lines {utils.numerals} until {utils.numerals}": [
         idea_range("range {} {}", drop=2)
     ],  # broken with go start
@@ -410,7 +420,11 @@ select_objects = {
     "way down": [idea("action EditorTextEndWithSelection")],
 }
 
-movement_verbs = {"go": [], "fix": [idea("action ShowIntentionActions")]}
+movement_verbs = {
+    "go": [],
+    "fix": [idea("action ShowIntentionActions")],
+    "paste": [idea("action EditorPaste")],
+}
 
 movement_objects = {
     "this": [],
@@ -441,10 +455,10 @@ movement_objects = {
     "start [{jetbrains.ordinal}] {jetbrains.path}": [push_loc, idea_psi("start")],
     # Generic
     "phrase": [utils.select_last_insert, idea("action EditorLeft")],
-    "left": [idea("action EditorLeft")],
-    "right": [idea("action EditorRight")],
-    "up": [idea("action EditorUp")],
-    "down": [idea("action EditorDown")],
+    # "left": [idea("action EditorLeft")],
+    # "right": [idea("action EditorRight")],
+    # "up": [idea("action EditorUp")],
+    # "down": [idea("action EditorDown")],
     "word left": [idea("action EditorPreviousWord")],
     "word right": [idea("action EditorNextWord")],
     "camel left": [idea("action EditorPreviousWordInDifferentHumpsMode")],
@@ -510,12 +524,17 @@ keymap.update(
         "extract parameter": idea("action IntroduceParameter"),
         "extract interface": idea("action ExtractInterface"),
         "extract method": idea("action ExtractMethod"),
+        "refactor in line": idea("action Inline"),
+        "refactor move": idea("action Move"),
+        "refactor rename": idea("action RenameElement"),
+        "rename file": idea("action RenameFile"),
         # Quick Fix / Intentions
         "fix this <dgndictation> [over]": [
             idea("action ShowIntentionActions"),
             utils.text,
         ],
         "fix (format | formatting)": idea("action ReformatCode"),
+        "fix imports": idea("action OptimizeImports"),
         # Go: move the caret
         "(go declaration | follow)": idea("action GotoDeclaration"),
         "go implementation": idea("action GotoImplementation"),
@@ -539,6 +558,24 @@ keymap.update(
             idea("action SearchEverywhere"),
             utils.text,
             set_extend(),
+        ],
+        "search symbol": idea("action GotoSymbol"),
+        "search symbol <dgndictation>": [
+            idea("action GotoSymbol"),
+            utils.text,
+            Key("enter"),
+        ],
+        "search class": idea("action GotoClass"),
+        "search class <dgndictation>": [
+            idea("action GotoClass"),
+            utils.text,
+            Key("enter"),
+        ],
+        "search file": idea("action GotoFile"),
+        "search file <dgndictation>": [
+            idea("action GotoFile"),
+            utils.text,
+            Key("enter"),
         ],
         "recent": [idea("action RecentFiles"), set_extend()],
         "recent <dgndictation> [over]": [
