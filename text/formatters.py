@@ -63,7 +63,7 @@ formatters = {
     "smash": NO_SPACES,
     "spine": DASH_SEPARATED,
     # Spaced
-    "sentence": SENTENCE,
+    # "sentence": SENTENCE,
     "jargon": JARGON,
     "title": (False, lambda i, word, _: word.capitalize()),
     "allcaps": (False, lambda i, word, _: word.upper()),

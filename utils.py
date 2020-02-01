@@ -6,7 +6,7 @@ import time
 
 from talon import resource, cron, ctrl
 from talon.voice import Str, press
-from talon_plugins import eye_mouse, eye_zoom_mouse
+from talon_plugins import eye_mouse, eye_zoom_mouse, microphone
 
 ordinal_indexes = {
     "first": 0,
@@ -126,6 +126,14 @@ def text(m):
     # Add a universal fudge factor.
     time.sleep(0.2)
 
+def sentence_text(m):
+    words = parse_words(m)
+    words[0] = str(words[0]).capitalize()
+    insert(join_words(words))
+    # Add a universal fudge factor.
+    time.sleep(0.2)
+
+
 
 def list_value(l, index=0):
     def _val(m):
@@ -226,3 +234,13 @@ def text_to_range(words, delimiter="until"):
 
 def delay(amount):
     return lambda _: time.sleep(amount)
+
+
+def use_mic(mic_name):
+    mic = microphone.manager.active_mic()
+    if mic is not None and mic.name == mic_name:
+        return
+    # noinspection PyUnresolvedReferences
+    mics = {i.name: i for i in list(microphone.manager.menu.items)}
+    if mic_name in mics:
+        microphone.manager.menu_click(mics[mic_name])

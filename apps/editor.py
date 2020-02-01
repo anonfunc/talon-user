@@ -83,6 +83,7 @@ def select_text_from_cursor(direction):
             back = "left"
         key = utils.join_words(words).lower()
         keys = homophone_lookup.get(key, [key])
+        keys = sorted(keys, key=len, reverse=True)
         text = _get_line(direction, back, more).lower()
         result = -1 if direction == "left" else len(text) + 1
         for needle_up in keys:
@@ -166,14 +167,16 @@ def _get_line(direction, back, more):
 def _select_in_text(direction, key, result, text):
     if direction == "left":
         count = len(text) - result
+        size = len(key)
     else:
         count = result
-    # print(direction, text, key, result, len(text), count)
+        size = len(key)
+    print(direction, text, key, result, len(text), count)
     # cursor over to the found key text
-    for i in range(0, count+1):
-        press(direction, wait=0)
+    for i in range(0, count):
+        press(direction, wait=100)
     # now select the matching key text
-    for i in range(0, len(key)):
+    for i in range(0, size):
         press("shift-right")
 
 

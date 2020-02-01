@@ -4,7 +4,6 @@ import talon.clip as clip
 from talon.voice import Context, Key, press
 
 from talon import applescript, keychain, tap, ui
-from talon_plugins import microphone
 from ..utils import add_vocab, delay, select_last_insert, text
 
 
@@ -49,7 +48,7 @@ ctx.keymap(
         "menu search": Key("ctrl-shift-f8"),
         # Different input volume levels
         "input volume high": lambda _: applescript.run("set volume input volume 90"),
-        "input volume low": lambda _: applescript.run("set volume input volume 50"),
+        "input volume low": lambda _: applescript.run("set volume input volume 30"),
     }
 )
 
@@ -65,12 +64,15 @@ ctx.keymap(
 
 ctx = Context("login", bundle="com.apple.loginwindow")
 ctx.keymap({"amigo": [keychain.find("login", "user"), Key("enter")]})
+
+
 # keychain.remove("login", "user"); keychain.add("login", "user", "pass")
 
 
-def screensaver_hotkey(_, e):
-    # print(e)
-    if e == "cmd-ctrl-§" and e.down:
+def misc_hotkey(_, e):
+    # if e.down:
+    #     print(e)
+    if e.down and e == "cmd-ctrl-§" or e == "ctrl-alt-shift-cmd-bksp":
         subprocess.check_call(
             ["open", "/System/Library/CoreServices/ScreenSaverEngine.app"]
         ),
@@ -78,16 +80,4 @@ def screensaver_hotkey(_, e):
     return True
 
 
-tap.register(tap.HOOK | tap.KEY, screensaver_hotkey)
-
-
-# Default to krisp on startup, if present.
-def _use_krisp():
-    # noinspection PyUnresolvedReferences
-    mics = {i.name: i for i in list(microphone.manager.menu.items)}
-    krisp = "krisp microphone"
-    if krisp in mics:
-        microphone.manager.menu_click(mics[krisp])
-
-
-_use_krisp()
+tap.register(tap.HOOK | tap.KEY, misc_hotkey)

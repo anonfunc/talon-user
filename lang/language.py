@@ -110,7 +110,7 @@ ctx.keymap(
         "state comment": i("# "),
         "[line] comment <dgndictation> [over]": [
             Key("cmd-right"),
-            i("  # "),
+            i("# "),
             formatted_text(SENTENCE),
         ],
         # "add comment <dgndictation> [over]": [
@@ -191,7 +191,7 @@ ctx.keymap(
         "state comment": i("// "),
         "[line] comment <dgndictation>": [
             Key("cmd-right"),
-            i(" // "),
+            i("// "),
             formatted_text(SENTENCE),
         ],
         # "add comment <dgndictation> [over]": [

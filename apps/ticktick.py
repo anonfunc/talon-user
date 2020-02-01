@@ -7,16 +7,16 @@ globalctx.keymap(
     {
         # Rebound, conflicted with Jetbrains action search
         "quick task [<dgndictation>] [over]": [
-            Key("shift-alt-cmd-a"),
+            Key("shift-alt-cmd-ctrl-a"),
             utils.delay(0.2),
             utils.text,
         ],
         # Rebound, didn't trust it
-        "toggle tick mini": [Key("shift-alt-cmd-o")],
+        "toggle tick mini": [Key("shift-alt-cmd-ctrl-o")],
         # Rebound, didn't trust it
-        "toggle tick main": [Key("shift-alt-cmd-e")],
+        "toggle tick main": [Key("shift-alt-cmd-ctrl-e")],
         # Rebound, didn't trust it
-        "toggle tick pomo": [Key("shift-alt-cmd-p")],
+        "toggle tick pomo": [Key("shift-alt-cmd-ctrl-p")],
     }
 )
 

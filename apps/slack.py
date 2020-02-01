@@ -65,7 +65,7 @@ def emoji_reaction_formatter(m):
 ctx = Context("slack", bundle="com.tinyspeck.slackmacgap")
 ctx.keymap(
     {
-        "next": [Key("f6")],
+        "focus next": [Key("f6")],
         "jump [<dgndictation>]": [Key("cmd-k"), text],
         "go (dm's | direct messages | messages)": Key("cmd-shift-k"),
         "go (and read | unread)": Key("cmd-shift-a"),

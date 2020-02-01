@@ -485,6 +485,11 @@ def build_text_action_keymap():
 
 keymap = build_text_action_keymap()
 
+
+# Finding action names:
+# https://github.com/JetBrains/intellij-community/blob/master/platform/platform-resources-en/src/messages/ActionsBundle.properties
+# Setting a hotkey or abbrev, then pulling it out of the xml files.
+
 # group = ContextGroup("jetbrains")
 ctx = Context("jetbrains", func=is_real_jetbrains_editor)  # , group=group)
 keymap.update(
@@ -703,21 +708,21 @@ keymap.update(
         "jet menu": idea("action Vcs.QuickListPopupAction"),
         # Tool windows:
         # Toggling various tool windows
-        "toggle project": idea("action ActivateProjectToolWindow"),
-        "toggle find": idea("action ActivateFindToolWindow"),
-        "toggle run": idea("action ActivateRunToolWindow"),
-        "toggle debug": idea("action ActivateDebugToolWindow"),
-        "toggle events": idea("action ActivateEventLogToolWindow"),
-        "toggle terminal": idea("action ActivateTerminalToolWindow"),
-        "toggle jet": idea("action ActivateVersionControlToolWindow"),
-        "toggle structure": idea("action ActivateStructureToolWindow"),
-        "toggle database": idea("action ActivateDatabaseToolWindow"),
-        "toggle database changes": idea("action ActivateDatabaseChangesToolWindow"),
-        "toggle make": idea("action ActivatemakeToolWindow"),
-        "toggle to do": idea("action ActivateTODOToolWindow"),
-        "toggle docker": idea("action ActivateDockerToolWindow"),
-        "toggle favorites": idea("action ActivateFavoritesToolWindow"),
-        "toggle last": idea("action JumpToLastWindow"),
+        "(toggle | focus) project": idea("action ActivateProjectToolWindow"),
+        "(toggle | focus) find": idea("action ActivateFindToolWindow"),
+        "(toggle | focus) run": idea("action ActivateRunToolWindow"),
+        "(toggle | focus) debug": idea("action ActivateDebugToolWindow"),
+        "(toggle | focus) events": idea("action ActivateEventLogToolWindow"),
+        "(toggle | focus) terminal": idea("action ActivateTerminalToolWindow"),
+        "(toggle | focus) jet": idea("action ActivateVersionControlToolWindow"),
+        "(toggle | focus) structure": idea("action ActivateStructureToolWindow"),
+        "(toggle | focus) database": idea("action ActivateDatabaseToolWindow"),
+        "(toggle | focus) database changes": idea("action ActivateDatabaseChangesToolWindow"),
+        "(toggle | focus) make": idea("action ActivatemakeToolWindow"),
+        "(toggle | focus) to do": idea("action ActivateTODOToolWindow"),
+        "(toggle | focus) docker": idea("action ActivateDockerToolWindow"),
+        "(toggle | focus) favorites": idea("action ActivateFavoritesToolWindow"),
+        "(toggle | focus) last": idea("action JumpToLastWindow"),
         # Pin/dock/float
         "toggle pinned": idea("action TogglePinnedMode"),
         "toggle docked": idea("action ToggleDockMode"),
@@ -768,9 +773,11 @@ keymap.update(
         "toggle [line] breakpoint": idea("action ToggleLineBreakpoint"),
         "toggle method breakpoint": idea("action ToggleMethodBreakpoint"),
         "step over": idea("action StepOver"),
+        "step out": idea("action StepOut"),
         "step into": idea("action StepInto"),
         "step smart": idea("action SmartStepInto"),
         "step to line": idea("action RunToCursor"),
+        "resume program": idea("action Resume"),
         # Grow / Shrink
         "(grow | shrink) window right": idea("action ResizeToolWindowRight"),
         "(grow | shrink) window left": idea("action ResizeToolWindowLeft"),

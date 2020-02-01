@@ -71,6 +71,7 @@ def select_text_to_left_of_cursor(m):
         return
     key = utils.join_words(words).lower()
     keys = homophone_lookup.get(key, [key])
+    keys = sorted(keys, key=len, reverse=True)
     press("left", wait=2000)
     press("right", wait=2000)
     press("shift-home", wait=2000)
