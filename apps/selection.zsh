@@ -128,9 +128,15 @@ for key kcap seq mode widget (
     yank    x       $'^y' deselect yank
   ) {
   eval "key-$key() r-$mode $widget"
-  zle -N key-$key
+  zle -N key-$key 
   bindkey ${terminfo[$kcap]-$seq} key-$key
 }
 
 zle_highlight=(region:bg=blue special:standout
               suffix:bold isearch:underline paste:bold)
+
+if [[ ${+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS} == 1 ]]
+then
+  ZSH_AUTOSUGGEST_ACCEPT_WIDGETS+=(key-right key-right2 key-end key-end2 key-end3)
+  ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(key-cright key-cright2)
+fi
