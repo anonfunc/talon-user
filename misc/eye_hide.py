@@ -58,6 +58,9 @@ class EyeHide:
             self.show = show
 
 
-hide = EyeHide()
-if not control_mouse.enabled:
-    ctrl.cursor_visible(True)
+try:
+    hide = EyeHide()
+    if not control_mouse.enabled:
+        ctrl.cursor_visible(True)
+except AttributeError:
+    pass

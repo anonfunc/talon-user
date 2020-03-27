@@ -30,7 +30,7 @@ PSI_PATHS = {
         "+": [", space", None],
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,PARAMETERS,PARAMETER_DECLARATION",
         "java": "METHOD|FUNCTION,^PARAMETER_LIST,PARAMETER",
-        "py": "FILE,FUNCTION_DECLARATION,PARAMETER",
+        "py": "FUNCTION_DECLARATION,PARAMETER",
         "php": "Class method|function|Function,Parameter list,Parameter",
         "default": "DECLARATION,PARAMETER",
     },
@@ -38,14 +38,14 @@ PSI_PATHS = {
         "_": 0,  # You probably want the first parameter of the current function
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,PARAMETERS,PARAMETER_DECLARATION##,PARAM_DEFINITION",
         "java": "METHOD|FUNCTION,^PARAMETER_LIST,PARAMETER##,IDENTIFIER",
-        "py": "FILE,FUNCTION_DECLARATION,PARAMETER##,IDENTIFIER",
+        "py": "FUNCTION_DECLARATION,PARAMETER##,IDENTIFIER",
         "php": "Class method|function|Function,Parameter list,Parameter",
     },
     "parameter type": {
         "_": 0,  # You probably want the first parameter of the current function
         "go": "METHOD_DECLARATION|FUNCTION_DECLARATION,PARAMETERS,PARAMETER_DECLARATION##,TYPE",
         "java": "METHOD|FUNCTION,^PARAMETER_LIST,PARAMETER##,TYPE,IDENTIFIER",
-        "py": "FILE,FUNCTION_DECLARATION,PARAMETER##,ANNOTATION,EXPRESSION",
+        "py": "FUNCTION_DECLARATION,PARAMETER##,ANNOTATION,EXPRESSION",
     },
     "import": {
         "_": 0, # You probably want the first import of the current file

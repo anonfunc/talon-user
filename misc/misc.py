@@ -3,7 +3,7 @@ import subprocess
 import talon.clip as clip
 from talon.voice import Context, Key, press
 
-from talon import applescript, keychain, tap, ui
+from talon import keychain, tap, ui
 from ..utils import add_vocab, delay, select_last_insert, text
 
 
@@ -47,8 +47,8 @@ ctx.keymap(
         # Bartender needed for this one
         "menu search": Key("ctrl-shift-f8"),
         # Different input volume levels
-        "input volume high": lambda _: applescript.run("set volume input volume 90"),
-        "input volume low": lambda _: applescript.run("set volume input volume 30"),
+        # "input volume high": lambda _: set_input_volume(90),
+        # "input volume low": lambda _: set_input_volume(30),
     }
 )
 
@@ -56,7 +56,7 @@ ctx = Context("shortcat")
 ctx.keymap(
     {
         "(shortcat | short cap | shortcut) [<dgndictation>]": [
-            Key("cmd+shift+ctrl+f14"),
+            Key("cmd+shift+ctrl+alt+n"),
             text,
         ]
     }

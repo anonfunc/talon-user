@@ -3,8 +3,9 @@ import os
 import re
 import string
 import time
+import typing as t
 
-from talon import resource, cron, ctrl
+from talon import applescript, resource, cron, ctrl
 from talon.voice import Str, press
 from talon_plugins import eye_mouse, eye_zoom_mouse, microphone
 
@@ -244,3 +245,13 @@ def use_mic(mic_name):
     mics = {i.name: i for i in list(microphone.manager.menu.items)}
     if mic_name in mics:
         microphone.manager.menu_click(mics[mic_name])
+
+def mic_uses_volume(settings: t.Dict[str, int]):
+    mics = {i.name: i for i in list(microphone.manager.menu.items)}
+    for m in settings:
+        if m in mics:
+            set_input_volume(settings[m])
+
+
+def set_input_volume(m: int):
+    applescript.run(f"set volume input volume {m}")

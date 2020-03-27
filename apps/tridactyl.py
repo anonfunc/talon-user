@@ -2,7 +2,7 @@ from talon.ui import active_app
 from talon.voice import Context, Key
 
 from ..utils import delay, text
-enabled = False
+enabled = True
 
 
 def is_tridactyl(app, _):

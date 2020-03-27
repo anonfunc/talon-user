@@ -3,7 +3,7 @@ from talon.voice import Context, Key
 
 from ..utils import delay, text
 
-enabled = True
+enabled = False
 
 
 def is_firefox(app, _):

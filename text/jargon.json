@@ -23,5 +23,6 @@
   "unsigned": "u",
   "weight": "wait",
   "strength": "string",
-  "air": "err"
+  "air": "err",
+  "the attacks": "mutex"
 }

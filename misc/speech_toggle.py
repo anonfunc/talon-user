@@ -49,10 +49,18 @@ def sleep_hotkey(typ, e):
     # print(e)
     if e == 'cmd-alt-ctrl-shift-tab' and e.down:
         speech.set_enabled(not speech.talon.enabled)
-        if microphone.manager.active_mic() is None:
-            utils.use_mic("krisp microphone")
-        if not engine.endpoint:
-            ui.launch(bundle="com.dragon.dictate")
+        if speech.talon.enabled:
+            if microphone.manager.active_mic() is None:
+                utils.use_mic("krisp microphone")
+            utils.mic_uses_volume({
+                "Plantronics Blackwire 435": 100,
+                "ATR2USB": 80,
+                "AndreaMA": 35,
+            })
+            if not engine.endpoint:
+                ui.launch(bundle="com.dragon.dictate")
+        else:
+            utils.set_input_volume(0)  # Fallback, only override with present mic.
         e.block()
     return True
 
